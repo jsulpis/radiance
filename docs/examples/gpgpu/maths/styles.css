@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  width: 100svw;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: black;
+  color: white;
+  font-family: sans-serif;
+}
+
+canvas {
+  display: none;
+}
+
+table {
+  font-size: 2rem;
+  border-spacing: 1em 0.5em;
+}
+
+#gpu,
+#cpu {
+  width: 12ch;
+}
