@@ -19,20 +19,25 @@ export function watchBoundingRect(target: HTMLElement, params: WatchBoundingRect
     left: 0,
     x: 0,
     y: 0,
+    center: {
+      x: 0,
+      y: 0,
+    },
   };
-
-  const center = { x: 0, y: 0 };
 
   function update() {
     const newRect = target.getBoundingClientRect();
 
-    // update the rect object instead of reassagning to allow destructuring the output of the function
-    for (const key of Object.keys(rect) as Array<keyof typeof rect>) {
+    const boundingRectKeys = Object.keys(rect).filter((key) => key !== "center") as Array<
+      keyof Omit<BoundingRect, "center">
+    >;
+
+    for (const key of boundingRectKeys) {
       rect[key] = newRect[key];
     }
 
-    center.x = (rect.left + rect.right) / 2;
-    center.y = (rect.top + rect.bottom) / 2;
+    rect.center.x = (rect.left + rect.right) / 2;
+    rect.center.y = (rect.top + rect.bottom) / 2;
   }
 
   onResize(target, update);
@@ -40,10 +45,7 @@ export function watchBoundingRect(target: HTMLElement, params: WatchBoundingRect
   if (windowScroll) window.addEventListener("scroll", update, { capture: true, passive: true });
   if (windowResize) window.addEventListener("resize", update, { passive: true });
 
-  return {
-    rect: rect as Readonly<typeof rect>,
-    center: center as Readonly<typeof center>,
-  };
+  return rect as Readonly<BoundingRect>;
 }
 
 /**
@@ -76,4 +78,8 @@ export type BoundingRect = {
   left: number;
   x: number;
   y: number;
+  center: {
+    x: number;
+    y: number;
+  };
 };

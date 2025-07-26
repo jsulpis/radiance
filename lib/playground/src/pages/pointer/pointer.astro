@@ -31,10 +31,10 @@ import Layout from "../../layouts/Layout.astro";
   });
 
   onPointerEvents(canvas, {
-    move: ({ pointer, canvasCenter, canvasRect }) => {
+    move: ({ pointer, boundingRect }) => {
       uniforms.uPointerPosition = [
-        (pointer.x - canvasCenter.x) / Math.min(canvasRect.width, canvasRect.height),
-        (canvasCenter.y - pointer.y) / Math.min(canvasRect.width, canvasRect.height),
+        (pointer.x - boundingRect.center.x) / Math.min(boundingRect.width, boundingRect.height),
+        (boundingRect.center.y - pointer.y) / Math.min(boundingRect.width, boundingRect.height),
       ];
     },
     down: () => {

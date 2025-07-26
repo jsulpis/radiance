@@ -1,10 +1,11 @@
+import type { BoundingRect } from "./watchBoundingRect";
 import { watchBoundingRect } from "./watchBoundingRect";
 
 /**
  * Listen to pointer events on a canvas and provide the pointer position, canvas bounding rect and center to the handlers.
  */
-export function onPointerEvents(canvas: HTMLCanvasElement, handlers: PointerEventsHandlers) {
-  const { rect: canvasRect, center: canvasCenter } = watchBoundingRect(canvas);
+export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHandlers) {
+  const boundingRect = watchBoundingRect(element);
 
   const activeHandlers = Object.fromEntries(
     Object.entries(handlers)
@@ -14,8 +15,7 @@ export function onPointerEvents(canvas: HTMLCanvasElement, handlers: PointerEven
         (e: PointerEvent) => {
           handlerFunction({
             pointer: { x: e.clientX, y: e.clientY },
-            canvasRect,
-            canvasCenter,
+            boundingRect,
           });
         },
       ]),
@@ -23,7 +23,7 @@ export function onPointerEvents(canvas: HTMLCanvasElement, handlers: PointerEven
 
   function listen() {
     for (const [event, handler] of Object.entries(activeHandlers)) {
-      canvas.addEventListener(`pointer${event as keyof PointerEventsHandlers}`, handler, {
+      element.addEventListener(`pointer${event as keyof PointerEventsHandlers}`, handler, {
         passive: true,
       });
     }
@@ -31,7 +31,7 @@ export function onPointerEvents(canvas: HTMLCanvasElement, handlers: PointerEven
 
   function stop() {
     for (const [event, handler] of Object.entries(activeHandlers)) {
-      canvas.removeEventListener(`pointer${event as keyof PointerEventsHandlers}`, handler);
+      element.removeEventListener(`pointer${event as keyof PointerEventsHandlers}`, handler);
     }
   }
 
@@ -57,18 +57,5 @@ export type HandlerArgs = {
     x: number;
     y: number;
   };
-  canvasRect: {
-    width: number;
-    height: number;
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-    x: number;
-    y: number;
-  };
-  canvasCenter: {
-    x: number;
-    y: number;
-  };
+  boundingRect: BoundingRect;
 };

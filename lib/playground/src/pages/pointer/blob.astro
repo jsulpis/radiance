@@ -23,9 +23,9 @@ import Layout from "../../layouts/Layout.astro";
   const targetPointer = { x: 0, y: 0 };
 
   onPointerEvents(canvas, {
-    move: ({ pointer, canvasRect, canvasCenter }) => {
-      targetPointer.x = (pointer.x - canvasCenter.x) / (canvasRect.width / 2);
-      targetPointer.y = (canvasCenter.y - pointer.y) / (canvasRect.height / 2);
+    move: ({ pointer, boundingRect }) => {
+      targetPointer.x = (pointer.x - boundingRect.center.x) / (boundingRect.width / 2);
+      targetPointer.y = (boundingRect.center.y - pointer.y) / (boundingRect.height / 2);
     },
     leave: () => {
       targetPointer.x = targetPointer.y = 0;
@@ -41,7 +41,7 @@ import Layout from "../../layouts/Layout.astro";
         currentPointerCoord.y + (targetPointer.y - currentPointerCoord.y) * 0.05,
       ];
     },
-    { immediate: false }
+    { immediate: false },
   );
 
   onAfterRender(incrementRenderCount);
