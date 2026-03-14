@@ -1,6 +1,7 @@
 import type { Uniforms } from "../types/types";
 import { renderPass, type RenderPassParams } from "./renderPass";
 import { findAttributeName, findVaryingName } from "../internal/findName";
+import quadVertexShaderSource from "./quadVertexShader.glsl";
 
 /**
  * Creates a render pass that renders a full-screen quad (actually a single large triangle for performance reasons, see [here](https://github.com/pmndrs/postprocessing?tab=readme-ov-file#performance) and [here](https://michaldrobot.com/2014/04/01/gcn-execution-patterns-in-full-screen-passes/)).
@@ -17,10 +18,7 @@ export function quadRenderPass<U extends Uniforms>(
   const uvVaryingName = findVaryingName(fragment, "uv");
 
   const vertexShader =
-    vertex ||
-    (uvVaryingName
-      ? quadVertexShaderSource.replace(/\bvUv\b/g, uvVaryingName)
-      : quadVertexShaderSource);
+    vertex || quadVertexShaderSource.replace(/(\bvUv\b)/g, uvVaryingName || "$1");
 
   const hasPositionAttribute = Object.keys(attributes).some((attributeName) =>
     attributeName.toLocaleLowerCase().endsWith("position"),
@@ -43,16 +41,6 @@ export function quadRenderPass<U extends Uniforms>(
     vertex: vertexShader,
   });
 }
-
-const quadVertexShaderSource = /*glsl*/ `#version 300 es
-in vec2 aPosition;
-out vec2 vUv;
-
-void main() {
-  gl_Position = vec4(aPosition, 0.0, 1.0);
-  vUv = (aPosition + 1.0) / 2.0;
-}
-`;
 
 /**
  * 1 big triangle filling the canvas offers better performance than 2 triangles :
