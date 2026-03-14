@@ -42,7 +42,7 @@ function convertToGLSL300(shader: string): string {
 
   if (shader.includes("gl_FragColor")) {
     // Fragment shader
-    glsl300Shader = "out vec4 fragColor;\n" + glsl300Shader;
+    glsl300Shader = glsl300Shader.replace(/\s*void\s+main/, "out vec4 fragColor;void main");
     glsl300Shader = glsl300Shader
       .replace(/\bvarying\b/g, "in")
       .replace(/\bgl_FragColor\b/g, "fragColor");
@@ -53,7 +53,7 @@ function convertToGLSL300(shader: string): string {
 
   const precisionRegex = /precision\s+(highp|mediump|lowp)\s+float\s*;/;
   if (!precisionRegex.test(glsl300Shader)) {
-    glsl300Shader = glsl300Shader.replace(/^(#version 300 es)?/, "$1\nprecision highp float;\n");
+    glsl300Shader = glsl300Shader.replace(/^(#version 300 es)?/, "$1\nprecision highp float;");
   }
 
   if (!shader.startsWith("#version")) {
