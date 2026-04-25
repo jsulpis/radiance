@@ -1,16 +1,18 @@
 .example-page {
-  --vp-padding: 24px;
-  --wrapper-width: calc(100svw - var(--vp-sidebar-width) - 2 * var(--vp-padding));
-  --wrapper-height: calc(
-    100svh - var(--vp-nav-height) - var(--vp-subnav-height, 0px) - 2 * var(--vp-padding)
-  );
-
   // full width page
   --vp-layout-max-width: 100%;
   .content-container,
   .container {
     max-width: 100% !important;
   }
+}
+
+:root {
+  --vp-padding: 24px;
+  --wrapper-width: calc(100svw - var(--vp-sidebar-width) - 2 * var(--vp-padding));
+  --wrapper-height: calc(
+    100svh - var(--vp-nav-height) - var(--vp-subnav-height, 0px) - 2 * var(--vp-padding)
+  );
 
   @media (width < 960px) {
     --vp-sidebar-width: 0px;
@@ -80,8 +82,13 @@
   }
 
   .sp-wrapper {
+    --sp-border-radius: 8px;
     width: var(--wrapper-width) !important;
     height: var(--wrapper-height) !important;
+  }
+
+  &.dark .sp-wrapper {
+    color-scheme: dark;
   }
 
   .sp-layout {
@@ -131,6 +138,14 @@
     span {
       display: none;
     }
+  }
+}
+
+:root.dark {
+  --vp-c-bg: black;
+
+  .sp-preview-iframe {
+    background: black;
   }
 }
 

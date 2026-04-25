@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
 
     <p class="bundle-graph__legend">
       <span><strong>weight</strong> = gzip size</span>
-      <span><strong>sloc</strong> = source lines of code</span>
+      <span><strong>sloc</strong> = source lines of code (JS) to render the shader</span>
     </p>
     <p class="bundle-graph__meta">
       Updated {{ generatedAt }}. See the

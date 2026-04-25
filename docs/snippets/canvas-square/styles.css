@@ -1,6 +1,9 @@
+html {
+  color-scheme: light dark;
+}
+
 body {
   margin: 0;
-  background: black;
   height: 100svh;
   display: grid;
   place-items: center;
@@ -11,5 +14,5 @@ canvas {
   aspect-ratio: 1;
   display: block;
   border-radius: 8px;
-  border: 1px solid #555;
+  border: 1px solid rgb(128 128 128 / 0.4);
 }
