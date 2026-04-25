@@ -182,18 +182,9 @@ function printTable(results: AppResult[]) {
 
 function toDocsBundleData(results: AppResult[], generatedAt: string) {
   const metric = "gzipBytes" as const;
-  const radiance = results.find((result) => result.id === "radiance");
-  const largestValue = Math.max(...results.map((result) => result[metric]));
-
-  if (!radiance) {
-    throw new Error("Missing @radiancejs/gl result.");
-  }
 
   return {
     generatedAt,
-    metric,
-    metricLabel: "Gzip size",
-    scenario: "Production JS bundle for the same fullscreen shader benchmark.",
     items: [...results]
       .sort((a, b) => a[metric] - b[metric])
       .map((result) => ({
@@ -201,17 +192,13 @@ function toDocsBundleData(results: AppResult[], generatedAt: string) {
         label: result.name,
         version: result.version,
         sloc: result.sloc,
-        value: result[metric],
-        formatted: formatBytes(result[metric]),
-        widthPercent: Number(((result[metric] / largestValue) * 100).toFixed(2)),
-        relativeToRadiance: Number((result[metric] / radiance[metric]).toFixed(1)),
-        highlight: result.id === "radiance",
+        gzip: formatBytes(result[metric]),
       })),
   };
 }
 
 function formatBytes(bytes: number) {
-  return `${(bytes / 1024).toFixed(2)} kB`;
+  return Number((bytes / 1024).toFixed(2));
 }
 
 async function loadAppVersions() {
