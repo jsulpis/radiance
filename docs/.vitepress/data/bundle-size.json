@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-04-25T14:25:34.260Z",
+  "metric": "gzipBytes",
+  "metricLabel": "Gzip size",
+  "scenario": "Production JS bundle for the same fullscreen shader benchmark.",
+  "items": [
+    {
+      "id": "vanilla",
+      "label": "vanilla WebGL",
+      "version": "",
+      "sloc": 68,
+      "value": 828,
+      "formatted": "0.81 kB",
+      "widthPercent": 0.67,
+      "relativeToRadiance": 0.2,
+      "highlight": false
+    },
+    {
+      "id": "radiance",
+      "label": "@radiancejs/gl",
+      "version": "0.10.0",
+      "sloc": 5,
+      "value": 5482,
+      "formatted": "5.35 kB",
+      "widthPercent": 4.46,
+      "relativeToRadiance": 1,
+      "highlight": true
+    },
+    {
+      "id": "twgl",
+      "label": "twgl.js",
+      "version": "7.0.0",
+      "sloc": 36,
+      "value": 6546,
+      "formatted": "6.39 kB",
+      "widthPercent": 5.33,
+      "relativeToRadiance": 1.2,
+      "highlight": false
+    },
+    {
+      "id": "ogl",
+      "label": "ogl",
+      "version": "1.0.11",
+      "sloc": 29,
+      "value": 13147,
+      "formatted": "12.84 kB",
+      "widthPercent": 10.71,
+      "relativeToRadiance": 2.4,
+      "highlight": false
+    },
+    {
+      "id": "three",
+      "label": "three",
+      "version": "0.183.2",
+      "sloc": 40,
+      "value": 122803,
+      "formatted": "119.92 kB",
+      "widthPercent": 100,
+      "relativeToRadiance": 22.4,
+      "highlight": false
+    }
+  ]
+}
