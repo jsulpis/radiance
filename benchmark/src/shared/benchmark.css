@@ -1,0 +1,50 @@
+:root {
+  color-scheme: light;
+  font-family: "Iosevka Etoile", "IBM Plex Mono", monospace;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.85), transparent 38%),
+    linear-gradient(160deg, #f3eadc 0%, #dde8ef 55%, #bfd2dd 100%);
+  color: #18202b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+.benchmark-badge {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(24, 32, 43, 0.12);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1rem 2rem rgba(24, 32, 43, 0.08);
+  line-height: 1.25;
+}
+
+.benchmark-badge strong {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.benchmark-badge span {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.95rem;
+}

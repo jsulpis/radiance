@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-04-25T14:26:32.571Z",
+  "results": [
+    {
+      "id": "radiance",
+      "name": "@radiancejs/gl",
+      "version": "0.10.0",
+      "sloc": 5,
+      "outputDir": "dist/radiance",
+      "rawBytes": 13946,
+      "gzipBytes": 5482,
+      "brotliBytes": 4942,
+      "jsFiles": [
+        {
+          "file": "dist/radiance/assets/radiance.js",
+          "rawBytes": 13946,
+          "gzipBytes": 5482,
+          "brotliBytes": 4942
+        }
+      ]
+    },
+    {
+      "id": "three",
+      "name": "three",
+      "version": "0.183.2",
+      "sloc": 40,
+      "outputDir": "dist/three",
+      "rawBytes": 486259,
+      "gzipBytes": 122803,
+      "brotliBytes": 101027,
+      "jsFiles": [
+        {
+          "file": "dist/three/assets/three.js",
+          "rawBytes": 486259,
+          "gzipBytes": 122803,
+          "brotliBytes": 101027
+        }
+      ]
+    },
+    {
+      "id": "ogl",
+      "name": "ogl",
+      "version": "1.0.11",
+      "sloc": 29,
+      "outputDir": "dist/ogl",
+      "rawBytes": 44905,
+      "gzipBytes": 13147,
+      "brotliBytes": 11037,
+      "jsFiles": [
+        {
+          "file": "dist/ogl/assets/ogl.js",
+          "rawBytes": 44905,
+          "gzipBytes": 13147,
+          "brotliBytes": 11037
+        }
+      ]
+    },
+    {
+      "id": "twgl",
+      "name": "twgl.js",
+      "version": "7.0.0",
+      "sloc": 36,
+      "outputDir": "dist/twgl",
+      "rawBytes": 19711,
+      "gzipBytes": 6546,
+      "brotliBytes": 5854,
+      "jsFiles": [
+        {
+          "file": "dist/twgl/assets/twgl.js",
+          "rawBytes": 19711,
+          "gzipBytes": 6546,
+          "brotliBytes": 5854
+        }
+      ]
+    },
+    {
+      "id": "vanilla",
+      "name": "vanilla WebGL",
+      "version": "",
+      "sloc": 68,
+      "outputDir": "dist/vanilla",
+      "rawBytes": 1642,
+      "gzipBytes": 828,
+      "brotliBytes": 712,
+      "jsFiles": [
+        {
+          "file": "dist/vanilla/assets/vanilla.js",
+          "rawBytes": 1642,
+          "gzipBytes": 828,
+          "brotliBytes": 712
+        }
+      ]
+    }
+  ]
+}
