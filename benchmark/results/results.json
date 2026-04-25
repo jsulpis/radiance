@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-25T14:26:32.571Z",
+  "generatedAt": "2026-04-25T16:10:27.979Z",
   "results": [
     {
       "id": "radiance",
@@ -23,17 +23,17 @@
       "id": "three",
       "name": "three",
       "version": "0.183.2",
-      "sloc": 40,
+      "sloc": 39,
       "outputDir": "dist/three",
-      "rawBytes": 486259,
-      "gzipBytes": 122803,
-      "brotliBytes": 101027,
+      "rawBytes": 486253,
+      "gzipBytes": 122797,
+      "brotliBytes": 100803,
       "jsFiles": [
         {
           "file": "dist/three/assets/three.js",
-          "rawBytes": 486259,
-          "gzipBytes": 122803,
-          "brotliBytes": 101027
+          "rawBytes": 486253,
+          "gzipBytes": 122797,
+          "brotliBytes": 100803
         }
       ]
     },
@@ -61,14 +61,14 @@
       "version": "7.0.0",
       "sloc": 36,
       "outputDir": "dist/twgl",
-      "rawBytes": 19711,
-      "gzipBytes": 6546,
+      "rawBytes": 19712,
+      "gzipBytes": 6547,
       "brotliBytes": 5854,
       "jsFiles": [
         {
           "file": "dist/twgl/assets/twgl.js",
-          "rawBytes": 19711,
-          "gzipBytes": 6546,
+          "rawBytes": 19712,
+          "gzipBytes": 6547,
           "brotliBytes": 5854
         }
       ]
@@ -79,15 +79,15 @@
       "version": "",
       "sloc": 68,
       "outputDir": "dist/vanilla",
-      "rawBytes": 1642,
-      "gzipBytes": 828,
-      "brotliBytes": 712,
+      "rawBytes": 1643,
+      "gzipBytes": 829,
+      "brotliBytes": 713,
       "jsFiles": [
         {
           "file": "dist/vanilla/assets/vanilla.js",
-          "rawBytes": 1642,
-          "gzipBytes": 828,
-          "brotliBytes": 712
+          "rawBytes": 1643,
+          "gzipBytes": 829,
+          "brotliBytes": 713
         }
       ]
     }
