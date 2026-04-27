@@ -102,6 +102,7 @@ void main() {
 ```
 
 <<< @/snippets/canvas-full/styles.css
+
 <<< @/snippets/default/index.html
 
 :::
@@ -119,8 +120,11 @@ Radiance automatically re-renders the canvas when uniforms are updated, or when 
 ::: example-editor {deps=tweakpane@^4.0.5}
 
 <<< ./examples/basics/uniforms/index.ts
+
 <<< ./examples/basics/uniforms/uniforms.frag
+
 <<< @/snippets/canvas-full/styles.css
+
 <<< @/snippets/render-count/index.html
 
 :::

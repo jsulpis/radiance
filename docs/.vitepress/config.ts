@@ -3,6 +3,7 @@ import { groupIconMdPlugin, groupIconVitePlugin } from "vitepress-plugin-group-i
 import container from "markdown-it-container";
 import { renderSandbox } from "vitepress-plugin-sandpack";
 import { withMermaid } from "vitepress-plugin-mermaid";
+import llmstxt from "vitepress-plugin-llms";
 import { apiSidebar, examplesSidebar } from "./sidebars";
 import pkg from "../../lib/package.json";
 
@@ -115,8 +116,28 @@ const config = defineConfig({
 
   outDir: "dist",
 
+  srcExclude: ["AGENTS.md"],
+
   vite: {
-    plugins: [groupIconVitePlugin()],
+    plugins: [
+      groupIconVitePlugin(),
+      llmstxt({
+        customLLMsTxtTemplate: `# {title}
+
+{description} {details}
+
+You can find below three groups of links:
+
+1. User guides to get started with the library and learn how to use it
+2. Code samples for different use cases (starting from "### Basics")
+3. Documentation of the API: functions, types etc (starting from "### Core")
+
+## Table of Contents
+
+{toc}`,
+        ignoreFiles: ["api/*/*", "api/index.md", "AGENTS.md"],
+      }),
+    ],
     css: {
       preprocessorOptions: {
         scss: {
