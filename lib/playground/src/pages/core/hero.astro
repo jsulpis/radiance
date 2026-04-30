@@ -21,6 +21,7 @@ import Layout from "../../layouts/Layout.astro";
   const eyesHappyAnimations = document.querySelectorAll<SVGAnimateElement>(".eyes .happy");
   const mouseLaughAnimations = document.querySelectorAll<SVGAnimateElement>(".mouse .laugh");
   const mouseHappyAnimations = document.querySelectorAll<SVGAnimateElement>(".mouse .happy");
+  const pointerZone = document.querySelector<HTMLElement>("#pointerZone")!;
   const faceGroup = document.querySelector<SVGGElement>("#face")!;
   const eyesGroup = document.querySelector<SVGGElement>("#eyesGroup")!;
   const mouthGroup = document.querySelector<SVGGElement>("#mouthGroup")!;
@@ -73,7 +74,7 @@ import Layout from "../../layouts/Layout.astro";
     setInterval(blink, 5000);
   }, 1500);
 
-  onPointerEvents(canvas as HTMLElement, {
+  onPointerEvents(pointerZone, {
     move: ({ pointer, boundingRect }) => {
       const pointerDirection = {
         x: pointer.x - boundingRect.center.x,
@@ -165,6 +166,7 @@ import Layout from "../../layouts/Layout.astro";
 <Layout title="Hero">
   <div class="container">
     <canvas id="glCanvas"></canvas>
+    <div id="pointerZone" class="pointer-zone" aria-hidden="true"></div>
 
     <svg
       width="494"
@@ -291,6 +293,11 @@ import Layout from "../../layouts/Layout.astro";
   canvas {
     width: 100%;
     border: none;
+  }
+
+  .pointer-zone {
+    position: absolute;
+    inset: -20%;
   }
 
   svg {
