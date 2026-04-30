@@ -21,10 +21,24 @@ import Layout from "../../layouts/Layout.astro";
   const eyesHappyAnimations = document.querySelectorAll<SVGAnimateElement>(".eyes .happy");
   const mouseLaughAnimations = document.querySelectorAll<SVGAnimateElement>(".mouse .laugh");
   const mouseHappyAnimations = document.querySelectorAll<SVGAnimateElement>(".mouse .happy");
+  const faceGroup = document.querySelector<SVGGElement>("#face")!;
+  const eyesGroup = document.querySelector<SVGGElement>("#eyesGroup")!;
+  const mouthGroup = document.querySelector<SVGGElement>("#mouthGroup")!;
+  const leftEyeHighlight = document.querySelector<SVGGElement>("#leftEyeHighlight")!;
+  const rightEyeHighlight = document.querySelector<SVGGElement>("#rightEyeHighlight")!;
+
+  const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
+  const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 
   let targetHappyCursor = 0;
   let eyesState: "happy" | "laugh" = "happy";
   let mouseState: "happy" | "laugh" = "happy";
+  let pointerOffset = { x: 0, y: 0 };
+  let targetFaceOffset = { x: 0, y: 0 };
+  let faceOffset = { x: 0, y: 0 };
+  let eyesOffset = { x: 0, y: 0 };
+  let mouthOffset = { x: 0, y: 0 };
+  let highlightOffset = { x: 0, y: 0 };
 
   const eyesLaugh = () => {
     eyesLaughAnimations.forEach((el) => el.beginElement());
@@ -59,19 +73,22 @@ import Layout from "../../layouts/Layout.astro";
     setInterval(blink, 5000);
   }, 1500);
 
-  const faceGroup = document.querySelector("g")!;
-
   onPointerEvents(canvas as HTMLElement, {
     move: ({ pointer, boundingRect }) => {
       const pointerDirection = {
         x: pointer.x - boundingRect.center.x,
         y: pointer.y - boundingRect.center.y,
       };
+      const normalizedPointer = {
+        x: clamp(pointerDirection.x / (boundingRect.width * 0.5), -1, 1),
+        y: clamp(pointerDirection.y / (boundingRect.height * 0.5), -1, 1),
+      };
 
-      faceGroup.setAttribute(
-        "transform",
-        `translate(${pointerDirection.x / 25}, ${pointerDirection.y / 25})`,
-      );
+      pointerOffset = normalizedPointer;
+      targetFaceOffset = {
+        x: 0 + normalizedPointer.x * 8,
+        y: 0 + normalizedPointer.y * 6,
+      };
 
       const distToCenter = Math.sqrt(pointerDirection.x ** 2 + pointerDirection.y ** 2);
       const relativeDistance = distToCenter / ((canvas as HTMLCanvasElement).clientWidth / 2);
@@ -90,8 +107,8 @@ import Layout from "../../layouts/Layout.astro";
       }
     },
     leave: () => {
-      faceGroup.setAttribute("transform", `translate(-10, 10)`);
-
+      pointerOffset = { x: 0, y: 0 };
+      targetFaceOffset = { x: 0, y: 0 };
       targetHappyCursor = 0;
       if (eyesState === "laugh") {
         eyesHappy();
@@ -102,9 +119,42 @@ import Layout from "../../layouts/Layout.astro";
     },
   });
 
-  const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
-
   loop(({ deltaTime }) => {
+    const smoothing = clamp(1 - Math.exp(-deltaTime / 120), 0, 1);
+    const followSmoothing = clamp(1 - Math.exp(-deltaTime / 90), 0, 1);
+
+    faceOffset.x = lerp(faceOffset.x, targetFaceOffset.x, smoothing);
+    faceOffset.y = lerp(faceOffset.y, targetFaceOffset.y, smoothing);
+
+    eyesOffset.x = lerp(eyesOffset.x, pointerOffset.x * 6, followSmoothing);
+    eyesOffset.y = lerp(eyesOffset.y, pointerOffset.y * 3.5, followSmoothing);
+
+    mouthOffset.x = lerp(mouthOffset.x, pointerOffset.x * 3.5, smoothing * 0.8);
+    mouthOffset.y = lerp(mouthOffset.y, pointerOffset.y * 2.0, smoothing * 0.8);
+
+    highlightOffset.x = lerp(
+      highlightOffset.x,
+      pointerOffset.x * 4,
+      clamp(followSmoothing * 1.2, 0, 1),
+    );
+    highlightOffset.y = lerp(
+      highlightOffset.y,
+      pointerOffset.y * 2.5,
+      clamp(followSmoothing * 1.2, 0, 1),
+    );
+
+    faceGroup.setAttribute("transform", `translate(${faceOffset.x}, ${faceOffset.y})`);
+    eyesGroup.setAttribute("transform", `translate(${eyesOffset.x}, ${eyesOffset.y})`);
+    mouthGroup.setAttribute("transform", `translate(${mouthOffset.x}, ${mouthOffset.y})`);
+    leftEyeHighlight.setAttribute(
+      "transform",
+      `translate(${highlightOffset.x}, ${highlightOffset.y})`,
+    );
+    rightEyeHighlight.setAttribute(
+      "transform",
+      `translate(${highlightOffset.x}, ${highlightOffset.y})`,
+    );
+
     if (Math.abs(targetHappyCursor - uniforms.uHappyCursor) > 0.01) {
       uniforms.uHappyCursor += ((targetHappyCursor - uniforms.uHappyCursor) * deltaTime) / 100;
     }
@@ -123,8 +173,8 @@ import Layout from "../../layouts/Layout.astro";
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g id="face" transform="translate(-10, 10)">
-        <g class="eyes">
+      <g id="face" transform="translate(0, 0)">
+        <g id="eyesGroup" class="eyes">
           <path
             d="M145.016 212C151.645 212.004 158.001 214.641 162.686 219.331C167.371 224.02 170.002 230.379 170 237.008C169.998 243.637 167.363 249.994 162.675 254.68C157.987 259.367 151.629 262 145 262C138.371 262 132.013 259.367 127.325 254.68C122.637 249.994 120.002 243.637 120 237.008C119.998 230.379 122.629 224.02 127.314 219.331C131.999 214.641 138.355 212.004 144.984 212H145.016Z"
             fill="black"
@@ -144,22 +194,24 @@ import Layout from "../../layouts/Layout.astro";
               class="happy"
               fill="freeze"></animate>
           </path>
-          <circle cx="137.026" cy="227.718" r="6.60172" fill="white">
-            <animate
-              attributeName="opacity"
-              fill="freeze"
-              to="0"
-              dur=".1s"
-              begin="indefinite"
-              class="laugh"></animate>
-            <animate
-              attributeName="opacity"
-              fill="freeze"
-              to="1"
-              dur=".1s"
-              begin="indefinite"
-              class="happy"></animate>
-          </circle>
+          <g id="leftEyeHighlight">
+            <circle cx="137.026" cy="227.718" r="6.60172" fill="white">
+              <animate
+                attributeName="opacity"
+                fill="freeze"
+                to="0"
+                dur=".1s"
+                begin="indefinite"
+                class="laugh"></animate>
+              <animate
+                attributeName="opacity"
+                fill="freeze"
+                to="1"
+                dur=".1s"
+                begin="indefinite"
+                class="happy"></animate>
+            </circle>
+          </g>
 
           <path
             d="M351.016 212C357.645 212.004 364.001 214.641 368.686 219.331C373.371 224.02 376.002 230.379 376 237.008C375.998 243.637 373.363 249.994 368.675 254.68C363.987 259.367 357.629 262 351 262C344.371 262 338.013 259.367 333.325 254.68C328.637 249.994 326.002 243.637 326 237.008C325.998 230.379 328.629 224.02 333.314 219.331C337.999 214.641 344.355 212.004 350.984 212H351.016Z"
@@ -181,46 +233,50 @@ import Layout from "../../layouts/Layout.astro";
               fill="freeze"></animate></path
           >
 
-          <circle cx="343.026" cy="227.718" r="6.60172" fill="white">
-            <animate
-              attributeName="opacity"
-              fill="freeze"
-              to="0"
-              dur=".1s"
-              begin="indefinite"
-              class="laugh"></animate>
-            <animate
-              attributeName="opacity"
-              fill="freeze"
-              to="1"
-              dur=".1s"
-              begin="indefinite"
-              class="happy"></animate>
-          </circle>
+          <g id="rightEyeHighlight">
+            <circle cx="343.026" cy="227.718" r="6.60172" fill="white">
+              <animate
+                attributeName="opacity"
+                fill="freeze"
+                to="0"
+                dur=".1s"
+                begin="indefinite"
+                class="laugh"></animate>
+              <animate
+                attributeName="opacity"
+                fill="freeze"
+                to="1"
+                dur=".1s"
+                begin="indefinite"
+                class="happy"></animate>
+            </circle>
+          </g>
         </g>
 
-        <path
-          class="mouse"
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M209.864 258.486C212.633 256.202 216.729 256.594 219.014 259.364C225.183 266.841 238.928 269 247.943 269C256.821 269 268.98 266.643 274.986 259.364C277.271 256.594 281.367 256.202 284.136 258.486C286.906 260.771 287.298 264.867 285.014 267.636C276.473 277.989 260.813 282 247.943 282C234.879 282 217.73 278.235 208.986 267.636C206.702 264.867 207.094 260.771 209.864 258.486Z"
-          fill="black"
-        >
-          <animate
-            attributeName="d"
-            to="M212.454 255C213.483 253.925 214.131 253 220.517 253C229.042 253 240.525 253 249.54 253C258.419 253 268.061 253 276.54 253C283.631 253 283.449 254 284.494 255C286.582 257 285.729 260 284.535 262.636C279.159 273.5 266.082 282 249.43 282C232.777 282 218.313 274 213.104 262.636C211.895 260 210.54 257 212.454 255Z"
-            dur=".1s"
-            begin="indefinite"
-            class="laugh"
-            fill="freeze"></animate>
-          <animate
-            attributeName="d"
-            to="M209.864 258.486C212.633 256.202 216.729 256.594 219.014 259.364C225.183 266.841 238.928 269 247.943 269C256.821 269 268.98 266.643 274.986 259.364C277.271 256.594 281.367 256.202 284.136 258.486C286.906 260.771 287.298 264.867 285.014 267.636C276.473 277.989 260.813 282 247.943 282C234.879 282 217.73 278.235 208.986 267.636C206.702 264.867 207.094 260.771 209.864 258.486Z"
-            dur=".1s"
-            begin="indefinite"
-            class="happy"
-            fill="freeze"></animate>
-        </path>
+        <g id="mouthGroup">
+          <path
+            class="mouse"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M209.864 258.486C212.633 256.202 216.729 256.594 219.014 259.364C225.183 266.841 238.928 269 247.943 269C256.821 269 268.98 266.643 274.986 259.364C277.271 256.594 281.367 256.202 284.136 258.486C286.906 260.771 287.298 264.867 285.014 267.636C276.473 277.989 260.813 282 247.943 282C234.879 282 217.73 278.235 208.986 267.636C206.702 264.867 207.094 260.771 209.864 258.486Z"
+            fill="black"
+          >
+            <animate
+              attributeName="d"
+              to="M212.454 255C213.483 253.925 214.131 253 220.517 253C229.042 253 240.525 253 249.54 253C258.419 253 268.061 253 276.54 253C283.631 253 283.449 254 284.494 255C286.582 257 285.729 260 284.535 262.636C279.159 273.5 266.082 282 249.43 282C232.777 282 218.313 274 213.104 262.636C211.895 260 210.54 257 212.454 255Z"
+              dur=".1s"
+              begin="indefinite"
+              class="laugh"
+              fill="freeze"></animate>
+            <animate
+              attributeName="d"
+              to="M209.864 258.486C212.633 256.202 216.729 256.594 219.014 259.364C225.183 266.841 238.928 269 247.943 269C256.821 269 268.98 266.643 274.986 259.364C277.271 256.594 281.367 256.202 284.136 258.486C286.906 260.771 287.298 264.867 285.014 267.636C276.473 277.989 260.813 282 247.943 282C234.879 282 217.73 278.235 208.986 267.636C206.702 264.867 207.094 260.771 209.864 258.486Z"
+              dur=".1s"
+              begin="indefinite"
+              class="happy"
+              fill="freeze"></animate>
+          </path>
+        </g>
       </g>
     </svg>
   </div>
