@@ -1,40 +1,37 @@
-attribute vec2 aCoords;
+#version 300 es
+precision highp float;
 
-uniform sampler2D uPositions;
-uniform float uTheme;
+uniform sampler2D uParticles;
+uniform vec3 uBaseColor;
+uniform vec3 uMainColor;
+uniform vec2 uResolution;
+uniform float uBaseRadius;
+uniform float uDpr;
 
-varying vec4 vColor;
-
-mat2 rotate2d(float angle) {
-  float c = cos(angle);
-  float s = sin(angle);
-  return mat2(c, -s, s, c);
-}
-
-float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-}
+in vec2 aCoords;
+out vec4 vColor;
 
 void main() {
-  vec4 state = texture2D(uPositions, aCoords);
+  vec4 state = texture(uParticles, aCoords);
+  float lifetime = state.w;
+
+  if (lifetime < 0.0) {
+    gl_Position = vec4(-2.0, -2.0, 0.0, 1.0);
+    gl_PointSize = 0.0;
+    vColor = vec4(0.0);
+    return;
+  }
+
   vec3 position = state.xyz;
-  float seed = hash(aCoords + 0.37);
 
-  // position.yz *= rotate2d(-0.35);
-  // position.xz *= rotate2d(-0.55);
+  vec2 projected = position.xy / (position.z + 2.45) * 1.72;
+  projected.x /= uResolution.x / uResolution.y;
+  gl_Position = vec4(projected, 0.0, 1.0);
 
-  vec3 view = position;
-  view.z += 2.6;
-  gl_Position = vec4(view.xy / view.z * 1.75, 0., 1.);
+  float pointSize = 10. / (position.z + 2.);
+  gl_PointSize = mix(12., pointSize, smoothstep(0., .2, lifetime)) * uDpr;
 
-  float depthFade = smoothstep(1.2, 3.4, view.z);
-  float band = 0.5 + 0.5 * sin(seed * 31.4159);
-  gl_PointSize = mix(3.8, 6.2, band) / view.z * 4.6;
-
-  vec3 darkBase = mix(vec3(0.82, 0.35, 1.1), vec3(1.45, 0.55, 1.32), band);
-  vec3 lightBase = mix(vec3(0.78, 0.1, 0.68), vec3(1.18, 0.2, 0.9), band);
-  vec3 color = mix(lightBase, darkBase, uTheme);
-  float alpha = mix(0.55, 0.72, band) * depthFade;
-
+  float alpha = smoothstep(.8 * uBaseRadius, .2 * uBaseRadius, position.y) * smoothstep(1.5, 0., position.z);
+  vec3 color = mix(uBaseColor, uMainColor, smoothstep(-1.5 * uBaseRadius, -0.5 * uBaseRadius, position.y));
   vColor = vec4(color, alpha);
 }

@@ -1,7 +1,13 @@
-varying vec4 vColor;
+#version 300 es
+precision highp float;
+
+in vec4 vColor;
+out vec4 fragColor;
 
 void main() {
-  vec2 uv = gl_PointCoord.xy;
-  gl_FragColor.a = vColor.a * smoothstep(0.5, 0.4, length(uv - 0.5));
-  gl_FragColor.rgb = vColor.rgb * gl_FragColor.a;
+  vec2 pointUv = gl_PointCoord.xy - 0.5;
+  float dist = length(pointUv);
+  float alpha = smoothstep(0.5, 0.2, dist) * vColor.a;
+
+  fragColor = vec4(vColor.rgb * alpha, alpha);
 }

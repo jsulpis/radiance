@@ -1,57 +1,55 @@
+#version 300 es
+precision highp float;
+
+uniform sampler2D tParticles;
+uniform float uCount;
+uniform float uBaseRadius;
 uniform float uDeltaTime;
-uniform vec2 uPointer;
-uniform sampler2D tPositions;
 
 in vec2 uv;
 out vec4 fragColor;
 
-const float PI = 3.14159265359;
-const float COUNT = 200.;
-const float SPEED = 2.;
-const float GOLDEN_ANGLE = PI * (3. - sqrt(5.));
+#define PI 3.14159265359
+#define GOLDEN_RATIO 1.618
 
-mat2 rotate2d(float angle) {
-  float c = cos(angle);
-  float s = sin(angle);
-  return mat2(c, -s, s, c);
-}
-
-float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-}
-
-vec3 fibonacciSphere(float index, float angleOffset) {
-  float wrappedIndex = mod(index, COUNT);
-  float y = 1. - 2. * (wrappedIndex + 0.5) / COUNT;
-  float radius = sqrt(max(0., 1. - y * y));
-  float phi = GOLDEN_ANGLE * wrappedIndex + angleOffset;
-  return vec3(cos(phi) * radius, y, sin(phi) * radius) * 0.9;
-}
-
-vec2 projectToScreen(vec3 position) {
-  // position.yz *= rotate2d(-0.35);
-  // position.xz *= rotate2d(-0.55);
-
-  vec3 view = position;
-  view.z += 2.6;
-  return view.xy / view.z * 1.75;
+float hash(float value) {
+  return fract(sin(value) * 43758.5453123);
 }
 
 void main() {
-  vec4 state = texture(tPositions, uv);
-  float progress = state.w;
-  float randomAngle = hash(uv + 0.17) * 2. * PI;
-  float nextProgress = mod(progress + uDeltaTime * SPEED, COUNT);
+  vec4 state = texture(tParticles, uv);
+  float lifetime = state.w;
+  ivec2 texel = ivec2(gl_FragCoord.xy - vec2(0.5));
+  ivec2 particlesTextureSize = textureSize(tParticles, 0);
+  float index = float(texel.y * particlesTextureSize.x + texel.x);
+  float radialJitter = hash(index + 1.) * 2. - 1.;
 
-  vec3 position = fibonacciSphere(nextProgress, randomAngle);
-  vec2 projected = projectToScreen(position);
+  lifetime += uDeltaTime * 0.0003;
 
-  vec2 pointer = vec2(uPointer.x, -uPointer.y) * 2.;
-  float pointerActive = step(0.001, length(uPointer));
-  float attraction = pointerActive * pow(smoothstep(1.05, 0.0, distance(projected, pointer)), 0.35);
-  vec2 attracted = mix(projected, pointer, attraction);
-  float swallowed = pointerActive * (1. - step(0.08, distance(attracted, pointer)));
+  if (lifetime < 0.) {
+    state.w = lifetime;
+    fragColor = vec4(state);
+    return;
+  }
 
-  vec3 respawn = fibonacciSphere(0., randomAngle);
-  fragColor = vec4(mix(position, respawn, swallowed), mix(nextProgress, 0., swallowed));
+  lifetime = mod(lifetime, 1.);
+
+  float phi = acos(1. - 2. * ((index / uCount) * lifetime));
+  float theta = 2. * PI * fract(index / GOLDEN_RATIO);
+  float chaos = smoothstep(0., PI, phi);
+
+  phi += chaos * radialJitter;
+  theta += chaos * radialJitter;
+
+  theta += lifetime * 1.5;
+
+  float radiusNoise = radialJitter * pow(phi / PI, 3.);
+
+  float x = cos(theta) * sin(phi) * (uBaseRadius + radiusNoise);
+  float y = -cos(phi) * uBaseRadius;
+  float z = sin(theta) * sin(phi) * (uBaseRadius + radiusNoise);
+
+  vec3 position = vec3(x, y, z);
+
+  fragColor = vec4(position, lifetime);
 }
