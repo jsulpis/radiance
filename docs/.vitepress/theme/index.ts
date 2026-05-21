@@ -3,7 +3,7 @@ import { Sandbox } from "vitepress-plugin-sandpack";
 import { h } from "vue";
 import BundleSizeGraph from "../../components/BundleSizeGraph.vue";
 import ExampleEditor from "../../components/ExampleEditor.vue";
-import HomeHeroShader from "../../components/HomeHeroShader.vue";
+import HomeHeroShader from "../../components/Hero/HomeHeroShader.vue";
 import "vitepress-plugin-sandpack/dist/style.css";
 import "virtual:group-icons.css";
 import "./styles.scss";

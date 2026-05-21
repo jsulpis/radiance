@@ -5,7 +5,7 @@ layout: home
 hero:
   name: Radiance
   text: Lightweight, reactive WebGL library
-  tagline: for working with shaders
+  tagline: A toolkit for building shader-driven experiences.
   actions:
     - theme: brand
       text: Get started
@@ -30,7 +30,7 @@ glCanvas({
   canvas: "#glCanvas",
   fragment,
   postEffects: [
-    bloom({ radius: 0.6, mix: 0.8 }), //
+    bloom({ radius: 0.5, mix: 0.8 }), //
     linearToneMapping({ exposure: 1 }),
   ],
   uniforms: {

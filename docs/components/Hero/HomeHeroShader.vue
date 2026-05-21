@@ -19,7 +19,7 @@ type LoopInstance = {
 
 const PARTICLE_COUNT = 200;
 const BASE_RADIUS = 1;
-const MAIN_COLOR: [number, number, number] = [0, 1, 1];
+const MAIN_COLOR: [number, number, number] = [0, 0.6, 1];
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 
 let animationLoop: LoopInstance | null = null;
@@ -28,7 +28,7 @@ function createInitialState(count: number) {
   const state = new Float32Array(count * 4);
 
   for (let index = 0; index < count; index++) {
-    state[index * 4 + 3] = Math.random() * -1; // initial lifetime value
+    state[index * 4 + 3] = Math.random() * 2 - 2; // initial lifetime value
   }
 
   return state;
@@ -104,6 +104,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="home-hero-shader">
+    <div class="home-hero-shader__pointer-zone" aria-hidden="true">
+      <div class="ball"></div>
+    </div>
     <canvas ref="canvasEl"></canvas>
   </div>
 </template>
@@ -125,13 +128,51 @@ onBeforeUnmount(() => {
     max-width: 100%;
     aspect-ratio: 1;
     display: block;
+    animation: fadeIn 3s 200ms ease backwards;
+  }
+
+  &__pointer-zone {
+    position: absolute;
+    inset: -60%;
+  }
+}
+
+.ball {
+  --size: 0.4;
+  aspect-ratio: 1;
+  width: calc(120% * var(--size));
+  border-radius: 50%;
+  background: linear-gradient(259.53deg, cyan 6.53%, blue 95.34%);
+  filter: blur(10vmax);
+  opacity: 0.6;
+  position: absolute;
+  z-index: -1;
+  top: 0%;
+  right: 15%;
+
+  @media (max-width: 640px) {
+    top: 40%;
+    right: 45%;
+    width: calc(160% * var(--size));
+    transform: translate(50%, -50%);
+    opacity: 0.2;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 }
 
 :global(body) {
   background:
-    radial-gradient(circle at top right, rgb(0 255 255 / 0.1), transparent 100vmin),
-    linear-gradient(to bottom, rgb(0 255 255 / 0.1), black 80vh);
+    radial-gradient(circle at top right, rgb(0 100 255 / 0.1), transparent 100vmin),
+    linear-gradient(to bottom, rgb(0 0 255 / 0.1), black 80vh);
+}
+
+:global(#app) {
+  overflow: hidden;
 }
 
 :global(.VPHomeHero .image) {
@@ -139,6 +180,6 @@ onBeforeUnmount(() => {
 }
 
 :global(.VPHomeHero .image-container) {
-  transform: none;
+  justify-content: end;
 }
 </style>
