@@ -32,6 +32,6 @@ void main() {
   gl_PointSize = mix(12., pointSize, smoothstep(0., .2, lifetime)) * uDpr;
 
   float alpha = smoothstep(.8 * uBaseRadius, .2 * uBaseRadius, position.y) * smoothstep(1.5, 0., position.z);
-  vec3 color = mix(uBaseColor, uMainColor, smoothstep(-1.5 * uBaseRadius, -0.5 * uBaseRadius, position.y));
+  vec3 color = mix(uBaseColor, uMainColor, smoothstep(-2.5 * uBaseRadius, -0.5 * uBaseRadius, position.y));
   vColor = vec4(color, alpha);
 }

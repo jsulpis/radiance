@@ -32,7 +32,7 @@ void main() {
     return;
   }
 
-  lifetime = mod(lifetime, 1.);
+  lifetime = mod(lifetime, 2.);
 
   float phi = acos(1. - 2. * ((index / uCount) * lifetime));
   float theta = 2. * PI * fract(index / GOLDEN_RATIO);
