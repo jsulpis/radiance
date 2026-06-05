@@ -6,6 +6,7 @@ uniform vec3 uBaseColor;
 uniform vec3 uMainColor;
 uniform vec2 uResolution;
 uniform float uBaseRadius;
+uniform vec2 uPointer;
 uniform float uDpr;
 
 in vec2 aCoords;
@@ -28,10 +29,14 @@ void main() {
   projected.x /= uResolution.x / uResolution.y;
   gl_Position = vec4(projected, 0.0, 1.0);
 
-  float pointSize = 10. / (position.z + 2.);
-  gl_PointSize = mix(12., pointSize, smoothstep(0., .2, lifetime)) * uDpr;
+  gl_PointSize = 10. / (position.z + 3.) * uDpr;
 
-  float alpha = smoothstep(.8 * uBaseRadius, .2 * uBaseRadius, position.y) * smoothstep(1.5, 0., position.z);
-  vec3 color = mix(uBaseColor, uMainColor, smoothstep(-2.5 * uBaseRadius, -0.5 * uBaseRadius, position.y));
+  vec3 topColor = mix(uMainColor, vec3(0.8, 0.25, 0.1), smoothstep(0., 1.,uPointer.y));
+  vec3 color = mix(uBaseColor, topColor, smoothstep(-1.8 * uBaseRadius, -.5 * uBaseRadius, position.y));
+
+  float alpha = smoothstep(1., .5, lifetime)
+          * (1. - smoothstep(.5, 1., abs(projected.y)))
+          * (1. - smoothstep(.5, 1., abs(projected.x)));
+
   vColor = vec4(color, alpha);
 }
