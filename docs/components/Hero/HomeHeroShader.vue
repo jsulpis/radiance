@@ -10,25 +10,24 @@ type RenderUniforms = {
   uBaseColor: [number, number, number];
   uMainColor: [number, number, number];
   uBaseRadius: number;
+  uPointer: [number, number];
   uDpr: number;
 };
 
-type LoopInstance = {
-  pause: () => void;
-};
-
-const PARTICLE_COUNT = 200;
+const PARTICLE_COUNT = 400;
 const BASE_RADIUS = 1;
+const BASE_COLOR: [number, number, number] = [1, 1, 1];
 const MAIN_COLOR: [number, number, number] = [0, 0.6, 1];
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 
-let animationLoop: LoopInstance | null = null;
+let animationLoop: ReturnType<typeof import("@radiancejs/gl").loop> | null = null;
+let pointerEvents: ReturnType<typeof import("@radiancejs/gl").onPointerEvents> | null = null;
 
 function createInitialState(count: number) {
   const state = new Float32Array(count * 4);
 
   for (let index = 0; index < count; index++) {
-    state[index * 4 + 3] = Math.random() * 2 - 2; // initial lifetime value
+    state[index * 4 + 3] = Math.random() - 1; // initial lifetime value between -1 and 0
   }
 
   return state;
@@ -55,6 +54,7 @@ onMounted(async () => {
       uCount: PARTICLE_COUNT,
       uBaseRadius: BASE_RADIUS,
       uDeltaTime: 0,
+      uPointer: [1, 1],
     },
   });
 
@@ -64,10 +64,14 @@ onMounted(async () => {
     fragment: haloFragment,
     uniforms: {
       uBaseRadius: BASE_RADIUS,
+      uBaseColor: BASE_COLOR,
       uMainColor: MAIN_COLOR,
       uTime: 0,
     },
   });
+
+  const pointerTarget = { x: 0.75, y: 0 };
+  const pointerState = { ...pointerTarget };
 
   const renderPass = radiance.glCanvas<RenderUniforms>({
     canvas,
@@ -75,9 +79,10 @@ onMounted(async () => {
     fragment,
     uniforms: {
       uParticles: () => simulationPass.texture,
-      uBaseColor: [1, 1, 1],
+      uBaseColor: BASE_COLOR,
       uMainColor: MAIN_COLOR,
       uBaseRadius: BASE_RADIUS,
+      uPointer: [pointerState.x, pointerState.y],
       uDpr: Math.min(devicePixelRatio, 2),
     },
     attributes: {
@@ -88,17 +93,43 @@ onMounted(async () => {
     blending: "additive",
   });
 
+  pointerEvents = radiance.onPointerEvents(canvas, {
+    move: ({ pointer, boundingRect }) => {
+      const centerX = boundingRect.center.x;
+      const centerY = boundingRect.center.y;
+
+      pointerTarget.x = (pointer.x - centerX) / (boundingRect.width * 0.5);
+      pointerTarget.y = (centerY - pointer.y) / (boundingRect.height * 0.5);
+    },
+  });
+
   animationLoop = radiance.loop(({ time, deltaTime }) => {
-    simulationPass.uniforms.uDeltaTime = deltaTime;
+    const pointerLerp = deltaTime / 1000;
+    pointerState.x += (pointerTarget.x - pointerState.x) * pointerLerp;
+    pointerState.y += (pointerTarget.y - pointerState.y) * pointerLerp;
+
+    simulationPass.uniforms.uPointer = [pointerState.x, pointerState.y];
+    simulationPass.uniforms.uDeltaTime = deltaTime * 0.75;
     simulationPass.render();
 
     halo.uniforms.uTime = time;
+
+    renderPass.uniforms.uPointer = [pointerState.x, pointerState.y];
     renderPass.render();
   });
 });
 
+document.addEventListener("visibilitychange", function (ev) {
+  if (document.hidden) {
+    animationLoop?.pause();
+  } else {
+    animationLoop?.play();
+  }
+});
+
 onBeforeUnmount(() => {
   animationLoop?.pause();
+  pointerEvents?.stop();
 });
 </script>
 
@@ -119,7 +150,6 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
   aspect-ratio: 1;
 
   canvas {
@@ -148,7 +178,7 @@ onBeforeUnmount(() => {
   position: absolute;
   z-index: -1;
   top: 0%;
-  right: 15%;
+  right: 20%;
 
   @media (max-width: 640px) {
     top: 40%;
@@ -167,7 +197,7 @@ onBeforeUnmount(() => {
 
 :global(body) {
   background:
-    radial-gradient(circle at top right, rgb(0 100 255 / 0.1), transparent 100vmin),
+    radial-gradient(circle at 80% -5%, rgb(0 100 255 / 0.3), transparent 100vmin),
     linear-gradient(to bottom, rgb(0 0 255 / 0.1), black 80vh);
 }
 

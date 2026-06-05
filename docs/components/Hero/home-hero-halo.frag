@@ -4,6 +4,7 @@ precision highp float;
 uniform sampler2D uTexture;
 uniform vec2 uResolution;
 uniform vec3 uMainColor;
+uniform vec3 uBaseColor;
 uniform float uBaseRadius;
 uniform float uTime;
 
@@ -25,7 +26,7 @@ void main() {
   vec4 halo = vec4(pow(edge, 20.)) * .3;
   halo += vec4(pow(edge, 4.)) * .1;
 
-  halo *= smoothstep(1.2, 2., length(uv - vec2(0., uBaseRadius))) * vec4(uMainColor, 1.0);
+  halo *= smoothstep(1.2, 2., length(uv - vec2(0., uBaseRadius))) * vec4(mix(uBaseColor, uMainColor, .5), 1.0);
 
   halo.a *= smoothstep(1000., 8000., uTime);
   halo.rgb *= halo.a;
