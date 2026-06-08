@@ -119,13 +119,15 @@ onMounted(async () => {
   });
 });
 
-document.addEventListener("visibilitychange", function (ev) {
-  if (document.hidden) {
-    animationLoop?.pause();
-  } else {
-    animationLoop?.play();
-  }
-});
+if (typeof window !== "undefined") {
+  document.addEventListener("visibilitychange", function (ev) {
+    if (document.hidden) {
+      animationLoop?.pause();
+    } else {
+      animationLoop?.play();
+    }
+  });
+}
 
 onBeforeUnmount(() => {
   animationLoop?.pause();

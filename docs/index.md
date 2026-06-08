@@ -145,38 +145,35 @@ const { uniforms } = glCanvas({
 uniforms.uPointer = 42; // Type 'number' is not assignable to type 'number[]'. [!code error]
 ```
 
-<style scoped>
-h2 {
-  border-top: 0;
-  margin-block: 6rem .5rem;
-  font-size: 2.25rem;
-}
-
-.ts-code {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 1rem;
-
-  > p {
-    flex: 3;
-    min-width: 320px;
-    text-wrap: pretty;
-  }
-  > div {
-    flex: 5;
-    min-width: 600px;
-  }
-}
-
-.language-ts {
-  margin: 1rem 0 0 0 !important;
-  max-width: 72ch;
-}
-
-</style>
-
 <style>
-  .is-home {
+  .VPContent.is-home {
+    h2 {
+      border-top: 0;
+      margin-block: 6rem .5rem;
+      font-size: 2.25rem;
+    }
+
+    .ts-code {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 1rem;
+
+      > p {
+        flex: 3;
+        min-width: 320px;
+        text-wrap: pretty;
+      }
+      > div {
+        flex: 5;
+        min-width: 600px;
+      }
+    }
+
+    .language-ts {
+      margin: 1rem 0 0 0 !important;
+      max-width: 72ch;
+    }
+
     .sp-layout {
       border: 0;
     }
@@ -202,10 +199,10 @@ h2 {
 
     .sp-editor {
       border-radius: var(--sp-border-radius) var(--sp-border-radius) 0 0;
+    }
 
-      :root:not(.dark) & {
-        border: 1px solid var(--vp-c-divider);
-      }
+    :root:not(.dark) .sp-editor {
+      border: 1px solid var(--vp-c-divider);
     }
   }
 

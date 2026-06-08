@@ -2,3 +2,8 @@ packages:
   - benchmark
   - docs
   - lib
+
+allowBuilds:
+  "@parcel/watcher": false
+  esbuild: true
+  sharp: false
