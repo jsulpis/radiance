@@ -5,7 +5,7 @@ position: 3
 
 ::: example-editor
 
-<<< ./gpu.ts{#active}
+<<< ./gpu.ts{prefix=#active/}
 <<< ./cpu.ts
 <<< ./index.ts
 <<< ./utils.ts
