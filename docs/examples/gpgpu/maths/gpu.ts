@@ -1,4 +1,4 @@
-import { useWebGLContext, useTransformFeedback, createFloatDataTexture } from "usegl";
+import { glContext, transformFeedback, createFloatDataTexture } from "@radiancejs/gl";
 
 export function square(flatMatrix: number[], matrixSize: number) {
   const indicesN: number[] = [];
@@ -11,9 +11,9 @@ export function square(flatMatrix: number[], matrixSize: number) {
     }
   }
 
-  const { gl } = useWebGLContext("#glCanvas");
+  const { gl } = glContext("#glCanvas");
 
-  const tf = useTransformFeedback(gl, {
+  const tf = transformFeedback(gl, {
     vertex: /* glsl */ `
     in float n;
     in float p;
