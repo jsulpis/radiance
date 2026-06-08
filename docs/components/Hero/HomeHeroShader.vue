@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
   }
 }
 
-:global(body) {
+:global(body:has(.VPHomeHero)) {
   background:
     radial-gradient(circle at 80% -5%, rgb(0 100 255 / 0.3), transparent 100vmin),
     linear-gradient(to bottom, rgb(0 0 255 / 0.1), black 80vh);

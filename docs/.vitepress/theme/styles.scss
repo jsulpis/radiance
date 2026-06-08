@@ -141,12 +141,12 @@
   }
 }
 
-:root.dark {
+:root.dark:has(.VPHomeHero) {
   --vp-c-bg: black;
+}
 
-  .sp-preview-iframe {
-    background: black;
-  }
+.sp-preview-iframe {
+  background: black;
 }
 
 .vp-doc {

@@ -12,7 +12,8 @@ const env = loadEnv(process.env.VERCEL_ENV || "development", process.cwd(), "");
 // https://vitepress.dev/reference/site-config
 const config = defineConfig({
   title: "Radiance",
-  description: "Lightweight, reactive WebGL library for working with shaders",
+  description: "A toolkit for building shader-driven experiences.",
+  appearance: "force-dark",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
