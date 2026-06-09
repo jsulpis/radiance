@@ -1,11 +1,11 @@
-import type { BoundingRect } from "./watchBoundingRect";
+import type { ElementBoundingRect, ElementCenter } from "./watchBoundingRect";
 import { watchBoundingRect } from "./watchBoundingRect";
 
 /**
  * Listen to pointer events on a canvas and provide the pointer position, canvas bounding rect and center to the handlers.
  */
 export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHandlers) {
-  const boundingRect = watchBoundingRect(element);
+  const { rect: boundingRect, center } = watchBoundingRect(element);
 
   const activeHandlers = Object.fromEntries(
     Object.entries(handlers)
@@ -16,6 +16,7 @@ export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHan
           handlerFunction({
             pointer: { x: e.clientX, y: e.clientY },
             boundingRect,
+            center,
           });
         },
       ]),
@@ -57,5 +58,6 @@ export type HandlerArgs = {
     x: number;
     y: number;
   };
-  boundingRect: BoundingRect;
+  boundingRect: ElementBoundingRect;
+  center: ElementCenter;
 };

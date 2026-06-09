@@ -10,7 +10,7 @@ export function watchBoundingRect(target: HTMLElement, params: WatchBoundingRect
     windowScroll = globalThis.window !== undefined,
   } = params;
 
-  const rect: BoundingRect = {
+  const rect: ElementBoundingRect = {
     width: 0,
     height: 0,
     top: 0,
@@ -19,25 +19,21 @@ export function watchBoundingRect(target: HTMLElement, params: WatchBoundingRect
     left: 0,
     x: 0,
     y: 0,
-    center: {
-      x: 0,
-      y: 0,
-    },
   };
+
+  const center = { x: 0, y: 0 };
 
   function update() {
     const newRect = target.getBoundingClientRect();
 
-    const boundingRectKeys = Object.keys(rect).filter((key) => key !== "center") as Array<
-      keyof Omit<BoundingRect, "center">
-    >;
+    const boundingRectKeys = Object.keys(rect) as Array<keyof ElementBoundingRect>;
 
     for (const key of boundingRectKeys) {
       rect[key] = newRect[key];
     }
 
-    rect.center.x = (rect.left + rect.right) / 2;
-    rect.center.y = (rect.top + rect.bottom) / 2;
+    center.x = (rect.left + rect.right) / 2;
+    center.y = (rect.top + rect.bottom) / 2;
   }
 
   onResize(target, update);
@@ -45,7 +41,10 @@ export function watchBoundingRect(target: HTMLElement, params: WatchBoundingRect
   if (windowScroll) window.addEventListener("scroll", update, { capture: true, passive: true });
   if (windowResize) window.addEventListener("resize", update, { passive: true });
 
-  return rect as Readonly<BoundingRect>;
+  return {
+    rect: rect as Readonly<ElementBoundingRect>,
+    center: center as Readonly<ElementCenter>,
+  };
 }
 
 /**
@@ -69,7 +68,7 @@ export interface WatchBoundingRectParams {
 /**
  * @internal
  */
-export type BoundingRect = {
+export type ElementBoundingRect = {
   width: number;
   height: number;
   top: number;
@@ -78,8 +77,12 @@ export type BoundingRect = {
   left: number;
   x: number;
   y: number;
-  center: {
-    x: number;
-    y: number;
-  };
+};
+
+/**
+ * @internal
+ */
+export type ElementCenter = {
+  x: number;
+  y: number;
 };
