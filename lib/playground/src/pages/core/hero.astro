@@ -75,10 +75,10 @@ import Layout from "../../layouts/Layout.astro";
   }, 1500);
 
   onPointerEvents(pointerZone, {
-    move: ({ pointer, boundingRect }) => {
+    move: ({ pointer, boundingRect, center }) => {
       const pointerDirection = {
-        x: pointer.x - boundingRect.center.x,
-        y: pointer.y - boundingRect.center.y,
+        x: pointer.x - center.x,
+        y: pointer.y - center.y,
       };
       const normalizedPointer = {
         x: clamp(pointerDirection.x / (boundingRect.width * 0.5), -1, 1),
