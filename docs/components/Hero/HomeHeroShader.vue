@@ -33,6 +33,14 @@ function createInitialState(count: number) {
   return state;
 }
 
+function handleVisibilityChange() {
+  if (document.hidden) {
+    animationLoop?.pause();
+  } else {
+    animationLoop?.play();
+  }
+}
+
 onMounted(async () => {
   const canvas = canvasEl.value;
 
@@ -94,9 +102,9 @@ onMounted(async () => {
   });
 
   pointerEvents = radiance.onPointerEvents(canvas, {
-    move: ({ pointer, boundingRect }) => {
-      const centerX = boundingRect.center.x;
-      const centerY = boundingRect.center.y;
+    move: ({ pointer, boundingRect, center }) => {
+      const centerX = center.x;
+      const centerY = center.y;
 
       pointerTarget.x = (pointer.x - centerX) / (boundingRect.width * 0.5);
       pointerTarget.y = (centerY - pointer.y) / (boundingRect.height * 0.5);
@@ -120,16 +128,11 @@ onMounted(async () => {
 });
 
 if (typeof window !== "undefined") {
-  document.addEventListener("visibilitychange", function (ev) {
-    if (document.hidden) {
-      animationLoop?.pause();
-    } else {
-      animationLoop?.play();
-    }
-  });
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 }
 
 onBeforeUnmount(() => {
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
   animationLoop?.pause();
   pointerEvents?.stop();
 });

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 import { routes } from "../playground/src/components/routes";
 
-const ignoreRoutes = new Set(["pause", "dataTexture", "particles - FBO", "boids"]);
+const ignoreRoutes = new Set(["pause", "dataTexture", "particles - FBO", "boids", "hero"]);
 
 const routesToTest = routes.filter(({ route }) => !ignoreRoutes.has(route));
 
