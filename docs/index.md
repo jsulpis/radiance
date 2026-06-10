@@ -87,13 +87,14 @@ void main() {
 
   vec3 localRo = rotateCube(ro);
   vec3 localRd = rotateCube(rd);
-  vec2 hit = intersectBox(localRo, localRd, vec3(uCubeSize));
+  vec3 bounds = vec3(uCubeSize);
+  vec2 hit = intersectBox(localRo, localRd, bounds);
   vec4 color = vec4(0.);
 
   if (hit.x < hit.y && hit.y > 0.) {
     float t = max(hit.x, 0.);
     vec3 p = localRo + localRd * t;
-    vec3 cubeColor = (p) * 0.5 + 0.5;
+    vec3 cubeColor = (p / bounds) * 0.5 + 0.5;
     color = vec4(cubeColor, 1.);
   }
 
