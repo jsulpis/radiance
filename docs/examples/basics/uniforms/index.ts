@@ -1,6 +1,6 @@
 import { glCanvas } from "@radiancejs/gl";
 import { Pane } from "tweakpane";
-import fragment from "./uniforms.frag";
+import fragment from "./uniforms.frag?raw";
 import "./styles.css";
 
 const { uniforms, onAfterRender } = glCanvas({

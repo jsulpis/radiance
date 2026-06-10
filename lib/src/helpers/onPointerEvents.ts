@@ -2,7 +2,7 @@ import type { ElementBoundingRect, ElementCenter } from "./watchBoundingRect";
 import { watchBoundingRect } from "./watchBoundingRect";
 
 /**
- * Listen to pointer events on a canvas and provide the pointer position, canvas bounding rect and center to the handlers.
+ * Listen to pointer events on an element and provide the pointer position, element bounding rect and center to the handlers.
  */
 export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHandlers) {
   const { rect: boundingRect, center } = watchBoundingRect(element);
