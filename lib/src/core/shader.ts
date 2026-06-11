@@ -1,3 +1,5 @@
+import { GL_COMPILE_STATUS } from "./constants";
+
 /**
  * Creates, compiles, and returns a WebGL shader.
  *
@@ -19,7 +21,7 @@ export function createShader(gl: WebGL2RenderingContext, source: string, type: G
   gl.shaderSource(shader, convertToGLSL300(source));
   gl.compileShader(shader);
 
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+  if (!gl.getShaderParameter(shader, GL_COMPILE_STATUS)) {
     console.error("could not compile shader: " + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
   }

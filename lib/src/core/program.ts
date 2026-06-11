@@ -1,3 +1,9 @@
+import {
+  GL_FRAGMENT_SHADER,
+  GL_LINK_STATUS,
+  GL_SEPARATE_ATTRIBS,
+  GL_VERTEX_SHADER,
+} from "./constants";
 import { createShader } from "./shader";
 
 /**
@@ -18,9 +24,9 @@ export function createProgram(
   transformFeedbackVaryings?: string[],
 ) {
   const vertexShader =
-    vertex instanceof WebGLShader ? vertex : createShader(gl, vertex, gl.VERTEX_SHADER);
+    vertex instanceof WebGLShader ? vertex : createShader(gl, vertex, GL_VERTEX_SHADER);
   const fragmentShader =
-    fragment instanceof WebGLShader ? fragment : createShader(gl, fragment, gl.FRAGMENT_SHADER);
+    fragment instanceof WebGLShader ? fragment : createShader(gl, fragment, GL_FRAGMENT_SHADER);
 
   const program = gl.createProgram();
   if (program === null || vertexShader == null || fragmentShader == null) {
@@ -30,14 +36,14 @@ export function createProgram(
   }
 
   if (transformFeedbackVaryings) {
-    gl.transformFeedbackVaryings(program, transformFeedbackVaryings, gl.SEPARATE_ATTRIBS);
+    gl.transformFeedbackVaryings(program, transformFeedbackVaryings, GL_SEPARATE_ATTRIBS);
   }
 
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
 
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+  if (!gl.getProgramParameter(program, GL_LINK_STATUS)) {
     console.error("could not link program: " + gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
     return null;

@@ -1,21 +1,41 @@
+import {
+  GL_CLAMP_TO_EDGE,
+  GL_FLOAT,
+  GL_LINEAR,
+  GL_LINEAR_MIPMAP_LINEAR,
+  GL_MIRRORED_REPEAT,
+  GL_NEAREST,
+  GL_NEAREST_MIPMAP_LINEAR,
+  GL_REPEAT,
+  GL_RGBA,
+  GL_RGBA32F,
+  GL_SRGB8_ALPHA8,
+  GL_TEXTURE_2D,
+  GL_TEXTURE_MAG_FILTER,
+  GL_TEXTURE_MIN_FILTER,
+  GL_TEXTURE_WRAP_S,
+  GL_TEXTURE_WRAP_T,
+  GL_UNPACK_FLIP_Y_WEBGL,
+  GL_UNSIGNED_BYTE,
+} from "./constants";
 import { isHTMLImageTexture, isHTMLVideoTexture } from "../internal/typeGuards";
 
 const minFilterMap: Record<MinFilter, number> = {
-  linear: WebGL2RenderingContext.LINEAR,
-  nearest: WebGL2RenderingContext.NEAREST,
-  "linear-mipmap-linear": WebGL2RenderingContext.LINEAR_MIPMAP_LINEAR,
-  "nearest-mipmap-linear": WebGL2RenderingContext.NEAREST_MIPMAP_LINEAR,
+  linear: GL_LINEAR,
+  nearest: GL_NEAREST,
+  "linear-mipmap-linear": GL_LINEAR_MIPMAP_LINEAR,
+  "nearest-mipmap-linear": GL_NEAREST_MIPMAP_LINEAR,
 };
 
 const magFilterMap: Record<MagFilter, number> = {
-  linear: WebGL2RenderingContext.LINEAR,
-  nearest: WebGL2RenderingContext.NEAREST,
+  linear: GL_LINEAR,
+  nearest: GL_NEAREST,
 };
 
 const wrapMap: Record<WrappingMode, number> = {
-  "clamp-to-edge": WebGL2RenderingContext.CLAMP_TO_EDGE,
-  repeat: WebGL2RenderingContext.REPEAT,
-  "mirrored-repeat": WebGL2RenderingContext.MIRRORED_REPEAT,
+  "clamp-to-edge": GL_CLAMP_TO_EDGE,
+  repeat: GL_REPEAT,
+  "mirrored-repeat": GL_MIRRORED_REPEAT,
 };
 
 /**
@@ -43,12 +63,10 @@ export function fillTexture(
   const {
     level = 0,
     flipY = true,
-    format = WebGL2RenderingContext.RGBA,
+    format = GL_RGBA,
     colorSpace = "linear-rgb",
-    internalFormat = colorSpace === "srgb"
-      ? WebGL2RenderingContext.SRGB8_ALPHA8
-      : WebGL2RenderingContext.RGBA,
-    type = WebGL2RenderingContext.UNSIGNED_BYTE,
+    internalFormat = colorSpace === "srgb" ? GL_SRGB8_ALPHA8 : GL_RGBA,
+    type = GL_UNSIGNED_BYTE,
     generateMipmaps = "src" in params && params.src != null, // no mipmap for data textures
     anisotropy = 1,
     minFilter = generateMipmaps ? "linear-mipmap-linear" : "linear",
@@ -57,19 +75,19 @@ export function fillTexture(
     wrapT = "clamp-to-edge",
   } = params;
 
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+  gl.bindTexture(GL_TEXTURE_2D, texture);
+  gl.pixelStorei(GL_UNPACK_FLIP_Y_WEBGL, flipY);
 
   if (isLoadedMedia) {
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, format, type, params.src);
+    gl.texImage2D(GL_TEXTURE_2D, level, internalFormat, format, type, params.src);
   } else {
     const dataTexture = (params || {}) as DataTextureParams;
     const { data = new Uint8Array([0, 0, 0, 255]), width = 1, height = 1 } = dataTexture;
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, 0, format, type, data);
+    gl.texImage2D(GL_TEXTURE_2D, level, internalFormat, width, height, 0, format, type, data);
   }
 
   if (generateMipmaps) {
-    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.generateMipmap(GL_TEXTURE_2D);
 
     // anisotropic filtering
     if (anisotropy > 1) {
@@ -77,7 +95,7 @@ export function fillTexture(
       if (ext) {
         const maxAnisotropy = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
         gl.texParameterf(
-          gl.TEXTURE_2D,
+          GL_TEXTURE_2D,
           ext.TEXTURE_MAX_ANISOTROPY_EXT,
           Math.min(maxAnisotropy, anisotropy),
         );
@@ -85,10 +103,10 @@ export function fillTexture(
     }
   }
 
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilterMap[minFilter]);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilterMap[magFilter]);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMap[wrapS]);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMap[wrapT]);
+  gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilterMap[minFilter]);
+  gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilterMap[magFilter]);
+  gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMap[wrapS]);
+  gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMap[wrapT]);
 }
 
 /**
@@ -192,9 +210,9 @@ export function createFloatDataTexture(data: number[] | Float32Array): DataTextu
 
   return {
     data: dataArray,
-    format: WebGL2RenderingContext.RGBA,
-    type: WebGL2RenderingContext.FLOAT,
-    internalFormat: WebGL2RenderingContext.RGBA32F,
+    format: GL_RGBA,
+    type: GL_FLOAT,
+    internalFormat: GL_RGBA32F,
     width: textureWidth,
     height: textureHeight,
     minFilter: "nearest",
@@ -261,7 +279,7 @@ export type BaseTextureParams = {
   level?: number;
   /**
    * The internal format of the texture in the GPU.
-   * @default WebGL2RenderingContext.RGBA
+   * @default RGBA
    */
   internalFormat?: number;
   /**
@@ -271,12 +289,12 @@ export type BaseTextureParams = {
   colorSpace?: ColorSpace;
   /**
    * The format of the texel data.
-   * @default WebGL2RenderingContext.RGBA
+   * @default RGBA
    */
   format?: number;
   /**
    * The data type of the texel data.
-   * @default WebGL2RenderingContext.UNSIGNED_BYTE
+   * @default UNSIGNED_BYTE
    */
   type?: number;
 };

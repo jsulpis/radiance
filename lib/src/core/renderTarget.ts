@@ -1,3 +1,13 @@
+import {
+  GL_COLOR_ATTACHMENT0,
+  GL_COLOR_BUFFER_BIT,
+  GL_DEPTH_ATTACHMENT,
+  GL_DEPTH_BUFFER_BIT,
+  GL_DEPTH_COMPONENT16,
+  GL_FRAMEBUFFER,
+  GL_RENDERBUFFER,
+  GL_TEXTURE_2D,
+} from "./constants";
 import type { BaseTextureParams } from "./texture";
 import { fillTexture } from "./texture";
 
@@ -25,19 +35,19 @@ export function createRenderTarget(
     height: _height,
   });
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, _texture, 0);
+  gl.bindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  gl.framebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texture, 0);
 
   let renderbuffer: WebGLRenderbuffer | null = null;
   if (params?.depthBuffer) {
     renderbuffer = gl.createRenderbuffer();
-    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, _width, _height);
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+    gl.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, _width, _height);
+    gl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
+    gl.bindRenderbuffer(GL_RENDERBUFFER, null);
   }
 
-  gl.bindTexture(gl.TEXTURE_2D, null);
+  gl.bindTexture(GL_TEXTURE_2D, null);
 
   /**
    * Resizes the render target, creating a new texture and reattaching it.
@@ -55,17 +65,17 @@ export function createRenderTarget(
       height,
     });
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, newTexture, 0);
+    gl.bindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, newTexture, 0);
 
     if (renderbuffer) {
-      gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-      gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, _width, _height);
-      gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+      gl.bindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+      gl.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, _width, _height);
+      gl.bindRenderbuffer(GL_RENDERBUFFER, null);
     }
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindFramebuffer(GL_FRAMEBUFFER, null);
+    gl.bindTexture(GL_TEXTURE_2D, null);
     gl.deleteTexture(_texture);
 
     _texture = newTexture;
@@ -101,11 +111,11 @@ export function setRenderTarget(
   const framebuffer = target?.framebuffer || null;
   const { width, height } = target || gl.canvas;
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  gl.bindFramebuffer(GL_FRAMEBUFFER, framebuffer);
   gl.viewport(0, 0, width, height);
 
   if (clear) {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 }
 

@@ -1,4 +1,5 @@
 import type { RenderTargetParams } from "../core/renderTarget";
+import { GL_HALF_FLOAT, GL_RGBA16F } from "../core/constants";
 import { createRenderTarget } from "../core/renderTarget";
 import type { glCanvas as _glCanvas } from "../global/glCanvas";
 import type { UniformValue, Uniforms } from "../types/types";
@@ -42,8 +43,8 @@ export function effectPass<U extends EffectUniforms>(params: EffectPassParams<U>
  * Use it as a parameter for {@link createRenderTarget | createRenderTarget()}.
  */
 export const floatTargetConfig: RenderTargetParams = {
-  internalFormat: WebGL2RenderingContext.RGBA16F,
-  type: WebGL2RenderingContext.HALF_FLOAT,
+  internalFormat: GL_RGBA16F,
+  type: GL_HALF_FLOAT,
 };
 
 /**

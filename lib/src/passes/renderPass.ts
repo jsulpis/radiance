@@ -1,4 +1,5 @@
 import type { Attribute, Uniforms } from "../types/types";
+import { GL_BLEND, GL_DEPTH_TEST, GL_ONE, GL_ONE_MINUS_SRC_ALPHA } from "../core/constants";
 import { createProgram } from "../core/program";
 import { setRenderTarget } from "../core/renderTarget";
 import type { RenderTarget } from "../core/renderTarget";
@@ -154,27 +155,27 @@ export function renderPass<U extends Uniforms>(
 
 function setBlending(gl: WebGL2RenderingContext, blending: "none" | "normal" | "additive") {
   if (blending === "none") {
-    return gl.disable(gl.BLEND);
+    return gl.disable(GL_BLEND);
   }
 
-  gl.enable(gl.BLEND);
+  gl.enable(GL_BLEND);
 
   // assuming premultiplied alpha
   switch (blending) {
     case "normal": {
-      return gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      return gl.blendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     }
     case "additive": {
-      return gl.blendFunc(gl.ONE, gl.ONE);
+      return gl.blendFunc(GL_ONE, GL_ONE);
     }
   }
 }
 
 function setDepthTest(gl: WebGL2RenderingContext, depthTest: boolean) {
   if (depthTest) {
-    gl.enable(gl.DEPTH_TEST);
+    gl.enable(GL_DEPTH_TEST);
   } else {
-    gl.disable(gl.DEPTH_TEST);
+    gl.disable(GL_DEPTH_TEST);
   }
 }
 
