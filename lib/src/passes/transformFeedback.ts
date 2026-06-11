@@ -1,4 +1,11 @@
 import { bindBuffer } from "../core/buffer";
+import {
+  GL_ARRAY_BUFFER,
+  GL_POINTS,
+  GL_RASTERIZER_DISCARD,
+  GL_TRANSFORM_FEEDBACK,
+  GL_TRANSFORM_FEEDBACK_BUFFER,
+} from "../core/constants";
 import type { Attribute, Uniforms } from "../types/types";
 import type { RenderPass } from "./renderPass";
 import { renderPass } from "./renderPass";
@@ -22,7 +29,7 @@ export function transformFeedback<O extends string, U extends Uniforms>(
   const outputBuffers = Object.fromEntries(
     Object.entries<{ size: number }>(outputs).map(([name, { size }]) => [
       name,
-      bindBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(vertexCount * size)),
+      bindBuffer(gl, GL_ARRAY_BUFFER, new Float32Array(vertexCount * size)),
     ]),
   ) as Record<O, WebGLBuffer>;
 
@@ -36,30 +43,30 @@ export function transformFeedback<O extends string, U extends Uniforms>(
   });
 
   const tf = gl.createTransformFeedback();
-  gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, tf);
+  gl.bindTransformFeedback(GL_TRANSFORM_FEEDBACK, tf);
 
   for (const [index, buffer] of Object.values(outputBuffers).entries()) {
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, index, buffer as WebGLBuffer);
+    gl.bindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer as WebGLBuffer);
   }
 
   mainPass.onBeforeRender(() => {
-    gl.enable(gl.RASTERIZER_DISCARD);
-    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, tf);
-    gl.beginTransformFeedback(gl.POINTS);
+    gl.enable(GL_RASTERIZER_DISCARD);
+    gl.bindTransformFeedback(GL_TRANSFORM_FEEDBACK, tf);
+    gl.beginTransformFeedback(GL_POINTS);
   });
 
   mainPass.onAfterRender(() => {
     gl.endTransformFeedback();
-    gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
-    gl.disable(gl.RASTERIZER_DISCARD);
+    gl.bindTransformFeedback(GL_TRANSFORM_FEEDBACK, null);
+    gl.disable(GL_RASTERIZER_DISCARD);
   });
 
   const tfRenderPass: TransformFeedbackPass<O, U> = Object.assign(mainPass, {
     getOutputData: function (bufferName: O) {
       const output = new Float32Array(vertexCount * outputs[bufferName].size);
       const buffer = outputBuffers[bufferName];
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.getBufferSubData(gl.ARRAY_BUFFER, 0, output);
+      gl.bindBuffer(GL_ARRAY_BUFFER, buffer);
+      gl.getBufferSubData(GL_ARRAY_BUFFER, 0, output);
       return output;
     },
     outputBuffers,

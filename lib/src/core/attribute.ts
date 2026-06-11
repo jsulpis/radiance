@@ -1,4 +1,15 @@
 import type { Attribute } from "../types/types";
+import {
+  GL_ARRAY_BUFFER,
+  GL_BYTE,
+  GL_ELEMENT_ARRAY_BUFFER,
+  GL_FLOAT,
+  GL_INT,
+  GL_SHORT,
+  GL_UNSIGNED_BYTE,
+  GL_UNSIGNED_INT,
+  GL_UNSIGNED_SHORT,
+} from "./constants";
 import { bindBuffer, getBufferData } from "./buffer";
 
 /**
@@ -22,7 +33,7 @@ export function setAttribute(
   const location = gl.getAttribLocation(program, name);
 
   if (name === "index") {
-    bindBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, bufferData);
+    bindBuffer(gl, GL_ELEMENT_ARRAY_BUFFER, bufferData);
 
     if (location === -1) {
       return { location, vertexCount: bufferData.length };
@@ -34,7 +45,7 @@ export function setAttribute(
     return { location, vertexCount: 0 };
   }
 
-  bindBuffer(gl, gl.ARRAY_BUFFER, bufferData);
+  bindBuffer(gl, GL_ARRAY_BUFFER, bufferData);
 
   gl.enableVertexAttribArray(location);
   gl.vertexAttribPointer(
@@ -45,7 +56,7 @@ export function setAttribute(
     attribute.stride || 0,
     attribute.offset || 0,
   );
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  gl.bindBuffer(GL_ARRAY_BUFFER, null);
 
   const vertexCount = attribute.stride
     ? bufferData.byteLength / attribute.stride
@@ -60,15 +71,15 @@ export function setAttribute(
   return { location, vertexCount };
 }
 
-function getGLType(gl: WebGL2RenderingContext, data: ArrayBufferView) {
-  if (data instanceof Float32Array) return gl.FLOAT;
-  if (data instanceof Uint8Array || data instanceof Uint8ClampedArray) return gl.UNSIGNED_BYTE;
-  if (data instanceof Int8Array) return gl.BYTE;
-  if (data instanceof Uint16Array) return gl.UNSIGNED_SHORT;
-  if (data instanceof Int16Array) return gl.SHORT;
-  if (data instanceof Uint32Array) return gl.UNSIGNED_INT;
-  if (data instanceof Int32Array) return gl.INT;
-  return gl.FLOAT;
+function getGLType(_gl: WebGL2RenderingContext, data: ArrayBufferView) {
+  if (data instanceof Float32Array) return GL_FLOAT;
+  if (data instanceof Uint8Array || data instanceof Uint8ClampedArray) return GL_UNSIGNED_BYTE;
+  if (data instanceof Int8Array) return GL_BYTE;
+  if (data instanceof Uint16Array) return GL_UNSIGNED_SHORT;
+  if (data instanceof Int16Array) return GL_SHORT;
+  if (data instanceof Uint32Array) return GL_UNSIGNED_INT;
+  if (data instanceof Int32Array) return GL_INT;
+  return GL_FLOAT;
 }
 
 /**

@@ -1,4 +1,5 @@
 import type { TypedArray } from "../types/types";
+import { GL_STATIC_DRAW } from "./constants";
 
 /**
  * Creates, binds, and fills a WebGL buffer with data.
@@ -17,7 +18,7 @@ export function bindBuffer(
   const buffer = gl.createBuffer();
   const bufferData = getBufferData(data);
   gl.bindBuffer(target, buffer);
-  gl.bufferData(target, bufferData, gl.STATIC_DRAW);
+  gl.bufferData(target, bufferData, GL_STATIC_DRAW);
 
   return buffer;
 }

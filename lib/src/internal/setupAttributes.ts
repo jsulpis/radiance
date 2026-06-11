@@ -1,8 +1,6 @@
 import { setAttribute } from "../core/attribute";
+import { GL_UNSIGNED_INT, GL_UNSIGNED_SHORT } from "../core/constants";
 import type { Attribute } from "../types/types";
-
-const UNSIGNED_INT = WebGL2RenderingContext.UNSIGNED_INT;
-const UNSIGNED_SHORT = WebGL2RenderingContext.UNSIGNED_SHORT;
 
 export function setupAttributes(attributes: Record<string, Attribute>) {
   let _gl: WebGL2RenderingContext;
@@ -22,7 +20,8 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
   }
 
   const hasIndices = attributes.index != undefined;
-  const indexType = attributes.index?.data.length < Math.pow(2, 16) ? UNSIGNED_SHORT : UNSIGNED_INT;
+  const indexType =
+    attributes.index?.data.length < Math.pow(2, 16) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
   function getVertexCount() {
     return vertexCount;

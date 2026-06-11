@@ -1,4 +1,5 @@
 import type { DataTextureParams, ImageTextureParams } from "../core/texture";
+import { GL_ACTIVE_UNIFORMS, GL_TEXTURE_2D, GL_TEXTURE0 } from "../core/constants";
 import { fillTexture } from "../core/texture";
 import type { UpdatedCallback } from "../passes/renderPass";
 import type { Uniforms } from "../types/types";
@@ -21,7 +22,7 @@ export function setupUniforms<U extends Uniforms>(uniforms: U) {
     _gl = gl;
     _program = program;
 
-    const uniformsCount = _gl.getProgramParameter(_program, _gl.ACTIVE_UNIFORMS);
+    const uniformsCount = _gl.getProgramParameter(_program, GL_ACTIVE_UNIFORMS);
     for (let i = 0; i < uniformsCount; i++) {
       const uniformName = _gl.getActiveUniform(_program, i)?.name as UniformName;
       uniformsLocations.set(uniformName, _gl.getUniformLocation(_program, uniformName) ?? -1);
@@ -63,8 +64,8 @@ export function setupUniforms<U extends Uniforms>(uniforms: U) {
         textureUnits.set(name, { index: textureUnitIndex++ });
       }
       const { index } = textureUnits.get(name)!;
-      _gl.activeTexture(_gl.TEXTURE0 + index);
-      _gl.bindTexture(_gl.TEXTURE_2D, value);
+      _gl.activeTexture(GL_TEXTURE0 + index);
+      _gl.bindTexture(GL_TEXTURE_2D, value);
 
       return _gl.uniform1i(uniformLocation, index);
     }
@@ -95,7 +96,7 @@ export function setupUniforms<U extends Uniforms>(uniforms: U) {
         textureUnits.set(name, { index: textureUnitIndex++, texture });
       }
       const { index, texture } = textureUnits.get(name)!;
-      _gl.activeTexture(_gl.TEXTURE0 + index);
+      _gl.activeTexture(GL_TEXTURE0 + index);
       fillTexture(_gl, texture!, value);
 
       return _gl.uniform1i(uniformLocation, index);

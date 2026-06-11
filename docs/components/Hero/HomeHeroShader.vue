@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import {
+  cineonToneMapping,
+  effectPass,
+  glCanvas,
+  glContext,
+  loop,
+  onPointerEvents,
+  pingPongFBO,
+  trails,
+} from "@radiancejs/gl";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import simulationFragment from "./home-hero-sim.frag?raw";
 import vertex from "./home-hero.vert?raw";
@@ -20,9 +30,6 @@ const BASE_COLOR: [number, number, number] = [1, 1, 1];
 const MAIN_COLOR: [number, number, number] = [0, 0.6, 1];
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 
-let animationLoop: ReturnType<typeof import("@radiancejs/gl").loop> | null = null;
-let pointerEvents: ReturnType<typeof import("@radiancejs/gl").onPointerEvents> | null = null;
-
 function createInitialState(count: number) {
   const state = new Float32Array(count * 4);
 
@@ -33,26 +40,16 @@ function createInitialState(count: number) {
   return state;
 }
 
-function handleVisibilityChange() {
-  if (document.hidden) {
-    animationLoop?.pause();
-  } else {
-    animationLoop?.play();
-  }
-}
-
-onMounted(async () => {
+onMounted(() => {
   const canvas = canvasEl.value;
 
   if (!canvas) {
     return;
   }
 
-  const radiance = await import("@radiancejs/gl");
-  const { gl } = radiance.glContext(canvas, { colorSpace: "display-p3" });
-  const toneMapping = radiance.cineonToneMapping({ exposure: 1 });
+  const { gl } = glContext(canvas, { colorSpace: "display-p3" });
 
-  const simulationPass = radiance.pingPongFBO(gl, {
+  const simulationPass = pingPongFBO(gl, {
     fragment: simulationFragment,
     dataTexture: {
       name: "tParticles",
@@ -66,9 +63,7 @@ onMounted(async () => {
     },
   });
 
-  simulationPass.render();
-
-  const halo = radiance.effectPass({
+  const halo = effectPass({
     fragment: haloFragment,
     uniforms: {
       uBaseRadius: BASE_RADIUS,
@@ -81,7 +76,7 @@ onMounted(async () => {
   const pointerTarget = { x: 0.75, y: 0 };
   const pointerState = { ...pointerTarget };
 
-  const renderPass = radiance.glCanvas<RenderUniforms>({
+  const renderPass = glCanvas<RenderUniforms>({
     canvas,
     vertex,
     fragment,
@@ -96,12 +91,11 @@ onMounted(async () => {
     attributes: {
       aCoords: simulationPass.coords,
     },
-    colorSpace: "display-p3",
-    postEffects: [radiance.trails({ fadeout: 0.15 }), halo, toneMapping],
+    postEffects: [trails({ fadeout: 0.15 }), halo, cineonToneMapping()],
     blending: "additive",
   });
 
-  pointerEvents = radiance.onPointerEvents(canvas, {
+  const pointerEvents = onPointerEvents(canvas, {
     move: ({ pointer, boundingRect, center }) => {
       const centerX = center.x;
       const centerY = center.y;
@@ -111,7 +105,7 @@ onMounted(async () => {
     },
   });
 
-  animationLoop = radiance.loop(({ time, deltaTime }) => {
+  const animationLoop = loop(({ time, deltaTime }) => {
     const pointerLerp = deltaTime / 1000;
     pointerState.x += (pointerTarget.x - pointerState.x) * pointerLerp;
     pointerState.y += (pointerTarget.y - pointerState.y) * pointerLerp;
@@ -125,16 +119,22 @@ onMounted(async () => {
     renderPass.uniforms.uPointer = [pointerState.x, pointerState.y];
     renderPass.render();
   });
-});
 
-if (typeof window !== "undefined") {
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      animationLoop?.pause();
+    } else {
+      animationLoop?.play();
+    }
+  }
+
   document.addEventListener("visibilitychange", handleVisibilityChange);
-}
 
-onBeforeUnmount(() => {
-  document.removeEventListener("visibilitychange", handleVisibilityChange);
-  animationLoop?.pause();
-  pointerEvents?.stop();
+  onBeforeUnmount(() => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    animationLoop?.pause();
+    pointerEvents?.stop();
+  });
 });
 </script>
 
