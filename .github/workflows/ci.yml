@@ -1,12 +1,13 @@
 name: CI
-permissions:
-  contents: read
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 env:
   PNPM_VERSION: 10
