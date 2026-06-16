@@ -16,7 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsdown && pnpm docgen",
+    "build": "pnpm build:lib && pnpm docgen",
+    "build:lib": "tsdown",
     "dev": "astro dev --port 3000",
     "docgen": "typedoc && node ./scripts/copy-docs.mjs && prettier --write ../docs/api --log-level warn --print-width 80",
     "format": "prettier src --check",
@@ -25,6 +26,7 @@
     "lint:fix": "eslint src --fix",
     "prepack": "tsdown",
     "release": "changelogen --release --clean && pnpm publish",
+    "size": "size-limit",
     "test": "playwright test",
     "test:local": "docker compose run --build --rm -p 9323:9323 test",
     "test:update": "docker compose run --build --rm -p 9323:9323 test sh -c 'xvfb-run pnpm run test -u'",
@@ -33,6 +35,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.6",
     "@playwright/test": "1.49.1",
+    "@size-limit/preset-small-lib": "12.1.0",
     "@tweakpane/core": "2.0.5",
     "@types/node": "22.19.13",
     "astro": "5.18.0",
@@ -41,6 +44,7 @@
     "eslint-config-unjs": "0.6.2",
     "gl-matrix": "3.4.4",
     "prettier": "3.8.1",
+    "size-limit": "12.1.0",
     "tsdown": "0.21.0",
     "tweakpane": "4.0.5",
     "typedoc": "0.28.17",
@@ -54,5 +58,10 @@
       ""
     ]
   },
-  "packageManager": "pnpm@10.30.3"
+  "packageManager": "pnpm@10.30.3",
+  "size-limit": [
+    {
+      "path": "dist/index.js"
+    }
+  ]
 }
