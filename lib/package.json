@@ -38,7 +38,7 @@
     "@size-limit/preset-small-lib": "12.1.0",
     "@tweakpane/core": "2.0.5",
     "@types/node": "22.19.13",
-    "astro": "5.18.0",
+    "astro": "6.4.6",
     "changelogen": "0.6.2",
     "eslint": "9.39.3",
     "eslint-config-unjs": "0.6.2",
