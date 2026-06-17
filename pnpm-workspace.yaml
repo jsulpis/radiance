@@ -7,3 +7,5 @@ allowBuilds:
   "@parcel/watcher": false
   esbuild: true
   sharp: false
+
+minimumReleaseAge: 1440
