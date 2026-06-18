@@ -18,7 +18,7 @@
     "@types/node": "22.19.13",
     "@types/three": "0.183.1",
     "typescript": "5.9.3",
-    "vite": "6.4.1"
+    "vite": "6.4.3"
   },
   "packageManager": "pnpm@10.30.3"
 }
