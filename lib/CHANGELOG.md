@@ -1,5 +1,54 @@
 # Changelog
 
+## v0.11.0
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.10.0...v0.11.0)
+
+### 🚀 Enhancements
+
+- **benchmark:** Add a benchmark to compare webgl libs ([3d9d022](https://github.com/jsulpis/radiance/commit/3d9d022))
+
+### 🔥 Performance
+
+- Optimize the compiled size of the quadRenderPass ([5f98f30](https://github.com/jsulpis/radiance/commit/5f98f30))
+
+### 🩹 Fixes
+
+- Avoid an error when a fragment shader already has a precision declaration ([beae048](https://github.com/jsulpis/radiance/commit/beae048))
+
+### 💅 Refactors
+
+- ⚠️  Modify the signature of useBoundingRect and usePointerEvents ([b67069d](https://github.com/jsulpis/radiance/commit/b67069d))
+- ⚠️  Update the signature of onPointerEvents handlers ([17c40a0](https://github.com/jsulpis/radiance/commit/17c40a0))
+- Create WebGL constants for server side compatibility ([1bad83e](https://github.com/jsulpis/radiance/commit/1bad83e))
+
+### 📖 Documentation
+
+- Setup API documentation generation from TSDoc ([cd71cba](https://github.com/jsulpis/radiance/commit/cd71cba))
+- Update the API documentation ([b7b25b9](https://github.com/jsulpis/radiance/commit/b7b25b9))
+- Add mermaid diagram in the API overview ([f30a35c](https://github.com/jsulpis/radiance/commit/f30a35c))
+- Update the examples with the new API ([88e7ac6](https://github.com/jsulpis/radiance/commit/88e7ac6))
+- Revamp the home page ([654d046](https://github.com/jsulpis/radiance/commit/654d046))
+- Add llms.txt and markdown files for LLMs ([c08aabb](https://github.com/jsulpis/radiance/commit/c08aabb))
+- Add an example of maths using Transform Feedback ([fdb3232](https://github.com/jsulpis/radiance/commit/fdb3232))
+- Add hero particles animation ([da90a0c](https://github.com/jsulpis/radiance/commit/da90a0c))
+- Force dark mode ([693d061](https://github.com/jsulpis/radiance/commit/693d061))
+
+### 🏡 Chore
+
+- Add BundleSizeGraph component ([a7b8c39](https://github.com/jsulpis/radiance/commit/a7b8c39))
+- Add size-limit script ([3196994](https://github.com/jsulpis/radiance/commit/3196994))
+- Add size-limit GitHub Action ([e91bbbc](https://github.com/jsulpis/radiance/commit/e91bbbc))
+- Update lib dependencies ([423f6d9](https://github.com/jsulpis/radiance/commit/423f6d9))
+- Update playwright ([a667e24](https://github.com/jsulpis/radiance/commit/a667e24))
+- Update documentation dependencies ([58f5d03](https://github.com/jsulpis/radiance/commit/58f5d03))
+- Remove WebGL constants from generated API docs ([b188cf5](https://github.com/jsulpis/radiance/commit/b188cf5))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Modify the signature of useBoundingRect and usePointerEvents ([b67069d](https://github.com/jsulpis/radiance/commit/b67069d))
+- ⚠️  Update the signature of onPointerEvents handlers ([17c40a0](https://github.com/jsulpis/radiance/commit/17c40a0))
+
 ## v0.10.0
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.9.0...v0.10.0)
