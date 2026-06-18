@@ -6,5 +6,5 @@ services:
     ports:
       - "9323:9323"
     volumes:
-      - ./test-results:/app/packages/gl/test-results
-      - ./tests/__screenshots__:/app/packages/gl/tests/__screenshots__
+      - ./test-results:/app/lib/test-results
+      - ./tests/__screenshots__:/app/lib/tests/__screenshots__
