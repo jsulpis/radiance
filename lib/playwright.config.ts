@@ -33,9 +33,6 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         viewport: desktopViewport,
-        launchOptions: {
-          args: ["--use-angle=gl"],
-        },
       },
     },
     {
@@ -61,9 +58,6 @@ export default defineConfig({
       use: {
         ...devices["Pixel 5"],
         viewport: mobileViewport,
-        launchOptions: {
-          args: ["--use-gl=egl", "--ignore-gpu-blocklist", "--use-gl=angle"],
-        },
       },
     },
     {
