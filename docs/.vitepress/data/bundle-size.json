@@ -1,40 +1,40 @@
 {
-  "generatedAt": "2026-04-25T16:10:27.979Z",
+  "generatedAt": "2026-07-17T18:44:26.951Z",
   "items": [
     {
       "id": "vanilla",
       "label": "vanilla WebGL",
       "version": "",
       "sloc": 68,
-      "gzip": 0.81
+      "gzip": 0.79
     },
     {
       "id": "radiance",
       "label": "@radiancejs/gl",
-      "version": "0.10.0",
+      "version": "0.11.0",
       "sloc": 5,
-      "gzip": 5.35
+      "gzip": 5.06
     },
     {
       "id": "twgl",
       "label": "twgl.js",
       "version": "7.0.0",
       "sloc": 36,
-      "gzip": 6.39
+      "gzip": 6.51
     },
     {
       "id": "ogl",
       "label": "ogl",
       "version": "1.0.11",
       "sloc": 29,
-      "gzip": 12.84
+      "gzip": 12.69
     },
     {
       "id": "three",
       "label": "three",
-      "version": "0.183.2",
+      "version": "0.185.1",
       "sloc": 39,
-      "gzip": 119.92
+      "gzip": 124.71
     }
   ]
 }
