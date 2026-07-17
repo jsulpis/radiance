@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.11.1
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.11.0...v0.11.1)
+
+### 🩹 Fixes
+
+- Fix broken shader transpilation to GLSL 300 ([57c9f8a](https://github.com/jsulpis/radiance/commit/57c9f8a))
+
+### 📖 Documentation
+
+- Update benchmark ([7ae8ed8](https://github.com/jsulpis/radiance/commit/7ae8ed8))
+
 ## v0.11.0
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.10.0...v0.11.0)
