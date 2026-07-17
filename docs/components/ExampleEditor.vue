@@ -7,7 +7,7 @@
       ...props,
       deps: {
         ...deps,
-        '@radiancejs/gl': '0.10.0',
+        '@radiancejs/gl': '0.11.1',
       },
     }"
   >

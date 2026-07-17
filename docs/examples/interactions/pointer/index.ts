@@ -26,10 +26,10 @@ const { uniforms, onAfterRender } = glCanvas({
 });
 
 onPointerEvents(canvas, {
-  move: ({ pointer, canvasCenter, canvasRect }) => {
+  move: ({ pointer, boundingRect, center }) => {
     uniforms.uPointerPosition = [
-      (pointer.x - canvasCenter.x) / Math.min(canvasRect.width, canvasRect.height),
-      (canvasCenter.y - pointer.y) / Math.min(canvasRect.width, canvasRect.height),
+      (pointer.x - center.x) / Math.min(boundingRect.width, boundingRect.height),
+      (center.y - pointer.y) / Math.min(boundingRect.width, boundingRect.height),
     ];
   },
   down: () => {
