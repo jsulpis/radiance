@@ -44,7 +44,10 @@ function convertToGLSL300(shader: string): string {
 
   if (shader.includes("gl_FragColor")) {
     // Fragment shader
-    glsl300Shader = glsl300Shader.replace(/\s*void\s+main/, "out vec4 fragColor;void main");
+    glsl300Shader = glsl300Shader.replace(
+      /(\n*\s*)void\s+main/,
+      "$1out vec4 fragColor;$1void main",
+    );
     glsl300Shader = glsl300Shader
       .replace(/\bvarying\b/g, "in")
       .replace(/\bgl_FragColor\b/g, "fragColor");
