@@ -2,6 +2,7 @@
   "name": "@radiancejs/gl",
   "version": "0.11.1",
   "description": "Lightweight, reactive WebGL library for working with shaders",
+  "homepage": "https://radiancejs.dev",
   "repository": "jsulpis/radiance",
   "license": "MIT",
   "author": "Julien SULPIS",

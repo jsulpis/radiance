@@ -1,3 +1,1 @@
-# Radiance
-
-WIP
+lib/README.md
