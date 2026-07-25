@@ -2,7 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/%40radiancejs%2Fgl?logo=npm&label=npm)](https://npmx.dev/package/@radiancejs/gl)
 [![CI](https://github.com/jsulpis/radiance/actions/workflows/ci.yml/badge.svg)](https://github.com/jsulpis/radiance/actions/workflows/ci.yml)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/%40radiancejs%2Fgl)](https://bundlephobia.com/package/@radiancejs/gl)
+![Lib Bundle Size (gzip)](<https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdeno.bundlejs.com%2F%3Fq%3D%40radiancejs%2Fgl&query=%24.size.compressedSize&style=flat&label=full%20(gzip)>)
+![glCanvas Size (gzip)](<https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdeno.bundlejs.com%2F%3Fq%3D%40radiancejs%2Fgl%26treeshake%3D%255B%257BglCanvas%257D%255D&query=%24.size.compressedSize&style=flat&label=glCanvas%20(gzip)>)
 [![license](https://img.shields.io/github/license/jsulpis/radiance)](https://github.com/jsulpis/radiance/blob/main/LICENSE)
 
 Lightweight, reactive WebGL2 library for building shader-driven experiences.
