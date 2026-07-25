@@ -6,5 +6,11 @@ export default defineConfig({
   platform: "browser",
   exports: true,
   plugins: [glsl({ minify: true })],
-  publint: true,
+  publint: {
+    strict: true,
+  },
+  attw: {
+    profile: "esm-only",
+    level: "error",
+  },
 });

@@ -38,6 +38,7 @@
     "typecheck": "tsc --noEmit && astro check --tsconfig playground/tsconfig.json"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "0.18.5",
     "@astrojs/check": "0.9.9",
     "@playwright/test": "1.61.0",
     "@size-limit/preset-small-lib": "12.1.0",
