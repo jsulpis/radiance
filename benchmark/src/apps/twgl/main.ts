@@ -26,7 +26,10 @@ const bufferInfo = createBufferInfoFromArrays(gl, {
 });
 
 function resize() {
-  resizeCanvasToDisplaySize(gl.canvas as HTMLCanvasElement, window.devicePixelRatio);
+  resizeCanvasToDisplaySize(
+    gl.canvas as HTMLCanvasElement,
+    Math.min(window.devicePixelRatio || 1, 2),
+  );
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 }
 

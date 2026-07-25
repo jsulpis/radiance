@@ -86,7 +86,7 @@ onMounted(() => {
       uMainColor: MAIN_COLOR,
       uBaseRadius: BASE_RADIUS,
       uPointer: [pointerState.x, pointerState.y],
-      uDpr: Math.min(devicePixelRatio, 2),
+      uDpr: Math.min(window.devicePixelRatio || 1, 2),
     },
     attributes: {
       aCoords: simulationPass.coords,
