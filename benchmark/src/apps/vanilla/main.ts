@@ -21,7 +21,7 @@ gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
 
 function resize() {
-  const devicePixelRatio = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   const width = Math.round(window.innerWidth * devicePixelRatio);
   const height = Math.round(window.innerHeight * devicePixelRatio);
 

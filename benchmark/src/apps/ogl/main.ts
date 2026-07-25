@@ -6,7 +6,7 @@ const renderer = new Renderer({
   canvas,
   antialias: false,
   alpha: false,
-  dpr: window.devicePixelRatio || 1,
+  dpr: Math.min(window.devicePixelRatio || 1, 2),
 });
 
 const { gl } = renderer;

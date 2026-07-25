@@ -28,7 +28,7 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     canvas: canvasProp,
     fragment,
     vertex,
-    dpr = globalThis.devicePixelRatio || 1,
+    dpr = Math.min(globalThis.devicePixelRatio || 1, 2),
     postEffects = [],
     immediate,
     renderMode = "auto",
@@ -181,7 +181,7 @@ export interface GLCanvasParams<U extends Uniforms> extends LoopParams, QuadPass
   webglAttributes?: WebGLContextAttributes;
   /**
    * Device Pixel Ratio for the canvas.
-   * @default window.devicePixelRatio
+   * @default Math.min(globalThis.devicePixelRatio || 1, 2)
    */
   dpr?: number;
   /**

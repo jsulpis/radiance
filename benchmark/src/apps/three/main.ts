@@ -10,7 +10,7 @@ import {
 const canvas = document.querySelector("canvas");
 
 const renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false });
-renderer.setPixelRatio(window.devicePixelRatio || 1);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 const scene = new Scene();
 const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
