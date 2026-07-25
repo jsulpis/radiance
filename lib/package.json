@@ -2,6 +2,14 @@
   "name": "@radiancejs/gl",
   "version": "0.11.1",
   "description": "Lightweight, reactive WebGL library for working with shaders",
+  "keywords": [
+    "webgl",
+    "webgl2",
+    "shaders",
+    "glsl",
+    "3d",
+    "graphics"
+  ],
   "homepage": "https://radiancejs.dev",
   "repository": {
     "type": "git",
