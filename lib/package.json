@@ -45,6 +45,7 @@
     "eslint-config-unjs": "0.6.2",
     "gl-matrix": "3.4.4",
     "prettier": "3.8.4",
+    "publint": "0.3.22",
     "size-limit": "12.1.0",
     "tsdown": "0.22.3",
     "tweakpane": "4.0.5",
@@ -54,12 +55,12 @@
     "typescript": "6.0.3",
     "vite-plugin-glsl": "1.6.0"
   },
+  "packageManager": "pnpm@11.7.0",
   "changelog": {
     "excludeAuthors": [
       ""
     ]
   },
-  "packageManager": "pnpm@11.7.0",
   "size-limit": [
     {
       "path": "dist/index.js"
