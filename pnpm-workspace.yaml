@@ -9,3 +9,6 @@ allowBuilds:
   sharp: false
 
 minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  # Renovate security update: astro@7.1.0
+  - astro@7.1.0
