@@ -2,8 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/%40radiancejs%2Fgl?logo=npm&label=npm)](https://npmx.dev/package/@radiancejs/gl)
 [![CI](https://github.com/jsulpis/radiance/actions/workflows/ci.yml/badge.svg)](https://github.com/jsulpis/radiance/actions/workflows/ci.yml)
-![Lib Bundle Size (gzip)](<https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdeno.bundlejs.com%2F%3Fq%3D%40radiancejs%2Fgl&query=%24.size.compressedSize&style=flat&label=full%20(gzip)>)
-![glCanvas Size (gzip)](<https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdeno.bundlejs.com%2F%3Fq%3D%40radiancejs%2Fgl%26treeshake%3D%255B%257BglCanvas%257D%255D&query=%24.size.compressedSize&style=flat&label=glCanvas%20(gzip)>)
+[![Lib Bundle Size (gzip)](<https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdeno.bundlejs.com%2F%3Fq%3D%40radiancejs%2Fgl&query=%24.size.compressedSize&style=flat&label=full%20(gzip)>)](https://bundlejs.com/?q=@radiancejs/gl&treeshake=%5B*%5D)
+[![glCanvas Size (gzip)](<https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdeno.bundlejs.com%2F%3Fq%3D%40radiancejs%2Fgl%26treeshake%3D%255B%257BglCanvas%257D%255D&query=%24.size.compressedSize&style=flat&label=glCanvas%20(gzip)>)](https://bundlejs.com/?q=@radiancejs/gl&treeshake=%5B%7BglCanvas%7D%5D)
 [![license](https://img.shields.io/github/license/jsulpis/radiance)](https://github.com/jsulpis/radiance/blob/main/LICENSE)
 
 Lightweight, reactive WebGL2 library for building shader-driven experiences.
