@@ -1,4 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>jsulpis/renovate-config:libs"]
+  "extends": ["local>jsulpis/renovate-config", ":semanticCommitsDisabled"],
+  "packageRules": [
+    {
+      "matchFileNames": ["lib/package.json"],
+      "extends": ["local>jsulpis/renovate-config:libs"]
+    },
+    {
+      "matchFileNames": ["benchmark/package.json"],
+      "matchDepTypes": ["dependencies"],
+      "groupName": "benchmark dependencies",
+      "groupSlug": "benchmark"
+    },
+    {
+      "matchFileNames": ["docs/package.json"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "non-major docs dependencies",
+      "groupSlug": "non-major-docs"
+    }
+  ]
 }
