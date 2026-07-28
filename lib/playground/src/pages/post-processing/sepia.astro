@@ -81,7 +81,7 @@ import Layout from "../../layouts/Layout.astro";
       }
     `,
     uniforms: {
-      uTexture: loadTexture("/images/lion.jpg"),
+      uTexture: await loadTexture("/images/lion.jpg"),
     },
     postEffects: [sepiaEffect, vignetteEffect],
   });
