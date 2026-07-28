@@ -9,8 +9,8 @@ importers:
   benchmark:
     dependencies:
       '@radiancejs/gl':
-        specifier: 0.11.0
-        version: 0.11.0
+        specifier: 0.11.1
+        version: 0.11.1
       ogl:
         specifier: 1.0.11
         version: 1.0.11
@@ -1256,8 +1256,8 @@ packages:
   '@quansync/fs@1.0.0':
     resolution: {integrity: sha512-4TJ3DFtlf1L5LDMaM6CanJ/0lckGNtJcMjQ1NAV6zDmA0tEHKZtxNKin8EgPaVX1YzljbxckyT2tJrpQKAtngQ==}
 
-  '@radiancejs/gl@0.11.0':
-    resolution: {integrity: sha512-Y+UNfJZZ+Nvy2LWeUjxUZiIZajheh2PmcBuKL5OS6H6s911KQQJPEVQT3pnHjd5yF6HAe/XfbYQVtztSPSdiJA==}
+  '@radiancejs/gl@0.11.1':
+    resolution: {integrity: sha512-bv71gCxxb1rFaXUQyzOq/3V4Sp2T97dD3J26isSWYYEZuBW8Ug53LVB3LffYMArH0J9gzBwZho2U/XCsU6vE5A==}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.7':
     resolution: {integrity: sha512-/uadfNUaMLFFBGvcIOiq8NnlhvTZTjOyybJaJnhGxD0n9k5vZRJfTaitH5GHnbwmc6T2PC+ZpS1FQH+vXyS/UA==}
@@ -5693,7 +5693,7 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@radiancejs/gl@0.11.0': {}
+  '@radiancejs/gl@0.11.1': {}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.7':
     optional: true
