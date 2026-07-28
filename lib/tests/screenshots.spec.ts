@@ -14,7 +14,6 @@ const expectedRendersByDemo = {
   mipmap: /[1-3]/,
   texture: /1|2/,
   offscreencanvas: "2",
-  sepia: /1|2/,
   alpha: "2",
   blending: "2",
   trails: "90",
