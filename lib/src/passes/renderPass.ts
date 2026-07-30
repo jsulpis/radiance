@@ -315,10 +315,4 @@ export type UpdatedCallback<U extends Uniforms = Record<string, never>> = (
  * @inline
  */
 type DrawMode =
-  | "POINTS"
-  | "LINES"
-  | "LINE_STRIP"
-  | "LINE_LOOP"
-  | "TRIANGLES"
-  | "TRIANGLE_STRIP"
-  | "TRIANGLE_FAN";
+  "POINTS" | "LINES" | "LINE_STRIP" | "LINE_LOOP" | "TRIANGLES" | "TRIANGLE_STRIP" | "TRIANGLE_FAN";
