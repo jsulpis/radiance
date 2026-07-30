@@ -7,14 +7,16 @@ const allLoops: Array<LoopObj> = [];
  * @returns  An object with `play` and `pause` methods to control the animation loop.
  */
 export function loop(callback: (data: LoopData) => void, params?: LoopParams) {
-  let animationFrameHandle: number;
+  let animationFrameHandle: number | undefined;
   let pauseTime: number | null;
   let loopStartTime: number;
   let delay = 0;
+  let stopped = false;
 
   const { immediate = true } = params || {};
 
   function loopFn(previousTime: number, delay = 0) {
+    if (stopped) return;
     const currentTime = performance.now();
     const elapsedTime = currentTime - loopStartTime;
     const time = elapsedTime - delay;
@@ -25,28 +27,38 @@ export function loop(callback: (data: LoopData) => void, params?: LoopParams) {
   }
 
   function play() {
+    if (stopped) return;
     const currentTime = performance.now();
     if (loopStartTime === undefined) {
       loopStartTime = performance.now();
     }
     delay += currentTime - (pauseTime || currentTime);
-    cancelAnimationFrame(animationFrameHandle);
+    if (animationFrameHandle != undefined) cancelAnimationFrame(animationFrameHandle);
     animationFrameHandle = requestAnimationFrame(() => loopFn(currentTime, delay));
     pauseTime = null;
   }
 
   function pause() {
+    if (stopped) return;
     if (pauseTime == null) {
       pauseTime = performance.now();
     }
-    cancelAnimationFrame(animationFrameHandle);
+    if (animationFrameHandle != undefined) cancelAnimationFrame(animationFrameHandle);
+  }
+
+  function stop() {
+    if (stopped) return;
+    stopped = true;
+    if (animationFrameHandle != undefined) cancelAnimationFrame(animationFrameHandle);
+    const index = allLoops.indexOf(loop);
+    if (index !== -1) allLoops.splice(index, 1);
   }
 
   if (immediate) {
     play();
   }
 
-  const loop: LoopObj = { play, pause };
+  const loop: LoopObj = { play, pause, stop };
 
   allLoops.push(loop);
 
@@ -117,4 +129,6 @@ export interface LoopObj {
   play: () => void;
   /** Pause the animation loop. */
   pause: () => void;
+  /** Stop the animation frame and unregister this loop. */
+  stop: () => void;
 }

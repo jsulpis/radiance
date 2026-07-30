@@ -59,3 +59,9 @@ export interface Attribute {
   /** The offset of the first component in the buffer. */
   offset?: number;
 }
+
+/** A resource that can release its owned browser or GPU resources. */
+export interface Disposable {
+  /** Releases owned resources. Safe to call more than once. */
+  dispose(): void;
+}

@@ -95,6 +95,11 @@ export function trails(params?: TrailsParams) {
 
   trailsPass.onAfterRender(swap);
 
+  trailsPass.onDispose(() => {
+    fboRead?.dispose();
+    fboWrite?.dispose();
+  });
+
   return trailsPass;
 }
 

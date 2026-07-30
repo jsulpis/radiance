@@ -8,6 +8,7 @@ import {
   GL_RENDERBUFFER,
   GL_TEXTURE_2D,
 } from "./constants";
+import type { Disposable } from "../types/types";
 import type { BaseTextureParams } from "./texture";
 import { fillTexture } from "./texture";
 
@@ -23,6 +24,7 @@ export function createRenderTarget(
 ): RenderTarget {
   let _width = params?.width ?? gl.canvas.width;
   let _height = params?.height ?? gl.canvas.height;
+  let disposed = false;
 
   const framebuffer = gl.createFramebuffer();
 
@@ -53,6 +55,7 @@ export function createRenderTarget(
    * Resizes the render target, creating a new texture and reattaching it.
    */
   function setSize(width: number, height: number) {
+    if (disposed) return;
     _width = width;
     _height = height;
 
@@ -81,6 +84,14 @@ export function createRenderTarget(
     _texture = newTexture;
   }
 
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    gl.deleteTexture(_texture);
+    if (renderbuffer) gl.deleteRenderbuffer(renderbuffer);
+    gl.deleteFramebuffer(framebuffer);
+  }
+
   return {
     framebuffer,
     get texture() {
@@ -93,6 +104,7 @@ export function createRenderTarget(
       return _height;
     },
     setSize,
+    dispose,
   };
 }
 
@@ -124,7 +136,7 @@ export function setRenderTarget(
  *
  * Use it with any kind of render pass with `pass.setTarget(renderTarget)` or as a parameter of the render function, to render offscreen and use the resulting texture in subsequent passes or for readback.
  */
-export type RenderTarget = {
+export type RenderTarget = Disposable & {
   /** The underlying WebGL framebuffer. */
   framebuffer: WebGLFramebuffer;
   /** The texture attached to the framebuffer. */

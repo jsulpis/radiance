@@ -20,6 +20,8 @@ export function onResize(
 ) {
   let size: ResizeObserverSize;
   let devicePixelSize: ResizeObserverSize;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  let stopped = false;
 
   const observer = new ResizeObserver((entries) => {
     const entry = entries.find((entry) => entry.target === target)!;
@@ -32,7 +34,8 @@ export function onResize(
 
     // call the callback after the next paint, otherwise there are glitches when resizing a canvas
     // with an active render loop
-    setTimeout(() => {
+    timeout = setTimeout(() => {
+      if (stopped) return;
       callback({
         size: { width: size.inlineSize, height: size.blockSize },
         devicePixelSize: { width: devicePixelSize.inlineSize, height: devicePixelSize.blockSize },
@@ -45,7 +48,12 @@ export function onResize(
 
   return {
     /** Disconnect the resize observer. */
-    disconnect: observer.disconnect,
+    stop: () => {
+      if (stopped) return;
+      stopped = true;
+      observer.disconnect();
+      if (timeout != undefined) clearTimeout(timeout);
+    },
     /** Start observing the target element. */
     observe: () => {
       observer.observe(target);

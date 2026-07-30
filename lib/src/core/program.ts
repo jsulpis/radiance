@@ -28,9 +28,15 @@ export function createProgram(
   const fragmentShader =
     fragment instanceof WebGLShader ? fragment : createShader(gl, fragment, GL_FRAGMENT_SHADER);
 
+  function dispose() {
+    if (typeof vertex === "string" && vertexShader) gl.deleteShader(vertexShader);
+    if (typeof fragment === "string" && fragmentShader) gl.deleteShader(fragmentShader);
+  }
+
   const program = gl.createProgram();
   if (program === null || vertexShader == null || fragmentShader == null) {
     console.error("could not create program");
+    dispose();
     gl.deleteProgram(program);
     return null;
   }
@@ -45,9 +51,12 @@ export function createProgram(
 
   if (!gl.getProgramParameter(program, GL_LINK_STATUS)) {
     console.error("could not link program: " + gl.getProgramInfoLog(program));
+    dispose();
     gl.deleteProgram(program);
     return null;
   }
+
+  dispose();
 
   return program;
 }

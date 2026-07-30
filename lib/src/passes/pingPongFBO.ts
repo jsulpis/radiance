@@ -73,6 +73,11 @@ export function pingPongFBO<U extends Uniforms>(
     swap();
   };
 
+  pingPongFBOPass.onDispose(() => {
+    fboRead.dispose();
+    fboWrite.dispose();
+  });
+
   return pingPongFBOPass;
 }
 

@@ -5,6 +5,7 @@ import type { Attribute } from "../types/types";
 export function setupAttributes(attributes: Record<string, Attribute>) {
   let _gl: WebGL2RenderingContext;
   let _vao: WebGLVertexArrayObject | null;
+  const buffers: WebGLBuffer[] = [];
 
   let vertexCount = 0;
 
@@ -16,6 +17,7 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
     for (const [attributeName, attributeObj] of Object.entries(attributes)) {
       const attr = setAttribute(_gl, program, attributeName, attributeObj);
       vertexCount = Math.max(vertexCount, attr.vertexCount);
+      if (attr.buffer) buffers.push(attr.buffer);
     }
   }
 
@@ -31,10 +33,18 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
     _gl.bindVertexArray(_vao);
   }
 
+  function dispose() {
+    for (const buffer of buffers) _gl.deleteBuffer(buffer);
+    buffers.length = 0;
+    if (_vao) _gl.deleteVertexArray(_vao);
+    _vao = null;
+  }
+
   return {
     initialize,
     getVertexCount,
     bindVAO,
+    dispose,
     hasIndices,
     indexType,
   };

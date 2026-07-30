@@ -107,12 +107,20 @@ export function setupUniforms<U extends Uniforms>(uniforms: U) {
     return getSnapshot({ ...uniformsProxy });
   }
 
+  function dispose() {
+    for (const { texture } of textureUnits.values()) {
+      if (texture) _gl.deleteTexture(texture);
+    }
+    textureUnits.clear();
+  }
+
   return {
     initialize,
     uniformsProxy,
     onUpdated,
     setUniforms,
     getUniformsSnapshot,
+    dispose,
   };
 }
 

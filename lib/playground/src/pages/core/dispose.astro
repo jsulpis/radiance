@@ -1,0 +1,35 @@
+---
+import GlobalPlayPause from "../../components/GlobalPlayPause.astro";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<script>
+  import { glCanvas, linearToneMapping, noise } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
+
+  const { onAfterRender, dispose, uniforms } = glCanvas({
+    canvas: document.querySelector("canvas")!,
+    fragment: /* glsl */ `
+			varying vec2 vUv;
+			uniform vec3 uColor;
+
+			void main() {
+				gl_FragColor = vec4(uColor, 1.);
+			}
+		`,
+    uniforms: {
+      uColor: [0, 1, 1],
+    },
+    postEffects: [noise(), linearToneMapping()],
+  });
+
+  onAfterRender(() => {
+    incrementRenderCount();
+    uniforms.uColor = [0, 0, 0];
+    dispose(); // should not re-render
+  });
+</script>
+
+<Layout title="Dispose">
+  <canvas></canvas>
+</Layout>

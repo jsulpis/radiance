@@ -5,7 +5,8 @@ import { watchBoundingRect } from "./watchBoundingRect";
  * Listen to pointer events on an element and provide the pointer position, element bounding rect and center to the handlers.
  */
 export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHandlers) {
-  const { rect: boundingRect, center } = watchBoundingRect(element);
+  const { rect: boundingRect, center, stop: stopBoundingRect } = watchBoundingRect(element);
+  let stopped = false;
 
   const activeHandlers = Object.fromEntries(
     Object.entries(handlers)
@@ -23,6 +24,7 @@ export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHan
   );
 
   function listen() {
+    if (stopped) return;
     for (const [event, handler] of Object.entries(activeHandlers)) {
       element.addEventListener(`pointer${event as keyof PointerEventsHandlers}`, handler, {
         passive: true,
@@ -30,10 +32,17 @@ export function onPointerEvents(element: HTMLElement, handlers: PointerEventsHan
     }
   }
 
-  function stop() {
+  function removeListeners() {
     for (const [event, handler] of Object.entries(activeHandlers)) {
       element.removeEventListener(`pointer${event as keyof PointerEventsHandlers}`, handler);
     }
+  }
+
+  function stop() {
+    if (stopped) return;
+    stopped = true;
+    removeListeners();
+    stopBoundingRect();
   }
 
   listen();

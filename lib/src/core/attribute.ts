@@ -33,10 +33,10 @@ export function setAttribute(
   const location = gl.getAttribLocation(program, name);
 
   if (name === "index") {
-    bindBuffer(gl, GL_ELEMENT_ARRAY_BUFFER, bufferData);
+    const buffer = bindBuffer(gl, GL_ELEMENT_ARRAY_BUFFER, bufferData);
 
     if (location === -1) {
-      return { location, vertexCount: bufferData.length };
+      return { location, vertexCount: bufferData.length, buffer };
     }
   }
 
@@ -45,7 +45,7 @@ export function setAttribute(
     return { location, vertexCount: 0 };
   }
 
-  bindBuffer(gl, GL_ARRAY_BUFFER, bufferData);
+  const buffer = bindBuffer(gl, GL_ARRAY_BUFFER, bufferData);
 
   gl.enableVertexAttribArray(location);
   gl.vertexAttribPointer(
@@ -68,7 +68,7 @@ export function setAttribute(
     );
   }
 
-  return { location, vertexCount };
+  return { location, vertexCount, buffer };
 }
 
 function getGLType(_gl: WebGL2RenderingContext, data: ArrayBufferView) {
@@ -90,4 +90,6 @@ interface SetAttributeResult {
   location: number;
   /** The computed vertex count based on the attribute data and configuration. */
   vertexCount: number;
+  /** The WebGL buffer associated with the attribute, if any. */
+  buffer?: WebGLBuffer | null;
 }
