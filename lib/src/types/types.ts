@@ -4,9 +4,7 @@ import type { TextureParams } from "../core/texture";
  * A vector uniform value, representing a vec2, vec3, or vec4.
  */
 export type VectorUniform =
-  | [number, number]
-  | [number, number, number]
-  | [number, number, number, number];
+  [number, number] | [number, number, number] | [number, number, number, number];
 
 /**
  * A matrix uniform value, representing a mat3 or mat4.
