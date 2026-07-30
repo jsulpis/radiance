@@ -36,14 +36,22 @@ export function watchBoundingRect(target: HTMLElement, params: WatchBoundingRect
     center.y = (rect.top + rect.bottom) / 2;
   }
 
-  onResize(target, update);
+  const resizeObserver = onResize(target, update);
 
   if (windowScroll) window.addEventListener("scroll", update, { capture: true, passive: true });
   if (windowResize) window.addEventListener("resize", update, { passive: true });
 
   return {
+    /** The current bounding rect of the element. */
     rect: rect as Readonly<ElementBoundingRect>,
+    /** The current center of the element. */
     center: center as Readonly<ElementCenter>,
+    /** Stop watching the bounding rect and remove event listeners. */
+    stop() {
+      resizeObserver.stop();
+      if (windowScroll) window.removeEventListener("scroll", update, { capture: true });
+      if (windowResize) window.removeEventListener("resize", update);
+    },
   };
 }
 

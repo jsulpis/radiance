@@ -28,6 +28,8 @@ export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
   const [onUpdated, executeUpdateCallbacks] = createHook<UpdatedCallback<any>>();
   const [onResize, executeResizeCallbacks] = createHook<(width: number, height: number) => void>();
   const [onInit, executeInitCallbacks] = createHook<(gl: WebGL2RenderingContext) => void>();
+  const [onDispose, executeDisposeCallbacks] = createHook();
+  let disposed = false;
 
   function render() {
     executeBeforeRenderCallbacks({ uniforms });
@@ -56,6 +58,13 @@ export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
     outputPass.setTarget(target);
   }
 
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    for (const pass of passes) pass.dispose();
+    executeDisposeCallbacks();
+  }
+
   return {
     get target() {
       return outputPass.target;
@@ -67,10 +76,12 @@ export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
     onUpdated,
     onResize,
     onInit,
+    onDispose,
     initialize,
     render,
     setSize,
     setTarget,
+    dispose,
   };
 }
 

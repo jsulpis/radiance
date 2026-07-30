@@ -1,4 +1,4 @@
-import type { Attribute, Uniforms } from "../types/types";
+import type { Attribute, Disposable, Uniforms } from "../types/types";
 import { GL_BLEND, GL_DEPTH_TEST, GL_ONE, GL_ONE_MINUS_SRC_ALPHA } from "../core/constants";
 import { createProgram } from "../core/program";
 import { setRenderTarget } from "../core/renderTarget";
@@ -39,6 +39,7 @@ export function renderPass<U extends Uniforms>(
   let _target = target;
   let _program: WebGLProgram;
   let _gl: WebGL2RenderingContext;
+  let disposed = false;
 
   const {
     initialize: initializeUniforms,
@@ -46,6 +47,7 @@ export function renderPass<U extends Uniforms>(
     setUniforms,
     getUniformsSnapshot,
     uniformsProxy,
+    dispose: disposeUniforms,
   } = setupUniforms(userUniforms);
   const {
     initialize: initializeAttributes,
@@ -53,11 +55,14 @@ export function renderPass<U extends Uniforms>(
     bindVAO,
     hasIndices,
     indexType,
+    dispose: disposeAttributes,
   } = setupAttributes(attributes);
 
   const [onInit, executeInitCallbacks] = createHook<(gl: WebGL2RenderingContext) => void>();
+  const [onDispose, executeDisposeCallbacks] = createHook();
 
   function initialize(gl: WebGL2RenderingContext) {
+    if (disposed) return;
     _gl = gl;
     const program = createProgram(_gl, fragment, vertex, transformFeedbackVaryings);
     if (program == null) {
@@ -85,6 +90,7 @@ export function renderPass<U extends Uniforms>(
   const [onResize, executeResizeCallbacks] = createHook<(width: number, height: number) => void>();
 
   function setSize(size: { width: number; height: number }) {
+    if (disposed) return;
     const width = size.width * resolutionScale;
     const height = size.height * resolutionScale;
 
@@ -98,6 +104,7 @@ export function renderPass<U extends Uniforms>(
   }
 
   function setTarget(target: RenderTarget | null) {
+    if (disposed) return;
     _target = target;
   }
 
@@ -111,6 +118,7 @@ export function renderPass<U extends Uniforms>(
   const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback<U>>();
 
   function render({ target, clear }: { target?: RenderTarget | null; clear?: boolean } = {}) {
+    if (disposed) return;
     if (_gl == undefined) {
       throw new Error("The render pass must be initialized before calling the render function");
     }
@@ -134,6 +142,17 @@ export function renderPass<U extends Uniforms>(
     executeAfterRenderCallbacks({ uniforms: getUniformsSnapshot() });
   }
 
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    if (_program != undefined) {
+      disposeUniforms();
+      disposeAttributes();
+      _gl.deleteProgram(_program);
+    }
+    executeDisposeCallbacks();
+  }
+
   return {
     render,
     initialize,
@@ -150,6 +169,8 @@ export function renderPass<U extends Uniforms>(
     onAfterRender,
     onInit,
     onResize,
+    onDispose,
+    dispose,
   };
 }
 
@@ -233,7 +254,7 @@ export type RenderPassParams<U extends Uniforms = Record<string, never>> = {
 /**
  * A generic rendering pass that encapsulates shaders, uniforms, and attributes.
  */
-export type RenderPass<U extends Uniforms = Record<string, never>> = {
+export type RenderPass<U extends Uniforms = Record<string, never>> = Disposable & {
   /**
    * Executes the render pass.
    * @param opts - Rendering params.
@@ -261,6 +282,8 @@ export type RenderPass<U extends Uniforms = Record<string, never>> = {
   onInit: (callback: (gl: WebGL2RenderingContext) => void) => void;
   /** Registers a callback called when the pass is resized. */
   onResize: (callback: (width: number, height: number) => void) => void;
+  /** Registers a callback called when the pass is disposed. */
+  onDispose: (callback: () => void) => void;
   /** Initializes the pass with a WebGL2 context. */
   initialize: (gl: WebGL2RenderingContext) => void;
 };

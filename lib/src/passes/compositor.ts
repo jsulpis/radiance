@@ -1,3 +1,4 @@
+import type { RenderTarget } from "../core/renderTarget";
 import { createRenderTarget } from "../core/renderTarget";
 import { findUniformName } from "../internal/findName";
 import { createHook } from "../internal/createHook";
@@ -5,6 +6,7 @@ import type { CompositeEffectPass } from "./compositeEffectPass";
 import type { EffectPass } from "./effectPass";
 import type { RenderPass } from "./renderPass";
 import { floatTargetConfig } from "./effectPass";
+import type { Disposable } from "../types/types";
 
 /**
  * The compositor handles the combination of the main render pass and the subsequent effects.
@@ -30,9 +32,12 @@ export function compositor(
 
   const [onBeforeRender, executeBeforeRenderCallbacks] = createHook();
   const [onAfterRender, executeAfterRenderCallbacks] = createHook();
+  let disposed = false;
 
+  let intermediateTarget: RenderTarget | null = null;
   if (effects.length > 0 && renderPass.target === null) {
-    renderPass.setTarget(createRenderTarget(gl, { ...floatTargetConfig, depthBuffer: true }));
+    intermediateTarget = createRenderTarget(gl, { ...floatTargetConfig, depthBuffer: true });
+    renderPass.setTarget(intermediateTarget);
   }
 
   let previousPass = renderPass;
@@ -73,12 +78,20 @@ export function compositor(
     }
   }
 
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    intermediateTarget?.dispose();
+    for (const pass of allPasses) pass.dispose();
+  }
+
   return {
     render,
     setSize,
     allPasses,
     onBeforeRender,
     onAfterRender,
+    dispose,
   };
 }
 
@@ -112,7 +125,7 @@ function setupEffectPass(
   }
 }
 
-export type Compositor = {
+export type Compositor = Disposable & {
   /** Renders the entire chain: the main pass followed by all effects. */
   render: (opts?: { clear?: boolean }) => void;
   /** Resizes all passes and their respective render targets. */

@@ -71,6 +71,10 @@ export function transformFeedback<O extends string, U extends Uniforms>(
     },
     outputBuffers,
   });
+  tfRenderPass.onDispose(() => {
+    gl.deleteTransformFeedback(tf);
+    for (const buffer of Object.values<WebGLBuffer>(outputBuffers)) gl.deleteBuffer(buffer);
+  });
 
   return tfRenderPass;
 }

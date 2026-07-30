@@ -1,4 +1,4 @@
-import type { RenderTargetParams } from "../core/renderTarget";
+import type { RenderTarget, RenderTargetParams } from "../core/renderTarget";
 import { GL_HALF_FLOAT, GL_RGBA16F } from "../core/constants";
 import { createRenderTarget } from "../core/renderTarget";
 import type { glCanvas as _glCanvas } from "../global/glCanvas";
@@ -19,18 +19,22 @@ import type { RenderPass } from "./renderPass";
  */
 export function effectPass<U extends EffectUniforms>(params: EffectPassParams<U>): EffectPass<U> {
   const { target = floatTargetConfig, resolutionScale = 1 } = params;
+  let ownedTarget: RenderTarget | null = null;
 
   const renderPass = quadRenderPass(undefined, { ...params, target: null });
 
   renderPass.onInit((gl) => {
     if (target == null || "framebuffer" in target) return;
-    renderPass.setTarget(
-      createRenderTarget(gl, {
-        ...target,
-        width: (target.width ?? gl.canvas.width) * resolutionScale,
-        height: (target.height ?? gl.canvas.height) * resolutionScale,
-      }),
-    );
+    ownedTarget = createRenderTarget(gl, {
+      ...target,
+      width: (target.width ?? gl.canvas.width) * resolutionScale,
+      height: (target.height ?? gl.canvas.height) * resolutionScale,
+    });
+    renderPass.setTarget(ownedTarget);
+  });
+
+  renderPass.onDispose(() => {
+    ownedTarget?.dispose();
   });
 
   return renderPass;

@@ -1,6 +1,8 @@
 import { onResize } from "../helpers/onResize";
+import type { LoopObj } from "../helpers/loop";
 import { loop, type LoopParams } from "../helpers/loop";
 import type { Uniforms } from "../types/types";
+import type { Disposable } from "../types/types";
 import type { CompositeEffectPass } from "../passes/compositeEffectPass";
 import type { EffectPass } from "../passes/effectPass";
 import type { UpdatedCallback } from "../passes/renderPass";
@@ -44,11 +46,17 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
 
   const renderPass = quadRenderPass(gl, params);
   const mainCompositor = compositor(gl, renderPass, postEffects);
+  let disposed = false;
+  let renderFrame: number | undefined;
+  let timeFrame: number | undefined;
+  const imageListeners: Array<{ image: HTMLImageElement; listener: () => void }> = [];
+  const videoFrames: Array<{ video: HTMLVideoElement; id: number }> = [];
 
   // flag to not render before the first resize of the canvas to avoid a glitch
   let isCanvasResized = false;
 
   function render() {
+    if (disposed) return;
     if (isCanvasResized) {
       mainCompositor.render();
     }
@@ -62,11 +70,12 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
    * the render will only be executed once.
    */
   function requestRender() {
-    if (requestedRender || renderMode === "manual") return;
+    if (disposed || requestedRender || renderMode === "manual") return;
     requestedRender = true;
 
-    requestAnimationFrame(() => {
+    renderFrame = requestAnimationFrame(() => {
       requestedRender = false;
+      renderFrame = undefined;
       render();
     });
   }
@@ -89,6 +98,7 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
   const [onCanvasReady, executeCanvasReadyCallbacks] = createHook();
 
   function setSize({ width, height }: { width: number; height: number }) {
+    if (disposed) return;
     setCanvasSize(width, height);
     mainCompositor.setSize({ width, height });
     requestRender();
@@ -108,33 +118,45 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     pass: { uniforms: Record<string, unknown> },
   ) {
     if (isPromiseLike(value)) {
-      value.then((resolvedValue) => (pass.uniforms[name] = resolvedValue));
+      value.then((resolvedValue) => {
+        if (!disposed) pass.uniforms[name] = resolvedValue;
+      });
     } else if (isHTMLImageTexture(value) && !value.src.complete) {
+      imageListeners.push({
+        image: value.src,
+        listener: requestRender,
+      });
       value.src.addEventListener("load", requestRender, { once: true });
     } else if (isHTMLVideoTexture(value)) {
-      value.src.requestVideoFrameCallback(function onFramePlayed() {
+      const videoFrame = { video: value.src, id: 0 };
+      const onFramePlayed = () => {
+        if (disposed) return;
         requestRender();
-        value.src.requestVideoFrameCallback(onFramePlayed);
-      });
+        videoFrame.id = value.src.requestVideoFrameCallback(onFramePlayed);
+      };
+      videoFrame.id = value.src.requestVideoFrameCallback(onFramePlayed);
+      videoFrames.push(videoFrame);
     }
   }
 
   const timeUniformName = findUniformName(fragment + vertex, "time");
+  let timeLoop: LoopObj | null = null;
   let play = () => {};
   let pause = () => {};
 
   if (timeUniformName && renderPass.uniforms[timeUniformName] === undefined) {
-    requestAnimationFrame(() => {
+    timeFrame = requestAnimationFrame(() => {
       // use RAF to avoid triggering an extra render for the initialization of the time uniform
       (renderPass.uniforms as Record<string, number>)[timeUniformName] = 0;
     });
 
-    ({ play, pause } = loop(
+    timeLoop = loop(
       ({ deltaTime }) => {
         (renderPass.uniforms as Record<string, number>)[timeUniformName] += deltaTime / 500;
       },
       { immediate },
-    ));
+    );
+    ({ play, pause } = timeLoop);
   }
 
   let resizeObserver: ReturnType<typeof onResize> | null = null;
@@ -147,6 +169,18 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     resizeObserver = onResize(canvas, ({ size }) => {
       setSize({ width: size.width * dpr, height: size.height * dpr });
     });
+  }
+
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    if (renderFrame != undefined) cancelAnimationFrame(renderFrame);
+    if (timeFrame != undefined) cancelAnimationFrame(timeFrame);
+    timeLoop?.stop();
+    resizeObserver?.stop();
+    for (const { image, listener } of imageListeners) image.removeEventListener("load", listener);
+    for (const { video, id } of videoFrames) video.cancelVideoFrameCallback(id);
+    mainCompositor.dispose();
   }
 
   return {
@@ -163,6 +197,7 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     onBeforeRender: mainCompositor.onBeforeRender,
     onAfterRender: mainCompositor.onAfterRender,
     resizeObserver,
+    dispose,
   };
 };
 
@@ -202,7 +237,7 @@ export interface GLCanvasParams<U extends Uniforms> extends LoopParams, QuadPass
 /**
  * The object returned by the {@link glCanvas} function.
  */
-export type GLCanvas<U extends Uniforms = Record<string, any>> = {
+export type GLCanvas<U extends Uniforms = Record<string, any>> = Disposable & {
   /** The WebGL2 rendering context. */
   gl: WebGL2RenderingContext;
   /** Executes a single render of the entire pipeline. */
