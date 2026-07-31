@@ -7,7 +7,7 @@ import Layout from "../../layouts/Layout.astro";
   import { glContext, pingPongFBO, glCanvas, createFloatDataTexture } from "@radiancejs/gl";
   import { incrementRenderCount } from "../../components/renderCount";
 
-  const { gl, canvas } = glContext("#glCanvas");
+  const { gl, canvas } = glContext({ canvas: "#glCanvas" });
 
   const positionsFragment = /* glsl */ `
     uniform float uDeltaTime;

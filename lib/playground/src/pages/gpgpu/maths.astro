@@ -6,7 +6,7 @@ import Layout from "../../layouts/Layout.astro";
   import { glContext, transformFeedback } from "@radiancejs/gl";
   import { incrementRenderCount } from "../../components/renderCount";
 
-  const { gl } = glContext("#glCanvas");
+  const { gl } = glContext({ canvas: "#glCanvas" });
 
   function printData(selector: string, data: number[] | Float32Array) {
     document.querySelector(selector)!.textContent = data.join(", ");

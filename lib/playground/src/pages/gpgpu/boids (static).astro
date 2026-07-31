@@ -13,7 +13,7 @@ import Layout from "../../layouts/Layout.astro";
     renderPassFragment,
   } from "../../shaders/boids";
 
-  const { gl, canvas } = glContext("#glCanvas");
+  const { gl, canvas } = glContext({ canvas: "#glCanvas" });
 
   const velocities = pingPongFBO({
     gl,

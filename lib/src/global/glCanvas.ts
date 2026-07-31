@@ -3,12 +3,12 @@ import type { LoopObj } from "../helpers/loop";
 import { loop, type LoopParams } from "../helpers/loop";
 import type { Uniforms } from "../types/types";
 import type { Disposable } from "../types/types";
-import type { CompositeEffectPass } from "../passes/compositeEffectPass";
-import type { EffectPass } from "../passes/effectPass";
 import type { UpdatedCallback } from "../passes/renderPass";
+import type { GLContextParams, WebGL2ContextAttributes } from "./glContext";
 import { glContext } from "./glContext";
 import type { QuadPassParams } from "../passes/quadRenderPass";
 import { quadRenderPass } from "../passes/quadRenderPass";
+import type { CompositorParams } from "../passes/compositor";
 import { compositor } from "../passes/compositor";
 import { findUniformName } from "../internal/findName";
 import { createHook } from "../internal/createHook";
@@ -31,7 +31,7 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     fragment,
     vertex,
     dpr = Math.min(globalThis.devicePixelRatio || 1, 2),
-    postEffects = [],
+    postEffects,
     immediate,
     renderMode = "auto",
     colorSpace,
@@ -42,10 +42,10 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     gl,
     canvas,
     setSize: setCanvasSize,
-  } = glContext(canvasProp, { ...webglAttributes, colorSpace });
+  } = glContext({ canvas: canvasProp, ...webglAttributes, colorSpace });
 
   const renderPass = quadRenderPass(params);
-  const mainCompositor = compositor(gl, renderPass, postEffects);
+  const mainCompositor = compositor({ gl, renderPass, postEffects });
   let disposed = false;
   let renderFrame: number | undefined;
   let timeFrame: number | undefined;
@@ -205,33 +205,26 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
  * @inline
  * @internal
  */
-export interface GLCanvasParams<U extends Uniforms> extends LoopParams, QuadPassParams<U> {
+export interface GLCanvasParams<U extends Uniforms>
+  extends
+    LoopParams,
+    QuadPassParams<U>,
+    Pick<CompositorParams, "postEffects">,
+    Pick<GLContextParams<HTMLCanvasElement | OffscreenCanvas | string>, "canvas" | "colorSpace"> {
   /**
-   * The canvas element to use or CSS selector to query it.
+   * Native WebGL2 context attributes.
    */
-  canvas: HTMLCanvasElement | OffscreenCanvas | string;
-  /**
-   * Optional WebGL context attributes.
-   */
-  webglAttributes?: WebGLContextAttributes;
+  webglAttributes?: WebGL2ContextAttributes;
   /**
    * Device Pixel Ratio for the canvas.
    * @default Math.min(globalThis.devicePixelRatio || 1, 2)
    */
   dpr?: number;
   /**
-   * An array of post-processing effects to apply.
-   */
-  postEffects?: Array<EffectPass<any> | CompositeEffectPass<any>>;
-  /**
    * Whether to render automatically when needed (uniform updated, canvas resized, image texture loaded...) or manually.
    * @default "auto"
    */
   renderMode?: "manual" | "auto";
-  /**
-   * Target color space for the drawing buffer.
-   */
-  colorSpace?: "srgb" | "display-p3";
 }
 
 /**

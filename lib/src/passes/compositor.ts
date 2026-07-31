@@ -21,15 +21,9 @@ import type { Disposable } from "../types/types";
  * The compositor owns its passes' lifecycle: it initializes uninitialized passes with
  * its WebGL2 context, and disposing the compositor disposes every pass.
  *
- * @param gl - The WebGL2 context.
- * @param renderPass - The main scene render pass.
- * @param effects - An array of post-processing effects to apply.
+ * @param params - Configuration for the compositor.
  */
-export function compositor(
-  gl: WebGL2RenderingContext,
-  renderPass: RenderPass<any>,
-  effects: Array<EffectPass<any> | CompositeEffectPass<any>>,
-): Compositor {
+export function compositor({ gl, renderPass, postEffects = [] }: CompositorParams): Compositor {
   // add the ability to render to floating-point buffers
   gl.getExtension("EXT_color_buffer_float");
 
@@ -40,17 +34,17 @@ export function compositor(
   renderPass.initialize(gl);
 
   let intermediateTarget: RenderTarget | null = null;
-  if (effects.length > 0 && renderPass.target === null) {
+  if (postEffects.length > 0 && renderPass.target === null) {
     intermediateTarget = createRenderTarget(gl, { ...floatTargetConfig, depthBuffer: true });
     renderPass.setTarget(intermediateTarget);
   }
 
   let previousPass = renderPass;
 
-  for (const [index, effect] of effects.entries()) {
+  for (const [index, effect] of postEffects.entries()) {
     effect.initialize(gl);
 
-    if (index === effects.length - 1 && effect.target !== null) {
+    if (index === postEffects.length - 1 && effect.target !== null) {
       effect.setTarget(null);
     }
 
@@ -67,7 +61,7 @@ export function compositor(
     }
   }
 
-  const allPasses = [renderPass, ...effects];
+  const allPasses = [renderPass, ...postEffects];
 
   function render({ clear }: { clear?: boolean } = {}) {
     executeBeforeRenderCallbacks();
@@ -141,4 +135,18 @@ export type Compositor = Disposable & {
   onBeforeRender: (callback: () => void) => void;
   /** Registers a callback called after the whole rendering pipeline finishes. */
   onAfterRender: (callback: () => void) => void;
+};
+
+/**
+ * Parameters for creating a {@link compositor}.
+ * @inline
+ * @internal
+ */
+export type CompositorParams = {
+  /** WebGL2 context used to initialize every pass. */
+  gl: WebGL2RenderingContext;
+  /** Main scene render pass. */
+  renderPass: RenderPass<any>;
+  /** Post-processing effects applied after the main pass. */
+  postEffects?: Array<EffectPass<any> | CompositeEffectPass<any>>;
 };
