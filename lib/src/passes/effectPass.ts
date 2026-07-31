@@ -18,20 +18,21 @@ import type { RenderPass } from "./renderPass";
  * @param params - Configuration for the effect pass.
  */
 export function effectPass<U extends EffectUniforms>(params: EffectPassParams<U>): EffectPass<U> {
-  const { target = floatTargetConfig, resolutionScale = 1 } = params;
   let ownedTarget: RenderTarget | null = null;
 
-  const renderPass = quadRenderPass(undefined, { ...params, target: null });
+  const renderPass = quadRenderPass(undefined, params);
 
-  renderPass.onInit((gl) => {
-    if (target == null || "framebuffer" in target) return;
-    ownedTarget = createRenderTarget(gl, {
-      ...target,
-      width: (target.width ?? gl.canvas.width) * resolutionScale,
-      height: (target.height ?? gl.canvas.height) * resolutionScale,
+  if (params.target === undefined) {
+    renderPass.onInit((gl) => {
+      const { targetParams = floatTargetConfig, resolutionScale = 1 } = params;
+      ownedTarget = createRenderTarget(gl, {
+        ...targetParams,
+        width: (targetParams.width ?? gl.canvas.width) * resolutionScale,
+        height: (targetParams.height ?? gl.canvas.height) * resolutionScale,
+      });
+      renderPass.setTarget(ownedTarget);
     });
-    renderPass.setTarget(ownedTarget);
-  });
+  }
 
   renderPass.onDispose(() => {
     ownedTarget?.dispose();
@@ -83,10 +84,19 @@ export type EffectUniforms = Record<
  * @inline
  * @internal
  */
-export type EffectPassParams<U extends EffectUniforms> = Omit<QuadPassParams<U>, "target"> & {
-  /**
-   * Parameters to create the render target for this pass.
-   * If null, it will render to the provided target or canvas.
-   */
-  target?: RenderTargetParams | null;
-};
+export type EffectPassParams<U extends EffectUniforms> = Omit<QuadPassParams<U>, "target"> &
+  (
+    | {
+        /** Caller-owned render target for this pass (never disposed by the effect), or null to render to the default target. */
+        target?: RenderTarget | null;
+        targetParams?: never;
+      }
+    | {
+        target?: never;
+        /**
+         * Parameters for an effect-owned render target, disposed with the effect.
+         * @default floatTargetConfig
+         */
+        targetParams?: RenderTargetParams;
+      }
+  );
