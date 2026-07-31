@@ -13,7 +13,7 @@ import Layout from "../../layouts/Layout.astro";
   } from "@radiancejs/gl";
   import { incrementRenderCount } from "../../components/renderCount";
 
-  const ctx = glContext("#glCanvas");
+  const ctx = glContext({ canvas: "#glCanvas" });
   const target = createRenderTarget(ctx.gl);
 
   const canvas = glCanvas({
@@ -56,7 +56,11 @@ import Layout from "../../layouts/Layout.astro";
   });
   bluePass.onAfterRender(incrementRenderCount);
 
-  const mainCompositor = compositor(canvas.gl, bluePass, [linearToneMapping()]);
+  const mainCompositor = compositor({
+    gl: canvas.gl,
+    renderPass: bluePass,
+    postEffects: [linearToneMapping()],
+  });
 
   canvas.onAfterRender(() => {
     mainCompositor.render({ clear: false });

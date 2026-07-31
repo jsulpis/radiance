@@ -120,7 +120,7 @@ buffers.
 ```ts
 import { glContext, pingPongFBO } from "@radiancejs/gl";
 
-const { gl } = glContext("#glCanvas");
+const { gl } = glContext({ canvas: "#glCanvas" });
 
 const simulation = pingPongFBO({
   gl,

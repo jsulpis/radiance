@@ -1,14 +1,13 @@
 /**
  * Initializes a WebGL2 rendering context for a given canvas.
  *
- * @param canvas - The canvas element to use or a CSS selector to query it.
- * @param params - WebGL2 context attributes and color space configuration.
+ * @param params - Canvas and WebGL2 context configuration.
  * @throws Error if the canvas or WebGL2 context could not be created.
  */
-export function glContext<T extends HTMLCanvasElement | OffscreenCanvas | string>(
-  canvas: T,
-  params?: WebGLContextParams,
-) {
+export function glContext<T extends HTMLCanvasElement | OffscreenCanvas | string>({
+  canvas,
+  ...params
+}: GLContextParams<T>) {
   let canvasElement: HTMLCanvasElement | OffscreenCanvas | null = null;
 
   if (typeof canvas === "string") {
@@ -39,8 +38,8 @@ export function glContext<T extends HTMLCanvasElement | OffscreenCanvas | string
   }
 
   return {
-    canvas: canvasElement as T extends OffscreenCanvas ? OffscreenCanvas : HTMLCanvasElement,
     gl,
+    canvas: canvasElement as T extends OffscreenCanvas ? OffscreenCanvas : HTMLCanvasElement,
     setSize,
   };
 }
@@ -50,9 +49,30 @@ export function glContext<T extends HTMLCanvasElement | OffscreenCanvas | string
  * @inline
  * @internal
  */
-export type WebGLContextParams = WebGLContextAttributes & {
+export interface GLContextParams<
+  T extends HTMLCanvasElement | OffscreenCanvas | string,
+> extends WebGL2ContextAttributes {
+  /** The canvas element to use or CSS selector to query it. */
+  canvas: T;
   /**
    * The color space to use for the drawing buffer.
    */
   colorSpace?: "srgb" | "display-p3";
+}
+
+/**
+ * Native WebGL2 context attributes.
+ * @inline
+ * @internal
+ */
+export type WebGL2ContextAttributes = {
+  alpha?: boolean;
+  antialias?: boolean;
+  depth?: boolean;
+  desynchronized?: boolean;
+  failIfMajorPerformanceCaveat?: boolean;
+  powerPreference?: "default" | "high-performance" | "low-power";
+  premultipliedAlpha?: boolean;
+  preserveDrawingBuffer?: boolean;
+  stencil?: boolean;
 };
