@@ -18,7 +18,8 @@ import Layout from "../../layouts/Layout.astro";
     renderMode: "manual",
   });
 
-  const rightShader = quadRenderPass(leftShader.gl, {
+  const rightShader = quadRenderPass({
+    gl: leftShader.gl,
     fragment: /* glsl */ `
 			void main() {
 				gl_FragColor = vec4(0, 1, 0, 1);

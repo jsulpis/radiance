@@ -36,7 +36,7 @@ import Layout from "../../layouts/Layout.astro";
   });
   canvas.onAfterRender(incrementRenderCount);
 
-  const bluePass = quadRenderPass(canvas.gl, {
+  const bluePass = quadRenderPass({
     target,
     fragment: /* glsl */ `
       varying vec2 vUv;

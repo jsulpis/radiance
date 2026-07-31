@@ -44,7 +44,7 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     setSize: setCanvasSize,
   } = glContext(canvasProp, { ...webglAttributes, colorSpace });
 
-  const renderPass = quadRenderPass(gl, params);
+  const renderPass = quadRenderPass(params);
   const mainCompositor = compositor(gl, renderPass, postEffects);
   let disposed = false;
   let renderFrame: number | undefined;

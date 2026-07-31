@@ -14,13 +14,13 @@ import {
  *
  * [Example: Multi pass](/examples/post-processing/multi-pass/)
  *
- * @param passes - Ordered list of sub-passes to execute.
- * @param uniforms - Reactive uniform values for the composite effect.
+ * @param params - Configuration for the composite effect pass.
  */
-export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
-  passes: EffectPass<Uniforms>[],
-  uniforms: U = {} as U,
-): CompositeEffectPass<U> {
+export function compositeEffectPass<U extends Uniforms = Record<string, never>>({
+  gl,
+  passes,
+  uniforms = {} as U,
+}: CompositeEffectPassParams<U>): CompositeEffectPass<U> {
   const outputPass = passes.at(-1)!;
 
   const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback<any>>();
@@ -29,6 +29,7 @@ export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
   const [onResize, executeResizeCallbacks] = createHook<(width: number, height: number) => void>();
   const [onInit, executeInitCallbacks] = createHook<(gl: WebGL2RenderingContext) => void>();
   const [onDispose, executeDisposeCallbacks] = createHook();
+  let _gl: WebGL2RenderingContext | undefined;
   let disposed = false;
 
   function render() {
@@ -38,13 +39,20 @@ export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
   }
 
   function initialize(gl: WebGL2RenderingContext) {
+    if (disposed || _gl) return;
+
     for (const pass of passes) {
       pass.initialize(gl);
       pass.onUpdated((...args) => {
         executeUpdateCallbacks(...args);
       });
     }
+    _gl = gl;
     executeInitCallbacks(gl);
+  }
+
+  if (gl) {
+    initialize(gl);
   }
 
   function setSize(size: { width: number; height: number }) {
@@ -97,4 +105,18 @@ export type CompositeEffectPass<U extends Uniforms = Record<string, never>> = Om
 > & {
   /** The sequence of sub-passes executed by this composite effect. */
   passes: EffectPass<Uniforms>[];
+};
+
+/**
+ * Parameters for creating a {@link compositeEffectPass}.
+ * @inline
+ * @internal
+ */
+export type CompositeEffectPassParams<U extends Uniforms = Record<string, never>> = {
+  /** Optional WebGL2 context used to initialize the composite effect immediately. */
+  gl?: WebGL2RenderingContext;
+  /** Ordered effect passes to execute. */
+  passes: EffectPass<Uniforms>[];
+  /** Reactive uniform values for the composite effect. */
+  uniforms?: U;
 };

@@ -76,7 +76,10 @@ export function trails(params?: TrailsParams) {
     },
   };
 
-  const trailsPass = compositeEffectPass([trailPass, outputPass], uniforms);
+  const trailsPass = compositeEffectPass({
+    passes: [trailPass, outputPass],
+    uniforms,
+  });
 
   trailsPass.onInit((gl) => {
     fboRead = createRenderTarget(gl, floatTargetConfig);

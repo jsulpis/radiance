@@ -16,7 +16,8 @@ import Layout from "../../layouts/Layout.astro";
 
   const numParticles = 300;
 
-  const velocities = pingPongFBO(gl, {
+  const velocities = pingPongFBO({
+    gl,
     fragment: boidsVelocities,
     uniforms: {
       uDeltaTime: 0,
@@ -40,7 +41,8 @@ import Layout from "../../layouts/Layout.astro";
     },
   });
 
-  const positions = pingPongFBO(gl, {
+  const positions = pingPongFBO({
+    gl,
     fragment: boidsPositions,
     uniforms: {
       uDeltaTime: 0,

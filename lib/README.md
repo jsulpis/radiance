@@ -122,7 +122,8 @@ import { glContext, pingPongFBO } from "@radiancejs/gl";
 
 const { gl } = glContext("#glCanvas");
 
-const simulation = pingPongFBO(gl, {
+const simulation = pingPongFBO({
+  gl,
   fragment: simulationFragment,
   dataTexture: {
     name: "tState",

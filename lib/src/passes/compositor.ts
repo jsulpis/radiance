@@ -12,11 +12,14 @@ import type { Disposable } from "../types/types";
  * The compositor handles the combination of the main render pass and the subsequent effects.
  *
  * It manages:
- * - Initialization of the WebGL context for all effects.
+ * - Initialization of the WebGL context for every pass.
  * - Automatic creation of intermediate floating-point render targets.
  * - Injecting `previousPass` and `inputPass` references into effect uniforms.
  * - Automatic linking of the previous pass's output texture to the next effect's input.
  * - Rendering all passes in the correct order.
+ *
+ * The compositor owns its passes' lifecycle: it initializes uninitialized passes with
+ * its WebGL2 context, and disposing the compositor disposes every pass.
  *
  * @param gl - The WebGL2 context.
  * @param renderPass - The main scene render pass.
@@ -33,6 +36,8 @@ export function compositor(
   const [onBeforeRender, executeBeforeRenderCallbacks] = createHook();
   const [onAfterRender, executeAfterRenderCallbacks] = createHook();
   let disposed = false;
+
+  renderPass.initialize(gl);
 
   let intermediateTarget: RenderTarget | null = null;
   if (effects.length > 0 && renderPass.target === null) {

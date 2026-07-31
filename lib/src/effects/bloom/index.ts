@@ -83,7 +83,10 @@ export function bloom(params?: BloomParams) {
     },
   };
 
-  return compositeEffectPass(bloomPasses, bloomUniforms);
+  return compositeEffectPass({
+    passes: bloomPasses,
+    uniforms: bloomUniforms,
+  });
 }
 
 /**

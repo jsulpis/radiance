@@ -31,7 +31,8 @@ import Layout from "../../layouts/Layout.astro";
     }
   `;
 
-  const positions = pingPongFBO(gl, {
+  const positions = pingPongFBO({
+    gl,
     fragment: positionsFragment,
     uniforms: {
       uDeltaTime: 0,
