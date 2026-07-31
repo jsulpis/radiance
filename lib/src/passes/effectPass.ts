@@ -17,10 +17,13 @@ import type { RenderPass } from "./renderPass";
  *
  * @param params - Configuration for the effect pass.
  */
-export function effectPass<U extends EffectUniforms>(params: EffectPassParams<U>): EffectPass<U> {
+export function effectPass<U extends EffectUniforms>({
+  gl,
+  ...params
+}: EffectPassParams<U>): EffectPass<U> {
   let ownedTarget: RenderTarget | null = null;
 
-  const renderPass = quadRenderPass(undefined, params);
+  const renderPass = quadRenderPass(params);
 
   if (params.target === undefined) {
     renderPass.onInit((gl) => {
@@ -32,6 +35,10 @@ export function effectPass<U extends EffectUniforms>(params: EffectPassParams<U>
       });
       renderPass.setTarget(ownedTarget);
     });
+  }
+
+  if (gl) {
+    renderPass.initialize(gl);
   }
 
   renderPass.onDispose(() => {

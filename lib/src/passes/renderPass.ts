@@ -14,24 +14,21 @@ import { createHook } from "../internal/createHook";
  * This is the core primitive for rendering anything to the screen or a texture.
  * It handles program creation, uniform management, attribute setup, and resizing.
  *
- * @param gl - The WebGL2 context. Can be undefined if you intend to initialize the pass later.
  * @param params - Configuration for the render pass.
  */
-export function renderPass<U extends Uniforms>(
-  gl: WebGL2RenderingContext | undefined,
-  {
-    target = null,
-    fragment,
-    vertex,
-    attributes = {},
-    uniforms: userUniforms = {} as U,
-    blending = "none",
-    depthTest = false,
-    drawMode: userDrawMode,
-    transformFeedbackVaryings,
-    resolutionScale = 1,
-  }: RenderPassParams<U>,
-): RenderPass<U> {
+export function renderPass<U extends Uniforms>({
+  gl,
+  target = null,
+  fragment,
+  vertex,
+  attributes = {},
+  uniforms: userUniforms = {} as U,
+  blending = "none",
+  depthTest = false,
+  drawMode: userDrawMode,
+  transformFeedbackVaryings,
+  resolutionScale = 1,
+}: RenderPassParams<U>): RenderPass<U> {
   /*
    * INIT
    */
@@ -62,12 +59,13 @@ export function renderPass<U extends Uniforms>(
   const [onDispose, executeDisposeCallbacks] = createHook();
 
   function initialize(gl: WebGL2RenderingContext) {
-    if (disposed) return;
-    _gl = gl;
-    const program = createProgram(_gl, fragment, vertex, transformFeedbackVaryings);
+    if (disposed || _gl) return;
+
+    const program = createProgram(gl, fragment, vertex, transformFeedbackVaryings);
     if (program == null) {
       throw new Error("could not initialize the render pass");
     }
+    _gl = gl;
     _program = program;
     _gl.useProgram(_program);
 
@@ -204,6 +202,13 @@ function setDepthTest(gl: WebGL2RenderingContext, depthTest: boolean) {
  * Parameters for creating a {@link RenderPass}.
  */
 export type RenderPassParams<U extends Uniforms = Record<string, never>> = {
+  /**
+   * Optional WebGL2 context used to initialize the pass immediately.
+   *
+   * Passes without a context are initialized by calling `pass.initialize(gl)` or using the compositor.
+   * Calling `initialize()` multiple times with the same context is a no-op.
+   */
+  gl?: WebGL2RenderingContext;
   /**
    * Optional initial render target for the pass.
    * If not provided, it will render directly to the canvas or can be set later.

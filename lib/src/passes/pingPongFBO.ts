@@ -14,14 +14,15 @@ import type { RenderPass } from "./renderPass";
  * - [Example: Boids](/examples/gpgpu/boids/)
  * - [Example: Game of Life](/examples/gpgpu/game-of-life/)
  *
- * @param gl - The WebGL2 context.
  * @param params - Configuration for the ping-pong pass.
  * @returns A {@link RenderPass} object specialized for double-buffering.
  */
-export function pingPongFBO<U extends Uniforms>(
-  gl: WebGL2RenderingContext,
-  { uniforms = {} as U, dataTexture, fragment }: PingPongFBOParams<U>,
-) {
+export function pingPongFBO<U extends Uniforms>({
+  gl,
+  uniforms = {} as U,
+  dataTexture,
+  fragment,
+}: PingPongFBOParams<U>) {
   // add the ability to render to 32-bit floating-point buffers
   gl.getExtension("EXT_color_buffer_float");
 
@@ -38,7 +39,8 @@ export function pingPongFBO<U extends Uniforms>(
     coords.set([u, v], i * 2);
   }
 
-  const fboPass = quadRenderPass(gl, {
+  const fboPass = quadRenderPass({
+    gl,
     fragment,
     uniforms: Object.assign(uniforms, {
       [dataTextureName]: initialDataTexture,
@@ -94,6 +96,8 @@ export type PingPongFBOPass<U extends Uniforms = Record<string, never>> = Render
  * @internal
  */
 export type PingPongFBOParams<U extends Uniforms = Record<string, never>> = {
+  /** WebGL2 context. */
+  gl: WebGL2RenderingContext;
   /** Uniforms for the pass. */
   uniforms?: U;
   /** Fragment shader source. Should read from `dataTexture.name`. */

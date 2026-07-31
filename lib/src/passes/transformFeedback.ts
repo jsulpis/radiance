@@ -16,13 +16,15 @@ import { renderPass } from "./renderPass";
  * It allows you to run a vertex shader and capture its output varyings into buffers
  * that can then be read back by the CPU or used as input for another pass.
  *
- * @param gl - The WebGL2 context.
  * @param params - Configuration for the transform feedback pass.
  */
-export function transformFeedback<O extends string, U extends Uniforms>(
-  gl: WebGL2RenderingContext,
-  { vertex, attributes = {}, uniforms = {} as U, outputs }: TransformFeedbackParams<O, U>,
-) {
+export function transformFeedback<O extends string, U extends Uniforms>({
+  gl,
+  vertex,
+  attributes = {},
+  uniforms = {} as U,
+  outputs,
+}: TransformFeedbackParams<O, U>) {
   const firstAttribute = Object.values(attributes)[0];
   const vertexCount = firstAttribute ? firstAttribute.data!.length / firstAttribute.size : 0;
 
@@ -33,7 +35,8 @@ export function transformFeedback<O extends string, U extends Uniforms>(
     ]),
   ) as Record<O, WebGLBuffer>;
 
-  const mainPass = renderPass(gl, {
+  const mainPass = renderPass({
+    gl,
     fragment: `void main() { gl_FragColor = vec4(0.0); }`,
     vertex,
     attributes,
@@ -88,6 +91,8 @@ export interface TransformFeedbackParams<
   O extends string,
   U extends Uniforms = Record<string, never>,
 > {
+  /** WebGL2 context. */
+  gl: WebGL2RenderingContext;
   /** Vertex shader source. Should write to the output varyings. */
   vertex: string;
   /** Vertex attributes (input buffers). */

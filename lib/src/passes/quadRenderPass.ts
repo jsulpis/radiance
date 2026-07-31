@@ -8,13 +8,14 @@ import quadVertexShaderSource from "./quadVertexShader.glsl";
  *
  * This is used for creating post-processing effect passes, but can also be used directly for any full-screen rendering.
  *
- * @param gl - The WebGL2 context.
  * @param params - Configuration for the quad render pass.
  */
-export function quadRenderPass<U extends Uniforms>(
-  gl: WebGL2RenderingContext | undefined,
-  { attributes = {}, fragment, vertex, ...renderPassParams }: QuadPassParams<U>,
-) {
+export function quadRenderPass<U extends Uniforms>({
+  attributes = {},
+  fragment,
+  vertex,
+  ...renderPassParams
+}: QuadPassParams<U>) {
   const uvVaryingName = findVaryingName(fragment, "uv");
 
   const vertexShader =
@@ -34,7 +35,7 @@ export function quadRenderPass<U extends Uniforms>(
     }
   }
 
-  return renderPass(gl, {
+  return renderPass({
     ...renderPassParams,
     attributes,
     fragment,

@@ -18,7 +18,8 @@ import Layout from "../../layouts/Layout.astro";
   printData("#a", a);
   printData("#b", b);
 
-  const { render, onAfterRender, getOutputData } = transformFeedback(gl, {
+  const { render, onAfterRender, getOutputData } = transformFeedback({
+    gl,
     vertex: /* glsl */ `
       in float a;
       in float b;
