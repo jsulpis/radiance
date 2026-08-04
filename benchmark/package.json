@@ -16,9 +16,9 @@
   },
   "devDependencies": {
     "@types/node": "26.1.2",
-    "@types/three": "0.185.1",
+    "@types/three": "0.185.3",
     "typescript": "7.0.2",
-    "vite": "8.1.5"
+    "vite": "8.2.0"
   },
   "packageManager": "pnpm@11.19.0"
 }
