@@ -20,20 +20,35 @@ export type MatrixUniform =
      number, number, number, number];
 
 /**
+ * A numeric collection accepted for vector and matrix uniforms.
+ */
+export type NumericArray = ArrayLike<number>;
+
+/**
  * A texture uniform value, which can be either a {@link TextureParams}
  * or a raw `WebGLTexture`.
  */
 export type TextureUniform = TextureParams | WebGLTexture;
 
 /**
- * All valid types for a uniform variable in a shader.
+ * All concrete values that can be uploaded to a uniform variable.
  */
-export type UniformValue = number | VectorUniform | MatrixUniform | Float32Array | TextureUniform;
+export type UniformValue =
+  number | boolean | VectorUniform | MatrixUniform | NumericArray | TextureUniform;
+
+/**
+ * A uniform variable that can be a uniform value or a function returning a uniform value.
+ */
+export type Uniform<Args = never> =
+  | UniformValue
+  | Promise<UniformValue>
+  | ((...args: [Args] extends [never] ? [] : [args: Args]) => UniformValue | Promise<UniformValue>);
 
 /**
  * A collection of uniform variables.
+ * An optional Args type parameter can be provided to specify the arguments for uniform functions.
  */
-export type Uniforms = Record<string, UniformValue | Promise<UniformValue>>;
+export type Uniforms<Args = never> = Record<string, Uniform<Args>>;
 
 /**
  * A TypedArray (e.g., Float32Array, Uint16Array) used for buffer data.

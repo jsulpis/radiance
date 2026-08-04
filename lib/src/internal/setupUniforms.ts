@@ -2,7 +2,7 @@ import type { DataTextureParams, ImageTextureParams } from "../core/texture";
 import { GL_ACTIVE_UNIFORMS, GL_TEXTURE_2D, GL_TEXTURE0 } from "../core/constants";
 import { fillTexture } from "../core/texture";
 import type { UpdatedCallback } from "../passes/renderPass";
-import type { Uniforms } from "../types/types";
+import type { NumericArray, Uniforms } from "../types/types";
 import { createHook } from "./createHook";
 
 export function setupUniforms<U extends Uniforms>(uniforms: U) {
@@ -70,22 +70,23 @@ export function setupUniforms<U extends Uniforms>(uniforms: U) {
       return _gl.uniform1i(uniformLocation, index);
     }
 
-    if (Array.isArray(value) || (ArrayBuffer.isView(value) && !(value instanceof DataView))) {
+    if (isNumericArray(value)) {
+      const floatArray = new Float32Array(value);
       switch (value.length) {
         case 2: {
-          return _gl.uniform2fv(uniformLocation, value);
+          return _gl.uniform2fv(uniformLocation, floatArray);
         }
         case 3: {
-          return _gl.uniform3fv(uniformLocation, value);
+          return _gl.uniform3fv(uniformLocation, floatArray);
         }
         case 4: {
-          return _gl.uniform4fv(uniformLocation, value);
+          return _gl.uniform4fv(uniformLocation, floatArray);
         }
         case 9: {
-          return _gl.uniformMatrix3fv(uniformLocation, false, value);
+          return _gl.uniformMatrix3fv(uniformLocation, false, floatArray);
         }
         case 16: {
-          return _gl.uniformMatrix4fv(uniformLocation, false, value);
+          return _gl.uniformMatrix4fv(uniformLocation, false, floatArray);
         }
       }
     }
@@ -126,6 +127,14 @@ export function setupUniforms<U extends Uniforms>(uniforms: U) {
 
 function getSnapshot<Obj extends Record<string, unknown>>(object: Obj): Obj {
   return Object.freeze({ ...object });
+}
+
+function isNumericArray(value: unknown): value is NumericArray {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    typeof (value as { length?: unknown }).length === "number"
+  );
 }
 
 function isTextureParams(value: unknown): value is ImageTextureParams | DataTextureParams {
