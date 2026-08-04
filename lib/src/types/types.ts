@@ -20,11 +20,6 @@ export type MatrixUniform =
      number, number, number, number];
 
 /**
- * A numeric collection accepted for vector and matrix uniforms.
- */
-export type NumericArray = ArrayLike<number>;
-
-/**
  * A texture uniform value, which can be either a {@link TextureParams}
  * or a raw `WebGLTexture`.
  */
@@ -34,7 +29,7 @@ export type TextureUniform = TextureParams | WebGLTexture;
  * All concrete values that can be uploaded to a uniform variable.
  */
 export type UniformValue =
-  number | boolean | VectorUniform | MatrixUniform | NumericArray | TextureUniform;
+  number | boolean | VectorUniform | MatrixUniform | Float32Array | TextureUniform;
 
 /**
  * A uniform variable that can be a uniform value or a function returning a uniform value.

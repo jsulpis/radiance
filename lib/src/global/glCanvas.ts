@@ -1,7 +1,7 @@
 import { onResize } from "../helpers/onResize";
 import type { LoopObj } from "../helpers/loop";
 import { loop, type LoopParams } from "../helpers/loop";
-import type { UniformValue, Uniforms } from "../types/types";
+import type { Uniforms } from "../types/types";
 import type { Disposable } from "../types/types";
 import type { UpdatedCallback } from "../passes/renderPass";
 import type { GLContextParams, WebGL2ContextAttributes } from "./glContext";
@@ -248,7 +248,7 @@ export type GLCanvas<U extends Uniforms = Record<string, any>> = Disposable & {
   /** The Device Pixel Ratio being used. */
   dpr: number;
   /** Reactive proxy of the main render pass's uniforms. */
-  uniforms: U & Record<string, UniformValue>;
+  uniforms: U;
   /** Registers a callback called whenever a uniform of the main render pass is updated. */
   onUpdated: (callback: UpdatedCallback<U>) => void;
   /** Registers a callback called just before the main render pass is rendered. */
