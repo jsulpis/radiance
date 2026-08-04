@@ -6,7 +6,7 @@ import {
   GL_TRANSFORM_FEEDBACK,
   GL_TRANSFORM_FEEDBACK_BUFFER,
 } from "../core/constants";
-import type { Attribute, Uniforms } from "../types/types";
+import type { Attribute, SyncUniforms } from "../types/types";
 import type { RenderPass } from "./renderPass";
 import { renderPass } from "./renderPass";
 
@@ -18,7 +18,7 @@ import { renderPass } from "./renderPass";
  *
  * @param params - Configuration for the transform feedback pass.
  */
-export function transformFeedback<O extends string, U extends Uniforms>({
+export function transformFeedback<O extends string, U extends SyncUniforms>({
   gl,
   vertex,
   attributes = {},
@@ -89,7 +89,7 @@ export function transformFeedback<O extends string, U extends Uniforms>({
  */
 export interface TransformFeedbackParams<
   O extends string,
-  U extends Uniforms = Record<string, never>,
+  U extends SyncUniforms = Record<string, never>,
 > {
   /** WebGL2 context. */
   gl: WebGL2RenderingContext;
@@ -111,7 +111,7 @@ export interface TransformFeedbackParams<
  */
 export type TransformFeedbackPass<
   O extends string,
-  U extends Uniforms = Record<string, never>,
+  U extends SyncUniforms = Record<string, never>,
 > = Omit<
   RenderPass<U>,
   "initialize" | "target" | "setTarget" | "setSize" | "vertex" | "fragment"

@@ -1,7 +1,7 @@
 import { onResize } from "../helpers/onResize";
 import type { LoopObj } from "../helpers/loop";
 import { loop, type LoopParams } from "../helpers/loop";
-import type { Uniforms } from "../types/types";
+import type { AsyncUniforms, SyncUniforms } from "../types/types";
 import type { Disposable } from "../types/types";
 import type { UpdatedCallback } from "../passes/renderPass";
 import type { GLContextParams, WebGL2ContextAttributes } from "./glContext";
@@ -25,7 +25,7 @@ import {
  * It combines context creation, a full-screen quad render pass, a post-processing compositor,
  * and automatic rendering/resizing logic.
  */
-export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanvas<U> => {
+export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GLCanvas<U> => {
   const {
     canvas: canvasProp,
     fragment,
@@ -44,7 +44,10 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     setSize: setCanvasSize,
   } = glContext({ canvas: canvasProp, ...webglAttributes, colorSpace });
 
-  const renderPass = quadRenderPass(params);
+  const renderPass = quadRenderPass<SyncUniforms>({
+    ...params,
+    uniforms: params.uniforms as SyncUniforms,
+  });
   const mainCompositor = compositor({ gl, renderPass, postEffects });
   let disposed = false;
   let renderFrame: number | undefined;
@@ -192,8 +195,8 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
     play,
     pause,
     dpr,
-    uniforms: renderPass.uniforms,
-    onUpdated: renderPass.onUpdated,
+    uniforms: renderPass.uniforms as U,
+    onUpdated: renderPass.onUpdated as (callback: UpdatedCallback<U>) => void,
     onBeforeRender: mainCompositor.onBeforeRender,
     onAfterRender: mainCompositor.onAfterRender,
     resizeObserver,
@@ -205,12 +208,14 @@ export const glCanvas = <U extends Uniforms>(params: GLCanvasParams<U>): GLCanva
  * @inline
  * @internal
  */
-export interface GLCanvasParams<U extends Uniforms>
+export interface GLCanvasParams<U extends AsyncUniforms>
   extends
     LoopParams,
-    QuadPassParams<U>,
+    Omit<QuadPassParams, "uniforms">,
     Pick<CompositorParams, "postEffects">,
     Pick<GLContextParams<HTMLCanvasElement | OffscreenCanvas | string>, "canvas" | "colorSpace"> {
+  /** Initial uniform values, including values that may resolve asynchronously. */
+  uniforms?: U;
   /**
    * Native WebGL2 context attributes.
    */
@@ -230,7 +235,7 @@ export interface GLCanvasParams<U extends Uniforms>
 /**
  * The object returned by the {@link glCanvas} function.
  */
-export type GLCanvas<U extends Uniforms = Record<string, any>> = Disposable & {
+export type GLCanvas<U extends AsyncUniforms = Record<string, any>> = Disposable & {
   /** The WebGL2 rendering context. */
   gl: WebGL2RenderingContext;
   /** Executes a single render of the entire pipeline. */

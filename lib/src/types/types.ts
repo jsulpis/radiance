@@ -32,10 +32,14 @@ export type UniformValue =
   number | boolean | VectorUniform | MatrixUniform | Float32Array | TextureUniform;
 
 /**
- * A uniform variable that can be a uniform value or a function returning a uniform value.
+ * A synchronous uniform variable that can be a uniform value or a function returning one.
  */
-export type Uniform<Args = never> =
-  | UniformValue
+export type SyncUniform<Args = never> =
+  UniformValue | ((...args: [Args] extends [never] ? [] : [args: Args]) => UniformValue);
+
+/** A uniform variable that may resolve asynchronously. */
+export type AsyncUniform<Args = never> =
+  | SyncUniform<Args>
   | Promise<UniformValue>
   | ((...args: [Args] extends [never] ? [] : [args: Args]) => UniformValue | Promise<UniformValue>);
 
@@ -43,7 +47,13 @@ export type Uniform<Args = never> =
  * A collection of uniform variables.
  * An optional Args type parameter can be provided to specify the arguments for uniform functions.
  */
-export type Uniforms<Args = never> = Record<string, Uniform<Args>>;
+export type SyncUniforms<Args = never> = Record<string, SyncUniform<Args>>;
+
+/** A collection of uniform variables that may resolve asynchronously. */
+export type AsyncUniforms<Args = never> = Record<string, AsyncUniform<Args>>;
+
+/** @deprecated Use {@link AsyncUniforms}. */
+export type Uniforms<Args = never> = AsyncUniforms<Args>;
 
 /**
  * A TypedArray (e.g., Float32Array, Uint16Array) used for buffer data.
