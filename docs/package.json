@@ -20,8 +20,8 @@
     "tweakpane": "4.0.5",
     "typescript": "6.0.3",
     "vitepress": "1.6.4",
-    "vitepress-plugin-group-icons": "1.7.5",
-    "vitepress-plugin-llms": "1.13.3",
+    "vitepress-plugin-group-icons": "1.7.6",
+    "vitepress-plugin-llms": "1.13.4",
     "vitepress-plugin-mermaid": "2.0.17",
     "vitepress-plugin-sandpack": "1.1.4",
     "vue": "3.5.40"
