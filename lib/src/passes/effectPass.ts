@@ -2,7 +2,7 @@ import type { RenderTarget, RenderTargetParams } from "../core/renderTarget";
 import { GL_HALF_FLOAT, GL_RGBA16F } from "../core/constants";
 import { createRenderTarget } from "../core/renderTarget";
 import type { glCanvas as _glCanvas } from "../global/glCanvas";
-import type { UniformValue, Uniforms } from "../types/types";
+import type { Uniforms } from "../types/types";
 import type { compositor as _compositor } from "./compositor";
 import type { QuadPassParams } from "./quadRenderPass";
 import { quadRenderPass } from "./quadRenderPass";
@@ -70,21 +70,17 @@ export type EffectPass<U extends Uniforms = Record<string, never>> = RenderPass<
  *
  * [Example: Multi pass](/examples/post-processing/multi-pass/)
  */
-export type EffectUniforms = Record<
-  string,
-  | UniformValue
-  | ((passes: {
-      /**
-       * - in an effect with only one pass, the inputPass is the pass rendered before this effect.
-       * - in an effect with multiple passes, the inputPass is the pass rendered before the first pass of the effect.
-       */
-      inputPass: RenderPass;
-      /**
-       * The pass rendered immediately before this specific effect pass.
-       */
-      previousPass: RenderPass;
-    }) => UniformValue)
->;
+export type EffectUniforms = Uniforms<{
+  /**
+   * - in an effect with only one pass, the inputPass is the pass rendered before this effect.
+   * - in an effect with multiple passes, the inputPass is the pass rendered before the first pass of the effect.
+   */
+  inputPass: RenderPass;
+  /**
+   * The pass rendered immediately before this specific effect pass.
+   */
+  previousPass: RenderPass;
+}>;
 
 /**
  * Parameters for creating an {@link effectPass}.
