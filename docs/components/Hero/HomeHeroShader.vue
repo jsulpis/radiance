@@ -47,9 +47,10 @@ onMounted(() => {
     return;
   }
 
-  const { gl } = glContext(canvas, { colorSpace: "display-p3" });
+  const { gl } = glContext({ canvas, colorSpace: "display-p3" });
 
-  const simulationPass = pingPongFBO(gl, {
+  const simulationPass = pingPongFBO({
+    gl,
     fragment: simulationFragment,
     dataTexture: {
       name: "tParticles",
