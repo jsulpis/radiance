@@ -1,4 +1,4 @@
-import type { Uniforms } from "../types/types";
+import type { SyncUniforms } from "../types/types";
 import { renderPass, type RenderPassParams } from "./renderPass";
 import { findAttributeName, findVaryingName } from "../internal/findName";
 import quadVertexShaderSource from "./quadVertexShader.glsl";
@@ -10,7 +10,7 @@ import quadVertexShaderSource from "./quadVertexShader.glsl";
  *
  * @param params - Configuration for the quad render pass.
  */
-export function quadRenderPass<U extends Uniforms>({
+export function quadRenderPass<U extends SyncUniforms>({
   attributes = {},
   fragment,
   vertex,
@@ -54,7 +54,7 @@ const quadVertexPositions = [-1, -1, 3, -1, -1, 3];
  * Parameters for creating a {@link quadRenderPass}.
  * Inherits from {@link RenderPassParams} but makes the vertex shader optional.
  */
-export type QuadPassParams<U extends Uniforms = Record<string, never>> = Omit<
+export type QuadPassParams<U extends SyncUniforms = Record<string, never>> = Omit<
   RenderPassParams<U>,
   "vertex"
 > & {

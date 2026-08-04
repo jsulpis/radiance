@@ -1,5 +1,5 @@
 import { createHook } from "../internal/createHook";
-import type { Uniforms } from "../types/types";
+import type { SyncUniforms } from "../types/types";
 import type { RenderTarget } from "../core/renderTarget";
 import type { EffectPass } from "./effectPass";
 import {
@@ -16,7 +16,7 @@ import {
  *
  * @param params - Configuration for the composite effect pass.
  */
-export function compositeEffectPass<U extends Uniforms = Record<string, never>>({
+export function compositeEffectPass<U extends SyncUniforms = Record<string, never>>({
   gl,
   passes,
   uniforms = {} as U,
@@ -99,12 +99,12 @@ export function compositeEffectPass<U extends Uniforms = Record<string, never>>(
  * @see {@link EffectPass}
  * @see {@link _RenderPass | RenderPass}
  */
-export type CompositeEffectPass<U extends Uniforms = Record<string, never>> = Omit<
+export type CompositeEffectPass<U extends SyncUniforms = Record<string, never>> = Omit<
   EffectPass<U>,
   "fragment" | "vertex"
 > & {
   /** The sequence of sub-passes executed by this composite effect. */
-  passes: EffectPass<Uniforms>[];
+  passes: EffectPass<SyncUniforms>[];
 };
 
 /**
@@ -112,11 +112,11 @@ export type CompositeEffectPass<U extends Uniforms = Record<string, never>> = Om
  * @inline
  * @internal
  */
-export type CompositeEffectPassParams<U extends Uniforms = Record<string, never>> = {
+export type CompositeEffectPassParams<U extends SyncUniforms = Record<string, never>> = {
   /** Optional WebGL2 context used to initialize the composite effect immediately. */
   gl?: WebGL2RenderingContext;
   /** Ordered effect passes to execute. */
-  passes: EffectPass<Uniforms>[];
+  passes: EffectPass<SyncUniforms>[];
   /** Reactive uniform values for the composite effect. */
   uniforms?: U;
 };

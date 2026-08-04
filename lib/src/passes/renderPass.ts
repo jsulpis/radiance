@@ -1,4 +1,4 @@
-import type { Attribute, Disposable, Uniforms } from "../types/types";
+import type { Attribute, Disposable, SyncUniforms } from "../types/types";
 import { GL_BLEND, GL_DEPTH_TEST, GL_ONE, GL_ONE_MINUS_SRC_ALPHA } from "../core/constants";
 import { createProgram } from "../core/program";
 import { setRenderTarget } from "../core/renderTarget";
@@ -16,7 +16,7 @@ import { createHook } from "../internal/createHook";
  *
  * @param params - Configuration for the render pass.
  */
-export function renderPass<U extends Uniforms>({
+export function renderPass<U extends SyncUniforms>({
   gl,
   target = null,
   fragment,
@@ -201,7 +201,7 @@ function setDepthTest(gl: WebGL2RenderingContext, depthTest: boolean) {
 /**
  * Parameters for creating a {@link RenderPass}.
  */
-export type RenderPassParams<U extends Uniforms = Record<string, never>> = {
+export type RenderPassParams<U extends SyncUniforms = Record<string, never>> = {
   /**
    * Optional WebGL2 context used to initialize the pass immediately.
    *
@@ -259,7 +259,7 @@ export type RenderPassParams<U extends Uniforms = Record<string, never>> = {
 /**
  * A generic rendering pass that encapsulates shaders, uniforms, and attributes.
  */
-export type RenderPass<U extends Uniforms = Record<string, never>> = Disposable & {
+export type RenderPass<U extends SyncUniforms = Record<string, never>> = Disposable & {
   /**
    * Executes the render pass.
    * @param opts - Rendering params.
@@ -297,7 +297,7 @@ export type RenderPass<U extends Uniforms = Record<string, never>> = Disposable 
  * Callback function executed during the render cycle.
  * @param args - An object containing the uniforms used for the render.
  */
-export type RenderCallback<U extends Uniforms = Record<string, never>> = (
+export type RenderCallback<U extends SyncUniforms = Record<string, never>> = (
   args: Readonly<{ uniforms: U }>,
 ) => void;
 
@@ -308,7 +308,7 @@ export type RenderCallback<U extends Uniforms = Record<string, never>> = (
  * @param oldValue - The previous value of the uniform.
  * @param uniforms - A snapshot of all uniforms after the change.
  */
-export type UpdatedCallback<U extends Uniforms = Record<string, never>> = (
+export type UpdatedCallback<U extends Record<string, unknown> = Record<string, never>> = (
   name: string,
   value: unknown,
   oldValue: unknown,

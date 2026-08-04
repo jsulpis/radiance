@@ -2,10 +2,10 @@ import type { DataTextureParams, ImageTextureParams } from "../core/texture";
 import { GL_ACTIVE_UNIFORMS, GL_TEXTURE_2D, GL_TEXTURE0 } from "../core/constants";
 import { fillTexture } from "../core/texture";
 import type { UpdatedCallback } from "../passes/renderPass";
-import type { Uniforms } from "../types/types";
+import type { SyncUniforms } from "../types/types";
 import { createHook } from "./createHook";
 
-export function setupUniforms<U extends Uniforms>(uniforms: U) {
+export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
   type UniformName = Extract<keyof U, string>;
 
   let textureUnitIndex = 0;

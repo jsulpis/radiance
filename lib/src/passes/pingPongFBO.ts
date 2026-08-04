@@ -1,6 +1,6 @@
 import { createRenderTarget } from "../core/renderTarget";
 import { createFloatDataTexture, type DataTextureParams } from "../core/texture";
-import type { Attribute, Uniforms } from "../types/types";
+import type { Attribute, SyncUniforms } from "../types/types";
 import { quadRenderPass } from "./quadRenderPass";
 import type { RenderPass } from "./renderPass";
 
@@ -17,7 +17,7 @@ import type { RenderPass } from "./renderPass";
  * @param params - Configuration for the ping-pong pass.
  * @returns A {@link RenderPass} object specialized for double-buffering.
  */
-export function pingPongFBO<U extends Uniforms>({
+export function pingPongFBO<U extends SyncUniforms>({
   gl,
   uniforms = {} as U,
   dataTexture,
@@ -83,7 +83,7 @@ export function pingPongFBO<U extends Uniforms>({
   return pingPongFBOPass;
 }
 
-export type PingPongFBOPass<U extends Uniforms = Record<string, never>> = RenderPass<U> & {
+export type PingPongFBOPass<U extends SyncUniforms = Record<string, never>> = RenderPass<U> & {
   /** The current output texture after a render. */
   texture: DataTextureParams | WebGLTexture;
   /** Pre-calculated UV coordinates for sampling data from the texture. */
@@ -95,7 +95,7 @@ export type PingPongFBOPass<U extends Uniforms = Record<string, never>> = Render
  * @inline
  * @internal
  */
-export type PingPongFBOParams<U extends Uniforms = Record<string, never>> = {
+export type PingPongFBOParams<U extends SyncUniforms = Record<string, never>> = {
   /** WebGL2 context. */
   gl: WebGL2RenderingContext;
   /** Uniforms for the pass. */
