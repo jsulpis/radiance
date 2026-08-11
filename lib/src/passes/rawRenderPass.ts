@@ -126,7 +126,7 @@ export function rawRenderPass<U extends UniformValues>({
       throw new Error("The render pass must be initialized before calling the render function");
     }
 
-    setRenderTarget(_gl, target ?? _target, clear);
+    setRenderTarget(_gl, target === undefined ? _target : target, clear);
     _gl.useProgram(_program);
 
     bindVAO();
