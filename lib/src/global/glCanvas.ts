@@ -11,6 +11,7 @@ import type { CompositorParams } from "../passes/compositor";
 import { compositor } from "../passes/compositor";
 import { createHook } from "../internal/createHook";
 import { isOffscreen } from "../internal/typeGuards";
+import type { RenderOptions } from "../passes/renderPass";
 
 /**
  * The main high-level function for managing a WebGL canvas.
@@ -55,15 +56,17 @@ export const glCanvas = <U extends UniformSources<UniformContext>>(
     passResolution: [canvas.width, canvas.height],
   };
 
-  function render() {
+  function render(options?: RenderOptions) {
     if (disposed || !isCanvasResized) return;
-    mainCompositor.render({
-      context: {
-        ...frameContext,
-        canvasResolution: [...frameContext.canvasResolution],
-        passResolution: [...frameContext.passResolution],
+    mainCompositor.render(
+      options ?? {
+        context: {
+          ...frameContext,
+          canvasResolution: [...frameContext.canvasResolution],
+          passResolution: [...frameContext.passResolution],
+        },
       },
-    });
+    );
   }
 
   let requestedRender = false;
@@ -206,7 +209,7 @@ export type GLCanvas<U extends UniformSources<UniformContext> = UniformSources<U
     /** The WebGL2 rendering context. */
     gl: WebGL2RenderingContext;
     /** Executes one render of the complete pipeline. */
-    render: () => void;
+    render: (options?: RenderOptions<UniformContext>) => void;
     /** Registers a callback called after the first canvas resize. */
     onCanvasReady: (callback: () => void) => void;
     /** The HTML canvas or OffscreenCanvas being rendered into. */

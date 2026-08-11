@@ -1,9 +1,8 @@
 import { createRenderTarget } from "../core/renderTarget";
 import { createFloatDataTexture, type DataTextureParams } from "../core/texture";
 import type { Attribute, UniformContext, UniformSources } from "../types/types";
-import type { RenderPass } from "./renderPass";
+import type { RenderOptions, RenderPass } from "./renderPass";
 import { quadRenderPass } from "./quadRenderPass";
-import type { RenderOptions } from "./rawRenderPass";
 
 /**
  * Creates a ping-pong Framebuffer Object (FBO) pass for GPGPU calculations.
@@ -67,7 +66,7 @@ export function pingPongFBO<U extends UniformSources<UniformContext>>({
 
   const renderFn = pingPongFBOPass.render;
 
-  pingPongFBOPass.render = (options: RenderOptions = {}) => {
+  pingPongFBOPass.render = (options?: RenderOptions) => {
     renderFn({ ...options, target: fboWrite });
     pingPongFBOPass.texture = fboWrite.texture;
     Object.assign(pingPongFBOPass.uniforms, {

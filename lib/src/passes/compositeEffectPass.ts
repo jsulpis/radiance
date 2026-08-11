@@ -2,9 +2,10 @@ import { createHook } from "../internal/createHook";
 import type { UniformSources } from "../types/types";
 import type { RenderTarget } from "../core/renderTarget";
 import type { EffectPass, EffectUniformContext } from "./effectPass";
-import type { RenderOptions, UpdatedCallback } from "./rawRenderPass";
+import type { UpdatedCallback } from "./rawRenderPass";
 import type { RenderCallback } from "./rawRenderPass";
-import type { RenderPass } from "./renderPass";
+import type { RenderOptions, RenderPass } from "./renderPass";
+import { createUniformContext } from "../internal/createUniformContext";
 
 /**
  * Creates a composite effect pass from a series of sub-passes.
@@ -29,27 +30,26 @@ export function compositeEffectPass<
   let disposed = false;
 
   function render(options?: RenderOptions<EffectUniformContext>) {
+    if (disposed || !_gl) return;
+
     executeBeforeRenderCallbacks({ uniforms });
-    const context = options?.context;
+    const context = (options?.context ??
+      createUniformContext(_gl)) as Readonly<EffectUniformContext>;
     let previousPass: RenderPass | EffectPass | undefined =
-      context?.previousPass ?? context?.inputPass;
+      context.previousPass ?? context.inputPass;
 
     for (const pass of passes) {
-      if (context) {
-        pass.render({
-          ...options,
-          context: {
-            ...context,
-            inputPass: context.inputPass,
-            previousPass: previousPass ?? context.inputPass,
-            passResolution: pass.target
-              ? [pass.target.width, pass.target.height]
-              : context.canvasResolution,
-          } as EffectUniformContext,
-        });
-      } else {
-        pass.render(options);
-      }
+      pass.render({
+        ...options,
+        context: {
+          ...context,
+          inputPass: context.inputPass,
+          previousPass: previousPass ?? context.inputPass,
+          passResolution: pass.target
+            ? [pass.target.width, pass.target.height]
+            : context.canvasResolution,
+        } as EffectUniformContext,
+      });
       previousPass = pass;
     }
     executeAfterRenderCallbacks({ uniforms });

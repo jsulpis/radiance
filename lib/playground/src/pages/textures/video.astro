@@ -56,7 +56,7 @@ import Layout from "../../layouts/Layout.astro";
       render();
 
       // check that the frames are updated when the video is playing
-      video.addEventListener("seeked", render, { once: true });
+      video.addEventListener("seeked", () => render(), { once: true });
       video.currentTime = 4;
     },
     { once: true },
