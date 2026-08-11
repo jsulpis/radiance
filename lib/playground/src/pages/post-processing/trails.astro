@@ -43,6 +43,7 @@ import Layout from "../../layouts/Layout.astro";
     `,
       uniforms: {
         uTime: 0,
+        uResolution: ({ canvasResolution }) => canvasResolution,
       },
       postEffects: [
         bloom(),

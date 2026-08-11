@@ -33,6 +33,9 @@ import Layout from "../../layouts/Layout.astro";
         gl_FragColor = vec4(circleLeft, circleRight, 0, alpha);
       }
     `,
+    uniforms: {
+      uResolution: ({ canvasResolution }) => canvasResolution,
+    },
   });
   canvas.onAfterRender(incrementRenderCount);
 
@@ -50,7 +53,7 @@ import Layout from "../../layouts/Layout.astro";
       }
     `,
     uniforms: {
-      uResolution: () => canvas.uniforms.uResolution,
+      uResolution: ({ canvasResolution }) => canvasResolution,
     },
     blending: "additive",
   });

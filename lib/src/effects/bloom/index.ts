@@ -28,6 +28,7 @@ export function bloom(params?: BloomParams) {
       resolutionScale: 1 / 2 ** level,
       uniforms: {
         uTexelSizeMultiplier: 0.5,
+        uInputTexture: ({ previousPass }) => previousPass.target!.texture,
       },
     });
     downsamplePasses.push(pass);

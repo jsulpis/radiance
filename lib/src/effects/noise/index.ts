@@ -12,10 +12,12 @@ export function noise(params?: NoiseParams) {
   return effectPass({
     fragment,
     uniforms: {
+      uTexture: ({ inputPass }) => inputPass.target!.texture,
       uIntensity: intensity,
       uSize: size,
       uColorMix: colorMix,
-      uTime: 0,
+      uResolution: ({ passResolution }) => passResolution,
+      uTime: ({ time }) => time,
     },
   });
 }

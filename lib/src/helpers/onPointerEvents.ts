@@ -62,6 +62,10 @@ export interface PointerEventsHandlers {
   up?: (args: HandlerArgs) => void;
 }
 
+/**
+ * @inline
+ * @internal
+ */
 export type HandlerArgs = {
   pointer: {
     x: number;

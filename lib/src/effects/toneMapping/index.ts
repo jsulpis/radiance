@@ -79,6 +79,7 @@ export function reinhardToneMapping(params?: ReinhardToneMappingParams) {
   return effectPass({
     fragment: reinhardFragment,
     uniforms: {
+      uTexture: ({ inputPass }) => inputPass.target!.texture,
       uExposure: exposure,
       uConvertToSRGB: outputColorSpace === "sRGB",
       uWhitePoint: whitePoint,
@@ -106,6 +107,7 @@ function createToneMappingPass(fragment: string, params?: ToneMappingParams) {
   return effectPass({
     fragment,
     uniforms: {
+      uTexture: ({ inputPass }) => inputPass.target!.texture,
       uExposure: exposure,
       uConvertToSRGB: outputColorSpace === "sRGB",
     },

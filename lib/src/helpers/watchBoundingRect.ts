@@ -74,6 +74,7 @@ export interface WatchBoundingRectParams {
 }
 
 /**
+ * @inline
  * @internal
  */
 export type ElementBoundingRect = {
@@ -88,6 +89,7 @@ export type ElementBoundingRect = {
 };
 
 /**
+ * @inline
  * @internal
  */
 export type ElementCenter = {

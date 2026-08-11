@@ -62,6 +62,7 @@ import Layout from "../../layouts/Layout.astro";
 		`,
     uniforms: {
       uThreshold: 0,
+      uTime: ({ time }) => time / 500,
     },
     attributes: {
       aPosition: {

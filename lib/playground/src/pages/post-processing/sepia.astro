@@ -28,8 +28,11 @@ import Layout from "../../layouts/Layout.astro";
 			void main() {
 				vec3 color = texture(uTexture, vUv).rgb * vignette();
 				gl_FragColor = vec4(color, 1.);
-			}
+      }
 		`,
+    uniforms: {
+      uTexture: ({ inputPass }) => inputPass.target!.texture,
+    },
   });
 
   const sepiaEffect = effectPass({
@@ -52,8 +55,11 @@ import Layout from "../../layouts/Layout.astro";
 				vec3 color = texture(uTexture, vUv).rgb;
 				color = mix(color, sepia(color), STRENGTH);
 				gl_FragColor = vec4(color, 1.);
-			}
+      }
 		`,
+    uniforms: {
+      uTexture: ({ inputPass }) => inputPass.target!.texture,
+    },
   });
 
   const { onAfterRender } = glCanvas({
@@ -82,6 +88,7 @@ import Layout from "../../layouts/Layout.astro";
     `,
     uniforms: {
       uTexture: await loadTexture("/images/lion.jpg"),
+      uResolution: ({ canvasResolution }) => canvasResolution,
     },
     postEffects: [sepiaEffect, vignetteEffect],
   });

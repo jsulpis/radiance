@@ -1,11 +1,11 @@
 import type { DataTextureParams, ImageTextureParams } from "../core/texture";
 import { GL_ACTIVE_UNIFORMS, GL_TEXTURE_2D, GL_TEXTURE0 } from "../core/constants";
 import { fillTexture } from "../core/texture";
-import type { UpdatedCallback } from "../passes/renderPass";
-import type { SyncUniforms } from "../types/types";
+import type { UpdatedCallback } from "../passes/rawRenderPass";
+import type { UniformValues } from "../types/types";
 import { createHook } from "./createHook";
 
-export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
+export function setupUniforms<U extends UniformValues>(uniforms: U) {
   type UniformName = Extract<keyof U, string>;
 
   let textureUnitIndex = 0;
@@ -15,8 +15,8 @@ export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
   let _program: WebGLProgram;
 
   const [onUpdated, executeUpdateCallbacks] = createHook<UpdatedCallback<U>>();
-
   const uniformsLocations = new Map<UniformName, WebGLUniformLocation>();
+  const currentValues: UniformValues = { ...uniforms };
 
   function initialize(gl: WebGL2RenderingContext, program: WebGLProgram) {
     _gl = gl;
@@ -32,7 +32,7 @@ export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
   const uniformsProxy = new Proxy(
     { ...uniforms },
     {
-      set(target, name: UniformName, value) {
+      set(target, name: UniformName, value: U[UniformName]) {
         if (value !== target[name]) {
           const oldValue = target[name];
           target[name] = value;
@@ -41,20 +41,26 @@ export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
         return true;
       },
     },
-  );
+  ) as U;
 
-  function setUniforms() {
-    for (const [uniformName, uniformValue] of Object.entries(uniformsProxy)) {
-      setUniform(
-        uniformName as UniformName,
-        (typeof uniformValue === "function" ? uniformValue() : uniformValue) as U[UniformName],
-      );
+  function setUniformValues(values: UniformValues) {
+    Object.assign(currentValues, values);
+  }
+
+  function uploadUniforms() {
+    for (const [name, value] of Object.entries(uniformsProxy)) {
+      currentValues[name] = value;
+    }
+    for (const [name, value] of Object.entries(currentValues)) {
+      if (value !== undefined) {
+        setUniform(name as UniformName, value as U[UniformName]);
+      }
     }
   }
 
   function setUniform<Uname extends UniformName>(name: Uname, value: U[Uname]) {
     const uniformLocation = uniformsLocations.get(name) || -1;
-    if (uniformLocation === -1) return -1;
+    if (uniformLocation === -1 || value === undefined) return -1;
 
     if (typeof value === "number") return _gl.uniform1f(uniformLocation, value);
     if (typeof value === "boolean") return _gl.uniform1i(uniformLocation, value ? 1 : 0);
@@ -104,7 +110,7 @@ export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
   }
 
   function getUniformsSnapshot() {
-    return getSnapshot({ ...uniformsProxy });
+    return getSnapshot({ ...currentValues });
   }
 
   function dispose() {
@@ -118,7 +124,8 @@ export function setupUniforms<U extends SyncUniforms>(uniforms: U) {
     initialize,
     uniformsProxy,
     onUpdated,
-    setUniforms,
+    uploadUniforms,
+    setUniformValues,
     getUniformsSnapshot,
     dispose,
   };

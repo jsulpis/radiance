@@ -63,6 +63,9 @@ function init(message: InitMessage) {
         fragColor = vec4(color, 1.);
       }
     `,
+    uniforms: {
+      uResolution: ({ canvasResolution }) => canvasResolution,
+    },
   });
 
   scene.onAfterRender(() => {

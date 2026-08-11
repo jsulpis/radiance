@@ -16,6 +16,8 @@ import Layout from "../../layouts/Layout.astro";
     vertex,
     uniforms: {
       uPointer: [0, 0],
+      uResolution: ({ canvasResolution }) => canvasResolution,
+      uTime: ({ time }) => time / 500,
     },
     immediate: false,
   });

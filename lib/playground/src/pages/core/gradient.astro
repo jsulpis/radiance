@@ -17,6 +17,9 @@ import Layout from "../../layouts/Layout.astro";
 				gl_FragColor = vec4(vUv, sin(uTime) / 2. + .5, 1.);
 			}
 		`,
+    uniforms: {
+      uTime: ({ time }) => time / 500,
+    },
     immediate: false,
   });
 

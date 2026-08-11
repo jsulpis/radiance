@@ -35,6 +35,7 @@ import Layout from "../../layouts/Layout.astro";
     `,
     uniforms: {
       uTexture: await loadTexture("/images/lion.jpg"),
+      uResolution: ({ canvasResolution }) => canvasResolution,
     },
     postEffects: [noiseEffect],
   });
