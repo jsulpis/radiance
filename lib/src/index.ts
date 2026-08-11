@@ -22,6 +22,8 @@ export { quadRenderPass } from "./passes/quadRenderPass";
 export type { QuadPassParams } from "./passes/quadRenderPass";
 export { renderPass } from "./passes/renderPass";
 export type { RenderPassParams, RenderPass } from "./passes/renderPass";
+export { rawRenderPass } from "./passes/rawRenderPass";
+export type { RawRenderPassParams, RawRenderPass, RenderOptions } from "./passes/rawRenderPass";
 export { pingPongFBO } from "./passes/pingPongFBO";
 export type { PingPongFBOPass } from "./passes/pingPongFBO";
 export { transformFeedback } from "./passes/transformFeedback";

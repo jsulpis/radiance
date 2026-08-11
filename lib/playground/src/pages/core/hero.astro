@@ -12,6 +12,7 @@ import Layout from "../../layouts/Layout.astro";
     uniforms: {
       uHappyCursor: 0,
       iTime: 0,
+      iResolution: ({ canvasResolution }) => canvasResolution,
     },
     colorSpace: "display-p3",
     postEffects: [bloom(), linearToneMapping({ exposure: 1.2 })],

@@ -2,7 +2,7 @@ import type { RenderTarget, RenderTargetParams } from "../core/renderTarget";
 import { GL_HALF_FLOAT, GL_RGBA16F } from "../core/constants";
 import { createRenderTarget } from "../core/renderTarget";
 import type { glCanvas as _glCanvas } from "../global/glCanvas";
-import type { SyncUniforms } from "../types/types";
+import type { UniformContext, UniformSources } from "../types/types";
 import type { compositor as _compositor } from "./compositor";
 import type { QuadPassParams } from "./quadRenderPass";
 import { quadRenderPass } from "./quadRenderPass";
@@ -60,17 +60,17 @@ export const floatTargetConfig: RenderTargetParams = {
 };
 
 /**
- * An alias for {@link RenderPass}, specifically used in the context of post-processing effects.
+ * An effect pass with contextual and asynchronous uniform sources.
  */
-export type EffectPass<U extends SyncUniforms = Record<string, never>> = RenderPass<U>;
+export type EffectPass<U extends EffectUniforms = EffectUniforms> = RenderPass<
+  U,
+  EffectUniformContext
+>;
 
 /**
- * Uniforms specifically used in post-processing effects.
- * Supports functional values that receive information about the previous rendering passes.
- *
- * [Example: Multi pass](/examples/post-processing/multi-pass/)
+ * Context supplied to effect uniform functions.
  */
-export type EffectUniforms = SyncUniforms<{
+export type EffectUniformContext = UniformContext & {
   /**
    * - in an effect with only one pass, the inputPass is the pass rendered before this effect.
    * - in an effect with multiple passes, the inputPass is the pass rendered before the first pass of the effect.
@@ -80,24 +80,30 @@ export type EffectUniforms = SyncUniforms<{
    * The pass rendered immediately before this specific effect pass.
    */
   previousPass: RenderPass;
-}>;
+};
+
+/** Uniform sources accepted by post-processing effects. */
+export type EffectUniforms = UniformSources<EffectUniformContext>;
 
 /**
  * Parameters for creating an {@link effectPass}.
  * @inline
  * @internal
  */
-export type EffectPassParams<U extends EffectUniforms> = Omit<QuadPassParams<U>, "target"> &
+export type EffectPassParams<U extends EffectUniforms> = Omit<
+  QuadPassParams<EffectUniformContext, U>,
+  "target"
+> &
   (
     | {
-        /** Caller-owned render target for this pass (never disposed by the effect), or null to render to the default target. */
+        /** Caller-owned target, or `null` to render to the default framebuffer. */
         target?: RenderTarget | null;
         targetParams?: never;
       }
     | {
         target?: never;
         /**
-         * Parameters for an effect-owned render target, disposed with the effect.
+         * Parameters for an effect-owned target, disposed with the effect.
          * @default floatTargetConfig
          */
         targetParams?: RenderTargetParams;

@@ -3,12 +3,12 @@ import Layout from "../../layouts/Layout.astro";
 ---
 
 <script>
-	import { glCanvas } from "@radiancejs/gl";
-	import { incrementRenderCount } from "../../components/renderCount";
+  import { glCanvas } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
 
-	const { onAfterRender } = glCanvas({
-		canvas: "#glCanvas",
-		fragment: /* glsl */ `
+  const { onAfterRender } = glCanvas({
+    canvas: "#glCanvas",
+    fragment: /* glsl */ `
 			varying vec2 uv;
 			uniform vec2 resolution;
 
@@ -20,17 +20,20 @@ import Layout from "../../layouts/Layout.astro";
 				gl_FragColor = vec4(vec3(circle), 1.);
 			}
 		`,
-	});
+    uniforms: {
+      resolution: ({ canvasResolution }) => canvasResolution,
+    },
+  });
 
-	onAfterRender(incrementRenderCount);
+  onAfterRender(incrementRenderCount);
 </script>
 
 <Layout title="Circle">
-	<canvas id="glCanvas"></canvas>
+  <canvas id="glCanvas"></canvas>
 </Layout>
 
 <style>
-	canvas {
-		aspect-ratio: 3 / 2;
-	}
+  canvas {
+    aspect-ratio: 3 / 2;
+  }
 </style>

@@ -1,42 +1,38 @@
 import { onResize } from "../helpers/onResize";
 import type { LoopObj } from "../helpers/loop";
 import { loop, type LoopParams } from "../helpers/loop";
-import type { AsyncUniforms, SyncUniforms } from "../types/types";
-import type { Disposable } from "../types/types";
-import type { UpdatedCallback } from "../passes/renderPass";
+import type { UniformSources, UniformContext, Disposable } from "../types/types";
+import type { UpdatedCallback } from "../passes/rawRenderPass";
 import type { GLContextParams, WebGL2ContextAttributes } from "./glContext";
 import { glContext } from "./glContext";
 import type { QuadPassParams } from "../passes/quadRenderPass";
 import { quadRenderPass } from "../passes/quadRenderPass";
 import type { CompositorParams } from "../passes/compositor";
 import { compositor } from "../passes/compositor";
-import { findUniformName } from "../internal/findName";
 import { createHook } from "../internal/createHook";
-import {
-  isHTMLImageTexture,
-  isHTMLVideoTexture,
-  isOffscreen,
-  isPromiseLike,
-} from "../internal/typeGuards";
+import { isOffscreen } from "../internal/typeGuards";
 
 /**
- * The main high-level function to manage a WebGL canvas.
+ * The main high-level function for managing a WebGL canvas.
  *
- * It combines context creation, a full-screen quad render pass, a post-processing compositor,
- * and automatic rendering/resizing logic.
+ * It combines WebGL2 context creation, a full-screen render pass, a
+ * post-processing compositor, resize handling, render scheduling, and an
+ * optional animation clock. Uniform functions receive a {@link UniformContext};
+ * promise sources are resolved for both the main pass and effects.
  */
-export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GLCanvas<U> => {
+export const glCanvas = <U extends UniformSources<UniformContext>>(
+  params: GLCanvasParams<U>,
+): GLCanvas<U> => {
   const {
     canvas: canvasProp,
-    fragment,
-    vertex,
     dpr = Math.min(globalThis.devicePixelRatio || 1, 2),
     postEffects,
     immediate,
-    renderMode = "auto",
+    renderMode: renderModeParam,
     colorSpace,
     webglAttributes,
   } = params;
+  const renderMode = renderModeParam ?? inferRenderMode(params.uniforms);
 
   const {
     gl,
@@ -44,25 +40,30 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
     setSize: setCanvasSize,
   } = glContext({ canvas: canvasProp, ...webglAttributes, colorSpace });
 
-  const renderPass = quadRenderPass<SyncUniforms>({
-    ...params,
-    uniforms: params.uniforms as SyncUniforms,
-  });
+  const renderPass = quadRenderPass<UniformContext, U>({ ...params, gl });
   const mainCompositor = compositor({ gl, renderPass, postEffects });
   let disposed = false;
   let renderFrame: number | undefined;
-  let timeFrame: number | undefined;
-  const imageListeners: Array<{ image: HTMLImageElement; listener: () => void }> = [];
-  const videoFrames: Array<{ video: HTMLVideoElement; id: number }> = [];
-
   // flag to not render before the first resize of the canvas to avoid a glitch
   let isCanvasResized = false;
 
+  const frameContext: UniformContext = {
+    time: 0,
+    elapsedTime: 0,
+    deltaTime: 0,
+    canvasResolution: [canvas.width, canvas.height],
+    passResolution: [canvas.width, canvas.height],
+  };
+
   function render() {
-    if (disposed) return;
-    if (isCanvasResized) {
-      mainCompositor.render();
-    }
+    if (disposed || !isCanvasResized) return;
+    mainCompositor.render({
+      context: {
+        ...frameContext,
+        canvasResolution: [...frameContext.canvasResolution],
+        passResolution: [...frameContext.passResolution],
+      },
+    });
   }
 
   let requestedRender = false;
@@ -85,16 +86,7 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
 
   if (renderMode === "auto") {
     for (const pass of mainCompositor.allPasses) {
-      if (!("uniforms" in pass)) continue;
-
-      pass.onUpdated((name, value) => {
-        requestRender();
-        watchUniformValue(name, value, pass);
-      });
-
-      for (const [name, value] of Object.entries(pass.uniforms)) {
-        watchUniformValue(name, value, pass);
-      }
+      pass.onUpdated(requestRender);
     }
   }
 
@@ -103,6 +95,8 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
   function setSize({ width, height }: { width: number; height: number }) {
     if (disposed) return;
     setCanvasSize(width, height);
+    frameContext.canvasResolution = [width, height];
+    frameContext.passResolution = [width, height];
     mainCompositor.setSize({ width, height });
     requestRender();
 
@@ -112,50 +106,17 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
     }
   }
 
-  /**
-   * Watch a uniform value for changes that would require re-rendering, such as promises resolving or media loading.
-   */
-  function watchUniformValue(
-    name: string,
-    value: unknown,
-    pass: { uniforms: Record<string, unknown> },
-  ) {
-    if (isPromiseLike(value)) {
-      value.then((resolvedValue) => {
-        if (!disposed) pass.uniforms[name] = resolvedValue;
-      });
-    } else if (isHTMLImageTexture(value) && !value.src.complete) {
-      imageListeners.push({
-        image: value.src,
-        listener: requestRender,
-      });
-      value.src.addEventListener("load", requestRender, { once: true });
-    } else if (isHTMLVideoTexture(value)) {
-      const videoFrame = { video: value.src, id: 0 };
-      const onFramePlayed = () => {
-        if (disposed) return;
-        requestRender();
-        videoFrame.id = value.src.requestVideoFrameCallback(onFramePlayed);
-      };
-      videoFrame.id = value.src.requestVideoFrameCallback(onFramePlayed);
-      videoFrames.push(videoFrame);
-    }
-  }
-
-  const timeUniformName = findUniformName(fragment + vertex, "time");
   let timeLoop: LoopObj | null = null;
   let play = () => {};
   let pause = () => {};
 
-  if (timeUniformName && renderPass.uniforms[timeUniformName] === undefined) {
-    timeFrame = requestAnimationFrame(() => {
-      // use RAF to avoid triggering an extra render for the initialization of the time uniform
-      (renderPass.uniforms as Record<string, number>)[timeUniformName] = 0;
-    });
-
+  if (renderMode === "continuous") {
     timeLoop = loop(
-      ({ deltaTime }) => {
-        (renderPass.uniforms as Record<string, number>)[timeUniformName] += deltaTime / 500;
+      ({ time, deltaTime, elapsedTime }) => {
+        frameContext.time = time;
+        frameContext.elapsedTime = elapsedTime;
+        frameContext.deltaTime = deltaTime;
+        requestRender();
       },
       { immediate },
     );
@@ -178,11 +139,8 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
     if (disposed) return;
     disposed = true;
     if (renderFrame != undefined) cancelAnimationFrame(renderFrame);
-    if (timeFrame != undefined) cancelAnimationFrame(timeFrame);
     timeLoop?.stop();
     resizeObserver?.stop();
-    for (const { image, listener } of imageListeners) image.removeEventListener("load", listener);
-    for (const { video, id } of videoFrames) video.cancelVideoFrameCallback(id);
     mainCompositor.dispose();
   }
 
@@ -195,8 +153,8 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
     play,
     pause,
     dpr,
-    uniforms: renderPass.uniforms as U,
-    onUpdated: renderPass.onUpdated as (callback: UpdatedCallback<U>) => void,
+    uniforms: renderPass.uniforms,
+    onUpdated: renderPass.onUpdated,
     onBeforeRender: mainCompositor.onBeforeRender,
     onAfterRender: mainCompositor.onAfterRender,
     resizeObserver,
@@ -204,62 +162,71 @@ export const glCanvas = <U extends AsyncUniforms>(params: GLCanvasParams<U>): GL
   };
 };
 
+function inferRenderMode(uniforms: UniformSources<UniformContext> | undefined = {}) {
+  const hasDynamicTimeUniform = Object.entries(uniforms).some(
+    ([name, value]) => /time/i.test(name) && typeof value === "function",
+  );
+  return hasDynamicTimeUniform ? "continuous" : "auto";
+}
+
 /**
  * @inline
  * @internal
  */
-export interface GLCanvasParams<U extends AsyncUniforms>
+export interface GLCanvasParams<U extends UniformSources<UniformContext>>
   extends
     LoopParams,
-    Omit<QuadPassParams, "uniforms">,
+    Omit<QuadPassParams<UniformContext, U>, "uniforms">,
     Pick<CompositorParams, "postEffects">,
     Pick<GLContextParams<HTMLCanvasElement | OffscreenCanvas | string>, "canvas" | "colorSpace"> {
-  /** Initial uniform values, including values that may resolve asynchronously. */
+  /** Initial uniform sources, including contextual functions and promises. */
   uniforms?: U;
   /**
    * Native WebGL2 context attributes.
    */
   webglAttributes?: WebGL2ContextAttributes;
   /**
-   * Device Pixel Ratio for the canvas.
+   * Device pixel ratio used when sizing a CSS-sized canvas.
    * @default Math.min(globalThis.devicePixelRatio || 1, 2)
    */
   dpr?: number;
   /**
-   * Whether to render automatically when needed (uniform updated, canvas resized, image texture loaded...) or manually.
-   * @default "auto"
+   * Rendering policy.
+   * - `auto` schedules renders when needed ((uniform updated, canvas resized, image texture loaded...)
+   * - `manual` renders only when {@link GLCanvas.render} is called
+   * - `continuous` renders every animation frame.
+   * @default `continuous` when the main pass has a uniform function with "time" in its name, otherwise `auto`
    */
-  renderMode?: "manual" | "auto";
+  renderMode?: "manual" | "auto" | "continuous";
 }
 
-/**
- * The object returned by the {@link glCanvas} function.
- */
-export type GLCanvas<U extends AsyncUniforms = Record<string, any>> = Disposable & {
-  /** The WebGL2 rendering context. */
-  gl: WebGL2RenderingContext;
-  /** Executes a single render of the entire pipeline. */
-  render: () => void;
-  /** Register a callback to execute after the first resizing of the canvas. */
-  onCanvasReady: (callback: () => void) => void;
-  /** The HTMLCanvasElement or OffscreenCanvas being used. */
-  canvas: HTMLCanvasElement | OffscreenCanvas;
-  /** Resizes the canvas and all render targets in the postprocessing chain. */
-  setSize: (size: { width: number; height: number }) => void;
-  /** Resumes the internal animation loop (if a 'time' uniform is detected). */
-  play: () => void;
-  /** Pauses the internal animation loop. */
-  pause: () => void;
-  /** The Device Pixel Ratio being used. */
-  dpr: number;
-  /** Reactive proxy of the main render pass's uniforms. */
-  uniforms: U;
-  /** Registers a callback called whenever a uniform of the main render pass is updated. */
-  onUpdated: (callback: UpdatedCallback<U>) => void;
-  /** Registers a callback called just before the main render pass is rendered. */
-  onBeforeRender: (callback: () => void) => void;
-  /** Registers a callback called after the last post-processing effect is rendered. */
-  onAfterRender: (callback: () => void) => void;
-  /** The resize observer managing the canvas resizing. */
-  resizeObserver: ReturnType<typeof onResize> | null;
-};
+/** The object returned by {@link glCanvas}. */
+export type GLCanvas<U extends UniformSources<UniformContext> = UniformSources<UniformContext>> =
+  Disposable & {
+    /** The WebGL2 rendering context. */
+    gl: WebGL2RenderingContext;
+    /** Executes one render of the complete pipeline. */
+    render: () => void;
+    /** Registers a callback called after the first canvas resize. */
+    onCanvasReady: (callback: () => void) => void;
+    /** The HTML canvas or OffscreenCanvas being rendered into. */
+    canvas: HTMLCanvasElement | OffscreenCanvas;
+    /** Resizes the canvas and every managed render target. */
+    setSize: (size: { width: number; height: number }) => void;
+    /** Starts the internal animation clock. */
+    play: () => void;
+    /** Pauses the internal animation clock. */
+    pause: () => void;
+    /** The device pixel ratio used for CSS-sized canvas resizing. */
+    dpr: number;
+    /** Reactive proxy containing the main pass's original uniform sources. */
+    uniforms: U;
+    /** Registers a callback whenever a main-pass uniform source changes. */
+    onUpdated: (callback: UpdatedCallback<U>) => void;
+    /** Registers a callback before the complete pipeline renders. */
+    onBeforeRender: (callback: () => void) => void;
+    /** Registers a callback after the complete pipeline renders. */
+    onAfterRender: (callback: () => void) => void;
+    /** The resize observer, or `null` when sizing is manual or fixed. */
+    resizeObserver: ReturnType<typeof onResize> | null;
+  };

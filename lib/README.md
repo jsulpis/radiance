@@ -64,8 +64,8 @@ glCanvas({
   canvas: "#glCanvas",
   fragment: /* glsl */ `
     varying vec2 vUv;       // provided automatically
-    uniform float uTime;    // updated automatically
-    uniform vec2 uResolution; // updated when the canvas is resized
+    uniform float uTime;
+    uniform vec2 uResolution;
 
     void main() {
       vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution) / uResolution.y;
@@ -73,11 +73,14 @@ glCanvas({
       gl_FragColor = vec4(color, 1.0);
     }
   `,
+  uniforms: {
+    uTime: ({ time }) => time / 500,
+    uResolution: ({ canvasResolution }) => canvasResolution,
+  },
 });
 ```
 
-When a shader contains a time uniform, Radiance creates and updates its
-animation loop. Uniforms are reactive, so changing a value schedules a render:
+An animation loop is started if a time uniform is detected. Uniforms are reactive, so changing a value schedules a render:
 
 ```ts
 const canvas = glCanvas({

@@ -1,4 +1,5 @@
 import type { TextureParams } from "../core/texture";
+import type { LoopData } from "../helpers/loop";
 
 /**
  * A vector uniform value, representing a vec2, vec3, or vec4.
@@ -32,28 +33,39 @@ export type UniformValue =
   number | boolean | VectorUniform | MatrixUniform | Float32Array | TextureUniform;
 
 /**
- * A synchronous uniform variable that can be a uniform value or a function returning one.
+ * A concrete uniform value, or `undefined` when a value is not available yet.
+ *
+ * `undefined` is useful for asynchronous sources: the runtime keeps the previous
+ * resolved value, or skips the upload until the source produces a value.
  */
-export type SyncUniform<Args = never> =
-  UniformValue | ((...args: [Args] extends [never] ? [] : [args: Args]) => UniformValue);
+export type UniformValueOrUndefined = UniformValue | undefined;
 
-/** A uniform variable that may resolve asynchronously. */
-export type AsyncUniform<Args = never> =
-  | SyncUniform<Args>
-  | Promise<UniformValue>
-  | ((...args: [Args] extends [never] ? [] : [args: Args]) => UniformValue | Promise<UniformValue>);
+/** Context supplied to every contextual uniform function. */
+export interface UniformContext extends LoopData {
+  /** Physical canvas dimensions in pixels, including device-pixel-ratio scaling. */
+  canvasResolution: [number, number];
+  /** Dimensions of the target currently rendered by the pass. */
+  passResolution: [number, number];
+}
 
 /**
- * A collection of uniform variables.
- * An optional Args type parameter can be provided to specify the arguments for uniform functions.
+ * A uniform source resolved before a render.
+ *
+ * A source may be a concrete value, a promise, or a synchronous function
+ * receiving the current frame context. Functions must not return promises.
+ * Managed passes resolve these sources; low-level `rawRenderPass()` accepts
+ * concrete values.
  */
-export type SyncUniforms<Args = never> = Record<string, SyncUniform<Args>>;
+export type UniformSource<Context = UniformContext> =
+  UniformValue | PromiseLike<UniformValue> | ((context: Readonly<Context>) => UniformValue);
 
-/** A collection of uniform variables that may resolve asynchronously. */
-export type AsyncUniforms<Args = never> = Record<string, AsyncUniform<Args>>;
+/**
+ * A collection of uniform sources keyed by GLSL uniform name.
+ */
+export type UniformSources<Context = UniformContext> = Record<string, UniformSource<Context>>;
 
-/** @deprecated Use {@link AsyncUniforms}. */
-export type Uniforms<Args = never> = AsyncUniforms<Args>;
+/** A collection of concrete uniform values ready for GPU upload. */
+export type UniformValues = Record<string, UniformValueOrUndefined>;
 
 /**
  * A TypedArray (e.g., Float32Array, Uint16Array) used for buffer data.

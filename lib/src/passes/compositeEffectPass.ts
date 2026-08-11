@@ -1,12 +1,10 @@
 import { createHook } from "../internal/createHook";
-import type { SyncUniforms } from "../types/types";
+import type { UniformSources } from "../types/types";
 import type { RenderTarget } from "../core/renderTarget";
-import type { EffectPass } from "./effectPass";
-import {
-  type RenderPass as _RenderPass,
-  type RenderCallback,
-  type UpdatedCallback,
-} from "./renderPass";
+import type { EffectPass, EffectUniformContext } from "./effectPass";
+import type { RenderOptions, UpdatedCallback } from "./rawRenderPass";
+import type { RenderCallback } from "./rawRenderPass";
+import type { RenderPass } from "./renderPass";
 
 /**
  * Creates a composite effect pass from a series of sub-passes.
@@ -16,11 +14,9 @@ import {
  *
  * @param params - Configuration for the composite effect pass.
  */
-export function compositeEffectPass<U extends SyncUniforms = Record<string, never>>({
-  gl,
-  passes,
-  uniforms = {} as U,
-}: CompositeEffectPassParams<U>): CompositeEffectPass<U> {
+export function compositeEffectPass<
+  U extends UniformSources<EffectUniformContext> = Record<string, never>,
+>({ gl, passes, uniforms = {} as U }: CompositeEffectPassParams<U>): CompositeEffectPass<U> {
   const outputPass = passes.at(-1)!;
 
   const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback<any>>();
@@ -32,9 +28,30 @@ export function compositeEffectPass<U extends SyncUniforms = Record<string, neve
   let _gl: WebGL2RenderingContext | undefined;
   let disposed = false;
 
-  function render() {
+  function render(options?: RenderOptions<EffectUniformContext>) {
     executeBeforeRenderCallbacks({ uniforms });
-    for (const pass of passes) pass.render();
+    const context = options?.context;
+    let previousPass: RenderPass | EffectPass | undefined =
+      context?.previousPass ?? context?.inputPass;
+
+    for (const pass of passes) {
+      if (context) {
+        pass.render({
+          ...options,
+          context: {
+            ...context,
+            inputPass: context.inputPass,
+            previousPass: previousPass ?? context.inputPass,
+            passResolution: pass.target
+              ? [pass.target.width, pass.target.height]
+              : context.canvasResolution,
+          } as EffectUniformContext,
+        });
+      } else {
+        pass.render(options);
+      }
+      previousPass = pass;
+    }
     executeAfterRenderCallbacks({ uniforms });
   }
 
@@ -97,14 +114,13 @@ export function compositeEffectPass<U extends SyncUniforms = Record<string, neve
  * An effect pass composed of multiple sub-passes.
  *
  * @see {@link EffectPass}
- * @see {@link _RenderPass | RenderPass}
+ * @see {@link RenderPass}
  */
-export type CompositeEffectPass<U extends SyncUniforms = Record<string, never>> = Omit<
-  EffectPass<U>,
-  "fragment" | "vertex"
-> & {
-  /** The sequence of sub-passes executed by this composite effect. */
-  passes: EffectPass<SyncUniforms>[];
+export type CompositeEffectPass<
+  U extends UniformSources<EffectUniformContext> = UniformSources<EffectUniformContext>,
+> = Omit<EffectPass<U>, "fragment" | "vertex" | "getResolution"> & {
+  /** The sequence of sub-passes executed by the composite effect. */
+  passes: EffectPass[];
 };
 
 /**
@@ -112,11 +128,13 @@ export type CompositeEffectPass<U extends SyncUniforms = Record<string, never>> 
  * @inline
  * @internal
  */
-export type CompositeEffectPassParams<U extends SyncUniforms = Record<string, never>> = {
+export type CompositeEffectPassParams<
+  U extends UniformSources<EffectUniformContext> = UniformSources<EffectUniformContext>,
+> = {
   /** Optional WebGL2 context used to initialize the composite effect immediately. */
   gl?: WebGL2RenderingContext;
   /** Ordered effect passes to execute. */
-  passes: EffectPass<SyncUniforms>[];
-  /** Reactive uniform values for the composite effect. */
+  passes: EffectPass[];
+  /** Reactive uniform sources for the composite effect itself. */
   uniforms?: U;
 };

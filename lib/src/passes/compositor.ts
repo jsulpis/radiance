@@ -1,27 +1,27 @@
 import type { RenderTarget } from "../core/renderTarget";
 import { createRenderTarget } from "../core/renderTarget";
-import { findUniformName } from "../internal/findName";
 import { createHook } from "../internal/createHook";
 import type { CompositeEffectPass } from "./compositeEffectPass";
-import type { EffectPass } from "./effectPass";
+import type { EffectPass, EffectUniformContext } from "./effectPass";
 import type { RenderPass } from "./renderPass";
+import type { RenderOptions } from "./rawRenderPass";
 import { floatTargetConfig } from "./effectPass";
-import type { Disposable } from "../types/types";
+import type { Disposable, UniformContext } from "../types/types";
 
 /**
- * The compositor handles the combination of the main render pass and the subsequent effects.
+ * Composes a main pass and post-processing effects into one render graph.
+ *
+ * The compositor initializes every pass, creates intermediate targets, resolves
+ * contextual uniform functions, and renders the chain in order. It owns the
+ * lifecycle of supplied effects and intermediate targets.
  *
  * It manages:
  * - Initialization of the WebGL context for every pass.
  * - Automatic creation of intermediate floating-point render targets.
- * - Injecting `previousPass` and `inputPass` references into effect uniforms.
- * - Automatic linking of the previous pass's output texture to the next effect's input.
- * - Rendering all passes in the correct order.
+ * - Supplying `previousPass`, `inputPass`, and frame context to effect uniforms.
+ * - Rendering every effect in the correct order.
  *
- * The compositor owns its passes' lifecycle: it initializes uninitialized passes with
- * its WebGL2 context, and disposing the compositor disposes every pass.
- *
- * @param params - Configuration for the compositor.
+ * @param params - Rendering context, main pass, and optional effects.
  */
 export function compositor({ gl, renderPass, postEffects = [] }: CompositorParams): Compositor {
   // add the ability to render to floating-point buffers
@@ -39,36 +39,47 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
     renderPass.setTarget(intermediateTarget);
   }
 
-  let previousPass = renderPass;
-
   for (const [index, effect] of postEffects.entries()) {
     effect.initialize(gl);
 
     if (index === postEffects.length - 1 && effect.target !== null) {
       effect.setTarget(null);
     }
-
-    if (isCompositeEffectPass(effect)) {
-      const inputPass = previousPass;
-      for (const effectPass of effect.passes) {
-        const previousPassRef = previousPass;
-        setupEffectPass(effectPass, previousPassRef, inputPass);
-        previousPass = effectPass;
-      }
-    } else {
-      setupEffectPass(effect, previousPass);
-      previousPass = effect;
-    }
   }
 
   const allPasses = [renderPass, ...postEffects];
 
-  function render({ clear }: { clear?: boolean } = {}) {
+  function render(options: RenderOptions = {}) {
     executeBeforeRenderCallbacks();
-    for (const [index, pass] of allPasses.entries()) {
-      pass.render(index === 0 ? { clear } : {});
+
+    renderPass.render(options);
+
+    let previousPass: RenderPass<any, any> | EffectPass | CompositeEffectPass = renderPass;
+    for (const effect of postEffects) {
+      renderEffect(effect, options, previousPass);
+      previousPass = isCompositeEffectPass(effect) ? effect.passes.at(-1)! : effect;
     }
     executeAfterRenderCallbacks();
+  }
+
+  function renderEffect(
+    pass: EffectPass | CompositeEffectPass,
+    options: RenderOptions,
+    previousPass: RenderPass<any, any> | EffectPass | CompositeEffectPass,
+  ) {
+    const target = pass.target;
+    const frameContext = options.context ?? createDefaultContext(gl);
+
+    pass.render({
+      ...options,
+      context: {
+        ...frameContext,
+        passResolution: target ? [target.width, target.height] : frameContext.canvasResolution,
+        inputPass: previousPass,
+        previousPass,
+      } as EffectUniformContext,
+      clear: false,
+    });
   }
 
   function setSize(size: { width: number; height: number }) {
@@ -94,59 +105,46 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
   };
 }
 
+function createDefaultContext(gl: WebGL2RenderingContext): UniformContext {
+  return {
+    time: 0,
+    deltaTime: 0,
+    elapsedTime: 0,
+    canvasResolution: [gl.canvas.width, gl.canvas.height],
+    passResolution: [gl.canvas.width, gl.canvas.height],
+  };
+}
+
 function isCompositeEffectPass(
-  effect: EffectPass | CompositeEffectPass<any>,
-): effect is CompositeEffectPass<any> {
+  effect: EffectPass | CompositeEffectPass,
+): effect is CompositeEffectPass {
   return Array.isArray((effect as CompositeEffectPass).passes);
 }
 
-function setupEffectPass(
-  effect: EffectPass<any>,
-  previousPass: EffectPass<any> | RenderPass<any>,
-  inputPass?: EffectPass<any> | RenderPass<any>,
-) {
-  // provide the previousPass and inputPass to the uniforms functions
-  for (const uniformName of Object.keys(effect.uniforms)) {
-    const uniformValue = effect.uniforms[uniformName];
-    if (typeof uniformValue === "function") {
-      effect.uniforms[uniformName] = () => uniformValue({ previousPass, inputPass });
-    }
-  }
-
-  // detect the first texture uniform and, if it has no texture provided, fill it with the previous pass
-  const textureUniformName =
-    findUniformName(effect.fragment, "image") ||
-    findUniformName(effect.fragment, "texture") ||
-    findUniformName(effect.fragment, "pass");
-
-  if (textureUniformName && effect.uniforms[textureUniformName] === undefined) {
-    effect.uniforms[textureUniformName] = () => previousPass.target?.texture;
-  }
-}
-
 export type Compositor = Disposable & {
-  /** Renders the entire chain: the main pass followed by all effects. */
-  render: (opts?: { clear?: boolean }) => void;
-  /** Resizes all passes and their respective render targets. */
+  /** Renders the main pass and every post-processing effect in order. */
+  render: (opts?: RenderOptions) => void;
+  /** Resizes every pass and render target managed by the compositor. */
   setSize: (size: { width: number; height: number }) => void;
-  /** Flat array of all passes managed by this compositor (main pass + all effects). */
-  allPasses: Array<RenderPass<any> | CompositeEffectPass<any>>;
-  /** Registers a callback called before the whole rendering pipeline starts. */
+  /** Top-level passes supplied to the compositor. */
+  allPasses: Array<RenderPass<any, any> | EffectPass | CompositeEffectPass>;
+  /** Registers a callback called before the complete chain renders. */
   onBeforeRender: (callback: () => void) => void;
-  /** Registers a callback called after the whole rendering pipeline finishes. */
+  /** Registers a callback called after the complete chain renders. */
   onAfterRender: (callback: () => void) => void;
 };
 
 /**
  * Parameters for creating a {@link compositor}.
+ *
  * @inline
  * @internal
  */
 export type CompositorParams = {
-  /** WebGL2 context used to initialize every pass. */
+  /** WebGL2 context shared by all passes. */
   gl: WebGL2RenderingContext;
-  /** Main scene render pass. */
-  renderPass: RenderPass<any>;
-  /** Post-processing effects applied after the main pass. */
-  postEffects?: Array<EffectPass<any> | CompositeEffectPass<any>>;
+  /** Main scene pass rendered before post-processing. */
+  renderPass: RenderPass<any, any>;
+  /** Post-processing effects rendered after the main scene pass. */
+  postEffects?: Array<EffectPass | CompositeEffectPass>;
 };
