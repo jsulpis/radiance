@@ -1,4 +1,4 @@
-import type { Attribute, Disposable, UniformContext, UniformValues } from "../types/types";
+import type { Attribute, Disposable, UniformValues } from "../types/types";
 import { GL_BLEND, GL_DEPTH_TEST, GL_ONE, GL_ONE_MINUS_SRC_ALPHA } from "../core/constants";
 import { createProgram } from "../core/program";
 import { setRenderTarget } from "../core/renderTarget";
@@ -120,7 +120,7 @@ export function rawRenderPass<U extends UniformValues>({
   const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback<U>>();
   const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback<U>>();
 
-  function render({ target, clear }: RenderOptions = {}) {
+  function render({ target, clear }: RawRenderOptions = {}) {
     if (disposed) return;
     if (_gl == undefined) {
       throw new Error("The render pass must be initialized before calling the render function");
@@ -268,9 +268,9 @@ export type RawRenderPassParams<U extends UniformValues = Record<string, never>>
 export type RawRenderPass<U extends UniformValues = Record<string, never>> = Disposable & {
   /**
    * Executes the render pass.
-   * @param opts - Rendering params.
+   * @param opts - Rendering options.
    */
-  render: (opts?: RenderOptions) => void;
+  render: (opts?: RawRenderOptions) => void;
   /** The current render target for this pass. */
   target: RenderTarget | null;
   /** Updates the current render target. */
@@ -327,9 +327,7 @@ type DrawMode =
   "POINTS" | "LINES" | "LINE_STRIP" | "LINE_LOOP" | "TRIANGLES" | "TRIANGLE_STRIP" | "TRIANGLE_FAN";
 
 /** Options shared by raw and managed render functions. */
-export type RenderOptions<Context extends UniformContext = UniformContext> = {
-  /** Context passed to function-valued uniforms by managed passes. */
-  context?: Readonly<Context>;
+export type RawRenderOptions = {
   /** Temporary render target for this invocation. */
   target?: RenderTarget | null;
   /** Whether to clear the target after binding it. */

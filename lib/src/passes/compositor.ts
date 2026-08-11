@@ -3,10 +3,10 @@ import { createRenderTarget } from "../core/renderTarget";
 import { createHook } from "../internal/createHook";
 import type { CompositeEffectPass } from "./compositeEffectPass";
 import type { EffectPass, EffectUniformContext } from "./effectPass";
-import type { RenderPass } from "./renderPass";
-import type { RenderOptions } from "./rawRenderPass";
+import type { RenderOptions, RenderPass } from "./renderPass";
 import { floatTargetConfig } from "./effectPass";
-import type { Disposable, UniformContext } from "../types/types";
+import type { Disposable } from "../types/types";
+import { createUniformContext } from "../internal/createUniformContext";
 
 /**
  * Composes a main pass and post-processing effects into one render graph.
@@ -49,26 +49,27 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
 
   const allPasses = [renderPass, ...postEffects];
 
-  function render(options: RenderOptions = {}) {
+  function render(options?: RenderOptions) {
     executeBeforeRenderCallbacks();
 
     renderPass.render(options);
 
     let previousPass: RenderPass<any, any> | EffectPass | CompositeEffectPass = renderPass;
     for (const effect of postEffects) {
-      renderEffect(effect, options, previousPass);
+      renderEffect(effect, previousPass, options);
       previousPass = isCompositeEffectPass(effect) ? effect.passes.at(-1)! : effect;
     }
+
     executeAfterRenderCallbacks();
   }
 
   function renderEffect(
     pass: EffectPass | CompositeEffectPass,
-    options: RenderOptions,
     previousPass: RenderPass<any, any> | EffectPass | CompositeEffectPass,
+    options?: RenderOptions,
   ) {
     const target = pass.target;
-    const frameContext = options.context ?? createDefaultContext(gl);
+    const frameContext = options?.context ?? createUniformContext(gl);
 
     pass.render({
       ...options,
@@ -102,16 +103,6 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
     onBeforeRender,
     onAfterRender,
     dispose,
-  };
-}
-
-function createDefaultContext(gl: WebGL2RenderingContext): UniformContext {
-  return {
-    time: 0,
-    deltaTime: 0,
-    elapsedTime: 0,
-    canvasResolution: [gl.canvas.width, gl.canvas.height],
-    passResolution: [gl.canvas.width, gl.canvas.height],
   };
 }
 

@@ -1,12 +1,13 @@
 import type { UniformContext, UniformSources, UniformValues } from "../types/types";
+import type { RawRenderOptions } from "./rawRenderPass";
 import {
   rawRenderPass,
   type RawRenderPassParams,
   type RawRenderPass,
-  type RenderOptions,
   type UpdatedCallback,
 } from "./rawRenderPass";
 import { uniformRuntime } from "../internal/uniformRuntime";
+import { createUniformContext } from "../internal/createUniformContext";
 
 /**
  * Creates a rendering pass that resolves functions, promises, and media uniforms
@@ -17,24 +18,26 @@ export function renderPass<Context extends UniformContext, U extends UniformSour
 ): RenderPass<U, Context> {
   const raw = rawRenderPass<UniformValues>({ ...params, uniforms: {} });
   const runtime = uniformRuntime<Context, U>(params.uniforms || ({} as U));
+  let _gl: WebGL2RenderingContext | undefined = params.gl;
 
-  function render(options: RenderOptions<Context> = {}) {
-    runtime.resolve(options.context);
+  raw.onInit((gl) => {
+    _gl = gl;
+  });
+
+  function render(options?: RenderOptions<Context>) {
+    const context = options?.context ?? (_gl && createUniformContext(_gl));
+    runtime.resolve(context as Readonly<Context> | undefined);
     raw.setUniformValues(runtime.getValues());
     raw.render(options);
   }
 
-  function dispose() {
-    runtime.dispose();
-    raw.dispose();
-  }
+  raw.onDispose(() => runtime.dispose());
 
   return {
     ...raw,
     render,
     onUpdated: runtime.onUpdated,
     uniforms: runtime.uniformsProxy,
-    dispose,
     get target() {
       return raw.target;
     },
@@ -61,4 +64,10 @@ export type RenderPass<
   render: (options?: RenderOptions<Context>) => void;
   /** Registers a callback whenever a uniform source changes. */
   onUpdated: (callback: UpdatedCallback<U>) => void;
+};
+
+/** Options shared by raw and managed render functions. */
+export type RenderOptions<Context extends UniformContext = UniformContext> = RawRenderOptions & {
+  /** Context passed to function-valued uniforms by managed passes. */
+  context?: Readonly<Context>;
 };
