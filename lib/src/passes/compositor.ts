@@ -31,7 +31,11 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
   const [onAfterRender, executeAfterRenderCallbacks] = createHook();
   let disposed = false;
 
-  renderPass.initialize(gl);
+  const allPasses = [renderPass, ...postEffects];
+
+  for (const pass of allPasses) {
+    pass.initialize(gl);
+  }
 
   let intermediateTarget: RenderTarget | null = null;
   if (postEffects.length > 0 && renderPass.target === null) {
@@ -39,48 +43,32 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
     renderPass.setTarget(intermediateTarget);
   }
 
-  for (const [index, effect] of postEffects.entries()) {
-    effect.initialize(gl);
-
-    if (index === postEffects.length - 1 && effect.target !== null) {
-      effect.setTarget(null);
-    }
-  }
-
-  const allPasses = [renderPass, ...postEffects];
-
   function render(options?: RenderOptions) {
     executeBeforeRenderCallbacks();
 
-    renderPass.render(options);
+    const { target: outputTarget, ...passOptions } = options ?? {};
+    renderPass.render(postEffects.length > 0 ? passOptions : options);
 
     let previousPass: RenderPass<any, any> | EffectPass | CompositeEffectPass = renderPass;
-    for (const effect of postEffects) {
-      renderEffect(effect, previousPass, options);
+    for (const [index, effect] of postEffects.entries()) {
+      const isFinal = index === postEffects.length - 1;
+      const target = isFinal ? (outputTarget ?? null) : effect.target;
+      const frameContext = options?.context ?? createUniformContext(gl);
+
+      effect.render({
+        target,
+        context: {
+          ...frameContext,
+          passResolution: target ? [target.width, target.height] : frameContext.canvasResolution,
+          inputPass: previousPass,
+          previousPass,
+        } as EffectUniformContext,
+        clear: false,
+      });
       previousPass = isCompositeEffectPass(effect) ? effect.passes.at(-1)! : effect;
     }
 
     executeAfterRenderCallbacks();
-  }
-
-  function renderEffect(
-    pass: EffectPass | CompositeEffectPass,
-    previousPass: RenderPass<any, any> | EffectPass | CompositeEffectPass,
-    options?: RenderOptions,
-  ) {
-    const target = pass.target;
-    const frameContext = options?.context ?? createUniformContext(gl);
-
-    pass.render({
-      ...options,
-      context: {
-        ...frameContext,
-        passResolution: target ? [target.width, target.height] : frameContext.canvasResolution,
-        inputPass: previousPass,
-        previousPass,
-      } as EffectUniformContext,
-      clear: false,
-    });
   }
 
   function setSize(size: { width: number; height: number }) {

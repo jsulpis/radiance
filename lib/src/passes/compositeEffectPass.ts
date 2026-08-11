@@ -37,17 +37,20 @@ export function compositeEffectPass<
       createUniformContext(_gl)) as Readonly<EffectUniformContext>;
     let previousPass: RenderPass | EffectPass | undefined =
       context.previousPass ?? context.inputPass;
+    const { target: outputTarget, ...passOptions } = options ?? {};
 
-    for (const pass of passes) {
+    for (const [index, pass] of passes.entries()) {
+      const isLastPass = index === passes.length - 1;
+      const target = isLastPass ? (outputTarget ?? null) : pass.target;
+
       pass.render({
-        ...options,
+        ...passOptions,
+        target,
         context: {
           ...context,
           inputPass: context.inputPass,
           previousPass: previousPass ?? context.inputPass,
-          passResolution: pass.target
-            ? [pass.target.width, pass.target.height]
-            : context.canvasResolution,
+          passResolution: target ? [target.width, target.height] : context.canvasResolution,
         } as EffectUniformContext,
       });
       previousPass = pass;
