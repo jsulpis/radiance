@@ -1,6 +1,9 @@
 name: Size
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -16,17 +19,78 @@ env:
 jobs:
   size:
     runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           version: ${{ env.PNPM_VERSION }}
-      - run: pnpm --filter="./lib" install
-      - uses: andresz1/size-limit-action@94bc357df29c36c8f8d50ea497c3e225c3c95d1d # v1.8.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory: lib/
-          build_script: build:lib
-          package_manager: pnpm
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Restore base size report
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/base-size-report
+          key: bundle-size-${{ github.event.pull_request.base.sha }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build library
+        run: pnpm --filter="./lib" build:lib
+
+      - name: Create glCanvas entry
+        env:
+          CONSUMER_ENTRY: ${{ github.workspace }}/benchmark/.size/glcanvas-entry.ts
+        run: node --experimental-strip-types .github/scripts/create-glcanvas-entry.mts
+
+      - name: Transpile and minify bundles
+        env:
+          CONSUMER_ENTRY: ${{ github.workspace }}/benchmark/.size/glcanvas-entry.ts
+          LIBRARY_DIST: ${{ runner.temp }}/library-dist
+          CONSUMER_DIST: ${{ runner.temp }}/consumer-dist
+        run: |
+          pnpm --filter="./lib" exec tsdown dist/index.js \
+            --no-config \
+            --format esm \
+            --platform browser \
+            --target es2022 \
+            --minify \
+            --out-dir "$LIBRARY_DIST"
+          pnpm --filter="./lib" exec tsdown "$CONSUMER_ENTRY" \
+            --no-config \
+            --format esm \
+            --platform browser \
+            --target es2022 \
+            --minify \
+            --out-dir "$CONSUMER_DIST"
+
+      - name: Measure gzip sizes
+        id: measure
+        env:
+          REPORT_DIR: ${{ runner.temp }}/size-report
+          LIBRARY_DIST: ${{ runner.temp }}/library-dist
+          CONSUMER_DIST: ${{ runner.temp }}/consumer-dist
+        run: |
+          node --experimental-strip-types .github/scripts/measure-size.mts
+
+      - name: Save main size report
+        if: github.event_name == 'push'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/size-report
+          key: bundle-size-${{ github.sha }}
+
+      - name: Update pull request comment
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_REPORT: ${{ runner.temp }}/size-report/report.json
+          BASE_REPORT: ${{ runner.temp }}/base-size-report/report.json
+        run: node --experimental-strip-types .github/scripts/update-size-comment.mts
