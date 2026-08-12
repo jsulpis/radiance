@@ -32,14 +32,6 @@ export type TextureUniform = TextureParams | WebGLTexture;
 export type UniformValue =
   number | boolean | VectorUniform | MatrixUniform | Float32Array | TextureUniform;
 
-/**
- * A concrete uniform value, or `undefined` when a value is not available yet.
- *
- * `undefined` is useful for asynchronous sources: the runtime keeps the previous
- * resolved value, or skips the upload until the source produces a value.
- */
-export type UniformValueOrUndefined = UniformValue | undefined;
-
 /** Context supplied to every contextual uniform function. */
 export interface UniformContext extends LoopData {
   /** Physical canvas dimensions in pixels, including device-pixel-ratio scaling. */
@@ -65,7 +57,7 @@ export type UniformSource<Context = UniformContext> =
 export type UniformSources<Context = UniformContext> = Record<string, UniformSource<Context>>;
 
 /** A collection of concrete uniform values ready for GPU upload. */
-export type UniformValues = Record<string, UniformValueOrUndefined>;
+export type UniformValues = Record<string, UniformValue | undefined>;
 
 /**
  * A TypedArray (e.g., Float32Array, Uint16Array) used for buffer data.

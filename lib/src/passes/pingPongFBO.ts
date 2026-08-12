@@ -96,7 +96,9 @@ export type PingPongFBOPass<U extends UniformSources<UniformContext> = Record<st
  * @inline
  * @internal
  */
-export type PingPongFBOParams<U extends UniformSources<UniformContext> = Record<string, never>> = {
+export interface PingPongFBOParams<
+  U extends UniformSources<UniformContext> = Record<string, never>,
+> {
   /** WebGL2 context. */
   gl: WebGL2RenderingContext;
   /** Uniform sources for the simulation pass. */
@@ -110,4 +112,4 @@ export type PingPongFBOParams<U extends UniformSources<UniformContext> = Record<
     /** The raw numerical data to seed the initial texture state. */
     initialData: Float32Array | number[];
   };
-};
+}

@@ -119,11 +119,11 @@ export type Compositor = Disposable & {
  * @inline
  * @internal
  */
-export type CompositorParams = {
+export interface CompositorParams {
   /** WebGL2 context shared by all passes. */
   gl: WebGL2RenderingContext;
   /** Main scene pass rendered before post-processing. */
   renderPass: RenderPass<any, any>;
   /** Post-processing effects rendered after the main scene pass. */
   postEffects?: Array<EffectPass | CompositeEffectPass>;
-};
+}
