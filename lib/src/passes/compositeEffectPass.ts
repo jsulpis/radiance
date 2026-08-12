@@ -131,13 +131,13 @@ export type CompositeEffectPass<
  * @inline
  * @internal
  */
-export type CompositeEffectPassParams<
+export interface CompositeEffectPassParams<
   U extends UniformSources<EffectUniformContext> = UniformSources<EffectUniformContext>,
-> = {
+> {
   /** Optional WebGL2 context used to initialize the composite effect immediately. */
   gl?: WebGL2RenderingContext;
   /** Ordered effect passes to execute. */
   passes: EffectPass[];
   /** Reactive uniform sources for the composite effect itself. */
   uniforms?: U;
-};
+}

@@ -56,14 +56,16 @@ const quadVertexPositions = [-1, -1, 3, -1, -1, 3];
  * Parameters for creating a {@link quadRenderPass}.
  *
  * Inherits from {@link RenderPassParams} but makes the vertex shader optional.
+ * @inline
+ * @internal
  */
-export type QuadPassParams<
+export interface QuadPassParams<
   Context extends UniformContext = UniformContext,
   U extends UniformSources<Context> = UniformSources<Context>,
-> = Omit<RenderPassParams<Context, U>, "vertex"> & {
+> extends Omit<RenderPassParams<Context, U>, "vertex"> {
   /**
    * Optional vertex shader. If omitted, the built-in full-screen triangle vertex
    * shader is used and its UV varying is adapted to the fragment shader.
    */
   vertex?: string;
-};
+}

@@ -205,8 +205,12 @@ function setDepthTest(gl: WebGL2RenderingContext, depthTest: boolean) {
   }
 }
 
-/** Parameters for creating a {@link rawRenderPass}. */
-export type RawRenderPassParams<U extends UniformValues = Record<string, never>> = {
+/**
+ * Parameters for creating a {@link rawRenderPass}.
+ * @inline
+ * @internal
+ */
+export interface RawRenderPassParams<U extends UniformValues = Record<string, never>> {
   /**
    * Optional WebGL2 context used to initialize the pass immediately.
    *
@@ -260,7 +264,7 @@ export type RawRenderPassParams<U extends UniformValues = Record<string, never>>
    * @default 1
    */
   resolutionScale?: number;
-};
+}
 
 /**
  * A low-level rendering pass that encapsulates shaders, concrete uniforms, and attributes.

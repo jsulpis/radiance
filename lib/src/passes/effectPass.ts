@@ -90,22 +90,15 @@ export type EffectUniforms = UniformSources<EffectUniformContext>;
  * @inline
  * @internal
  */
-export type EffectPassParams<U extends EffectUniforms> = Omit<
+export interface EffectPassParams<U extends EffectUniforms> extends Omit<
   QuadPassParams<EffectUniformContext, U>,
   "target"
-> &
-  (
-    | {
-        /** Caller-owned target, or `null` to render to the default framebuffer. */
-        target?: RenderTarget | null;
-        targetParams?: never;
-      }
-    | {
-        target?: never;
-        /**
-         * Parameters for an effect-owned target, disposed with the effect.
-         * @default floatTargetConfig
-         */
-        targetParams?: RenderTargetParams;
-      }
-  );
+> {
+  /** Caller-owned target, or `null` to render to the default framebuffer. */
+  target?: RenderTarget | null;
+  /**
+   * Parameters for an effect-owned target, disposed with the effect.
+   * @default floatTargetConfig
+   */
+  targetParams?: RenderTargetParams;
+}

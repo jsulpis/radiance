@@ -44,14 +44,18 @@ export function renderPass<Context extends UniformContext, U extends UniformSour
   };
 }
 
-/** Parameters for creating a managed {@link renderPass}. */
-export type RenderPassParams<
+/**
+ * Parameters for creating a managed {@link renderPass}.
+ * @inline
+ * @internal
+ */
+export interface RenderPassParams<
   Context extends UniformContext = UniformContext,
   U extends UniformSources<Context> = UniformSources<Context>,
-> = Omit<RawRenderPassParams<UniformValues>, "uniforms"> & {
+> extends Omit<RawRenderPassParams<UniformValues>, "uniforms"> {
   /** Uniform values, synchronous functions, promises, or media descriptors. */
   uniforms?: U;
-};
+}
 
 /** A rendering pass with managed uniform sources. */
 export type RenderPass<

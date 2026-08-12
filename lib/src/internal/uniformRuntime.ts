@@ -1,5 +1,5 @@
 import { isHTMLImageTexture, isHTMLVideoTexture, isPromiseLike } from "./typeGuards";
-import type { UniformSource, UniformValueOrUndefined, UniformValues } from "../types/types";
+import type { UniformSource, UniformValue, UniformValues } from "../types/types";
 import type { UpdatedCallback } from "../passes/rawRenderPass";
 import { createHook } from "./createHook";
 
@@ -17,7 +17,7 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
   // Cleanup callbacks for active image-load and video-frame listeners.
   const mediaCleanups = new Map<Name, () => void>();
   // Last media value watched for each uniform, preventing duplicate listeners.
-  const mediaValues = new Map<Name, UniformValueOrUndefined>();
+  const mediaValues = new Map<Name, UniformValue | undefined>();
 
   const [onUpdated, executeUpdated] = createHook<UpdatedCallback<U>>();
   let disposed = false;
@@ -61,7 +61,7 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
         (value) => {
           if (disposed || pending.get(name) !== token) return;
           pending.delete(name);
-          const resolvedValue = value as UniformValueOrUndefined;
+          const resolvedValue = value as UniformValue | undefined;
           values[name] = resolvedValue;
           watchMedia(name, resolvedValue);
           executeUpdated(name, resolvedValue, undefined, getValuesSnapshot() as Readonly<U>);
@@ -84,7 +84,7 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
   }
 
   /** Subscribes to image-load and video-frame events for media uniforms. */
-  function watchMedia(name: Name, value: UniformValueOrUndefined) {
+  function watchMedia(name: Name, value: UniformValue | undefined) {
     if (mediaValues.get(name) === value) return;
     cleanupMedia(name);
     mediaValues.set(name, value);
