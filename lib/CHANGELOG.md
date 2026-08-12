@@ -1,5 +1,42 @@
 # Changelog
 
+## v0.12.0
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.11.1...v0.12.0)
+
+### 🚀 Enhancements
+
+- Set a max devicePixelRatio to 2 ([f7504ec](https://github.com/jsulpis/radiance/commit/f7504ec))
+- **postprocessing:** Add procedural noise effect ([b136434](https://github.com/jsulpis/radiance/commit/b136434))
+- Implement resource disposal mechanisms ([3b41df3](https://github.com/jsulpis/radiance/commit/3b41df3))
+- ⚠️  Overhaul of uniforms resolution ([ad282e9](https://github.com/jsulpis/radiance/commit/ad282e9))
+
+### 💅 Refactors
+
+- ⚠️  Separate `targetParams` and `target` options for the `effectPass` ([9e4a15f](https://github.com/jsulpis/radiance/commit/9e4a15f))
+- ⚠️  Update functions signatures with a single object parameter ([b55b1ba](https://github.com/jsulpis/radiance/commit/b55b1ba))
+- ⚠️  Update the signature of `glContext` and `compositor` to accept a single object params ([bbe4fa3](https://github.com/jsulpis/radiance/commit/bbe4fa3))
+- Update Uniforms types ([5fe86b2](https://github.com/jsulpis/radiance/commit/5fe86b2))
+
+### 📖 Documentation
+
+- Update readme ([895045b](https://github.com/jsulpis/radiance/commit/895045b))
+
+### 🏡 Chore
+
+- **release:** V0.11.1 ([538aed3](https://github.com/jsulpis/radiance/commit/538aed3))
+- Run publint when building the lib ([8f2e084](https://github.com/jsulpis/radiance/commit/8f2e084))
+- Fix repository url in package.json ([51051d1](https://github.com/jsulpis/radiance/commit/51051d1))
+- Run attw check when building the lib ([b1ad54f](https://github.com/jsulpis/radiance/commit/b1ad54f))
+- Configure Renovate ([#60](https://github.com/jsulpis/radiance/pull/60))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Overhaul of uniforms resolution ([ad282e9](https://github.com/jsulpis/radiance/commit/ad282e9))
+- ⚠️  Separate `targetParams` and `target` options for the `effectPass` ([9e4a15f](https://github.com/jsulpis/radiance/commit/9e4a15f))
+- ⚠️  Update functions signatures with a single object parameter ([b55b1ba](https://github.com/jsulpis/radiance/commit/b55b1ba))
+- ⚠️  Update the signature of `glContext` and `compositor` to accept a single object params ([bbe4fa3](https://github.com/jsulpis/radiance/commit/bbe4fa3))
+
 ## v0.11.1
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.11.0...v0.11.1)
