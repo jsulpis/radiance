@@ -21,6 +21,7 @@ type RenderUniforms = {
   uMainColor: [number, number, number];
   uBaseRadius: number;
   uPointer: [number, number];
+  uResolution: () => [number, number];
   uDpr: number;
 };
 
@@ -67,10 +68,12 @@ onMounted(() => {
   const halo = effectPass({
     fragment: haloFragment,
     uniforms: {
+      uTexture: ({ inputPass }) => inputPass.target!.texture,
       uBaseRadius: BASE_RADIUS,
       uBaseColor: BASE_COLOR,
       uMainColor: MAIN_COLOR,
-      uTime: 0,
+      uResolution: ({ passResolution }) => passResolution,
+      uTime: ({ time }) => time,
     },
   });
 
@@ -87,6 +90,7 @@ onMounted(() => {
       uMainColor: MAIN_COLOR,
       uBaseRadius: BASE_RADIUS,
       uPointer: [pointerState.x, pointerState.y],
+      uResolution: ({ canvasResolution }) => canvasResolution,
       uDpr: Math.min(window.devicePixelRatio || 1, 2),
     },
     attributes: {
@@ -106,7 +110,7 @@ onMounted(() => {
     },
   });
 
-  const animationLoop = loop(({ time, deltaTime }) => {
+  const animationLoop = loop(({ deltaTime }) => {
     const pointerLerp = deltaTime / 1000;
     pointerState.x += (pointerTarget.x - pointerState.x) * pointerLerp;
     pointerState.y += (pointerTarget.y - pointerState.y) * pointerLerp;
@@ -114,8 +118,6 @@ onMounted(() => {
     simulationPass.uniforms.uPointer = [pointerState.x, pointerState.y];
     simulationPass.uniforms.uDeltaTime = deltaTime * 0.75;
     simulationPass.render();
-
-    halo.uniforms.uTime = time;
 
     renderPass.uniforms.uPointer = [pointerState.x, pointerState.y];
     renderPass.render();
