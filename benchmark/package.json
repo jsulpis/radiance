@@ -9,7 +9,7 @@
     "measure": "node ./scripts/build-and-measure.mts"
   },
   "dependencies": {
-    "@radiancejs/gl": "0.11.1",
+    "@radiancejs/gl": "workspace:*",
     "ogl": "1.0.11",
     "three": "0.185.1",
     "twgl.js": "7.0.0"

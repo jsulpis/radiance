@@ -23,9 +23,7 @@ const material = new ShaderMaterial({
     }
   `,
   fragmentShader: await fetch("/shaders/fullscreen.frag").then((res) => res.text()),
-  uniforms: {
-    uTime: { value: 0 },
-  },
+  uniforms: { uTime: { value: 0 } },
 });
 
 const mesh = new Mesh(new PlaneGeometry(2, 2), material);
