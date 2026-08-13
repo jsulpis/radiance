@@ -63,7 +63,7 @@ import { glCanvas } from "@radiancejs/gl";
 glCanvas({
   canvas: "#glCanvas",
   fragment: /* glsl */ `
-    varying vec2 vUv;       // provided automatically
+    varying vec2 vUv; // provided by the default vertex shader
     uniform float uTime;
     uniform vec2 uResolution;
 

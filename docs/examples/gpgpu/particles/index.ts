@@ -1,13 +1,7 @@
-import {
-  createFloatDataTexture,
-  glCanvas,
-  glContext,
-  loop,
-  pingPongFBO,
-} from "@radiancejs/gl";
+import { createFloatDataTexture, glCanvas, glContext, loop, pingPongFBO } from "@radiancejs/gl";
 import "./styles.css";
 
-const { gl, canvas } = glContext("#glCanvas");
+const { gl, canvas } = glContext({ canvas: "#glCanvas" });
 
 const positionsFragment = /* glsl */ `
   uniform float uDeltaTime;
@@ -33,7 +27,8 @@ const positionsFragment = /* glsl */ `
 
 const count = 100;
 
-const positions = pingPongFBO(gl, {
+const positions = pingPongFBO({
+  gl,
   fragment: positionsFragment,
   uniforms: {
     uDeltaTime: 0,
@@ -43,7 +38,7 @@ const positions = pingPongFBO(gl, {
         /* G */ Math.random() * 0.2 - 0.1,
         /* B */ 0,
         /* A */ 0,
-      ])
+      ]),
     ),
   },
   dataTexture: {

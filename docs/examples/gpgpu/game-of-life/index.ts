@@ -1,7 +1,7 @@
 import { glCanvas, glContext, loop, pingPongFBO } from "@radiancejs/gl";
 import "./styles.css";
 
-const { gl, canvas } = glContext("#glCanvas");
+const { gl, canvas } = glContext({ canvas: "#glCanvas" });
 
 const gridSize = 100;
 
@@ -47,7 +47,8 @@ for (let i = 0; i < gridSize * gridSize; i++) {
   initialData.set([alive, alive, alive, 1], i * 4);
 }
 
-const gameState = pingPongFBO(gl, {
+const gameState = pingPongFBO({
+  gl,
   fragment: lifeUpdateFragment,
   dataTexture: {
     name: "tCurrentState",

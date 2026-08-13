@@ -22,6 +22,7 @@ const { uniforms, onAfterRender } = glCanvas({
   uniforms: {
     uPointerPosition: [0, 0],
     uCircleColor: [1, 1, 1],
+    uResolution: ({ canvasResolution }) => canvasResolution,
   },
 });
 

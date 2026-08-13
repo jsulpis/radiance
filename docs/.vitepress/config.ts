@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from "vitepress";
+import { readFileSync } from "node:fs";
 import { groupIconMdPlugin, groupIconVitePlugin } from "vitepress-plugin-group-icons";
 import container from "markdown-it-container";
-import { renderSandbox } from "vitepress-plugin-sandpack";
 import { withMermaid } from "vitepress-plugin-mermaid";
 import llmstxt from "vitepress-plugin-llms";
 import { apiSidebar, examplesSidebar } from "./sidebars";
@@ -91,7 +91,28 @@ const config = defineConfig({
       md.use(groupIconMdPlugin);
       md.use(container, "example-editor", {
         render(tokens: unknown[], idx: number) {
-          return renderSandbox(tokens, idx, "example-editor");
+          const token = tokens[idx] as {
+            nesting: number;
+            attrs?: [string, string][];
+          };
+          if (token.nesting === -1) return "</ExampleEditor>";
+
+          const files = [];
+          for (let index = idx + 1; tokens[index]?.type !== token.type.replace("_open", "_close"); index++) {
+            const item = tokens[index] as any;
+            if (item.type === "fence") {
+              const source = item.src?.[0];
+              files.push({
+                info: item.info || "",
+                code: item.content || (source ? readFileSync(source, "utf8") : ""),
+              });
+            }
+          }
+          const attrs = (token.attrs || [])
+            .map(([name, value]) => `${name}="${value || ""}"`)
+            .join(" ");
+
+          return `<ExampleEditor source-files="${encodeURIComponent(JSON.stringify(files))}" ${attrs}>`;
         },
       });
     },

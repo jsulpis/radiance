@@ -19,7 +19,7 @@ hero:
 
 Radiance takes care of the WebGL boilerplate, so you can focus on your shader.
 
-::: example-editor {deps=motion@12}
+::: example-editor
 
 ```ts /index.ts
 import { glCanvas, bloom, linearToneMapping } from "@radiancejs/gl";
@@ -35,6 +35,8 @@ glCanvas({
   ],
   uniforms: {
     uCubeSize: 1,
+    uTime: ({ time }) => time / 500,
+    uResolution: ({ canvasResolution }) => canvasResolution,
   },
   colorSpace: "display-p3",
 });
@@ -188,9 +190,9 @@ uniforms.uPointer = 42; // Type 'number' is not assignable to type 'number[]'. [
       }
 
       @media (width >= 720px) and (orientation: landscape) {
-        --wrapper-height: 420px;
+        --wrapper-height: 460px;
         --wrapper-width: 100%;
-        --editor-height: 420px;
+        --editor-height: 460px;
 
         .sp-editor {
           border-radius: var(--sp-border-radius) 0 0 var(--sp-border-radius);

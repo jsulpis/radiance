@@ -54,5 +54,8 @@ glCanvas({
       size: 3,
     },
   },
+  uniforms: {
+    uTime: ({ time }) => time / 500,
+  },
   blending: "normal",
 });

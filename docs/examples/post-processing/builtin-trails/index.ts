@@ -26,6 +26,7 @@ const { uniforms } = glCanvas({
   },
   uniforms: {
     uParticleSize: 3,
+    uTime: ({ time }) => time / 500,
   },
   blending: "normal",
   postEffects: [trailsEffect, linearToneMapping()],
