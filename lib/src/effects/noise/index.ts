@@ -7,7 +7,7 @@ import fragment from "./glsl/noise.frag";
  * @param params - Noise configuration.
  */
 export function noise(params?: NoiseParams) {
-  const { intensity = 0.5, size = 2, colorMix = 0.5 } = params || {};
+  const { intensity = 0.5, size = 2, colorMix = 0.5, time: timeParam } = params || {};
 
   return effectPass({
     fragment,
@@ -17,7 +17,7 @@ export function noise(params?: NoiseParams) {
       uSize: size,
       uColorMix: colorMix,
       uResolution: ({ passResolution }) => passResolution,
-      uTime: ({ time }) => time,
+      uTime: ({ time }) => timeParam ?? time,
     },
   });
 }
@@ -46,4 +46,12 @@ export type NoiseParams = {
    * @default 0.5
    */
   colorMix?: number;
+  /**
+   * Fixed time value for the noise effect. If not provided, the effect will use the time value of the current frame context.
+   *
+   * You can dynamically update the value:
+   * - noiseEffect.uniforms.uTime = () => 0; // Freeze the noise
+   * - noiseEffect.uniforms.uTime = ({ time }) => time; // Animate the noise over time
+   */
+  time?: number;
 };
