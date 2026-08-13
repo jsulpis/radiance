@@ -87,7 +87,7 @@ export const glCanvas = <U extends UniformSources<UniformContext>>(
     });
   }
 
-  if (renderMode === "auto") {
+  if (["auto", "continuous"].includes(renderMode)) {
     for (const pass of mainCompositor.allPasses) {
       pass.onUpdated(requestRender);
     }
