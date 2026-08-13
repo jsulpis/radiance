@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-17T18:44:26.951Z",
+  "generatedAt": "2026-08-13T19:00:26.184Z",
   "items": [
     {
       "id": "vanilla",
@@ -11,30 +11,30 @@
     {
       "id": "radiance",
       "label": "@radiancejs/gl",
-      "version": "0.11.0",
-      "sloc": 5,
-      "gzip": 5.06
+      "version": "0.12.0",
+      "sloc": 6,
+      "gzip": 6.05
     },
     {
       "id": "twgl",
       "label": "twgl.js",
       "version": "7.0.0",
-      "sloc": 36,
+      "sloc": 39,
       "gzip": 6.51
     },
     {
       "id": "ogl",
       "label": "ogl",
       "version": "1.0.11",
-      "sloc": 29,
-      "gzip": 12.69
+      "sloc": 27,
+      "gzip": 12.7
     },
     {
       "id": "three",
       "label": "three",
       "version": "0.185.1",
-      "sloc": 39,
-      "gzip": 124.71
+      "sloc": 37,
+      "gzip": 124.22
     }
   ]
 }

@@ -11,6 +11,7 @@ const resultsDir = resolve(benchmarkRoot, "results");
 const docsDataDir = resolve(benchmarkRoot, "..", "docs", ".vitepress", "data");
 const docsBundleDataPath = resolve(docsDataDir, "bundle-size.json");
 const benchmarkPackageJsonPath = resolve(benchmarkRoot, "package.json");
+const libPackageJsonPath = resolve(benchmarkRoot, "..", "lib", "package.json");
 
 const apps = [
   { id: "radiance", name: "@radiancejs/gl" },
@@ -202,9 +203,10 @@ function formatBytes(bytes: number) {
 
 async function loadAppVersions() {
   const benchmarkPackageJson = await readJsonFile<PackageJson>(benchmarkPackageJsonPath);
+  const libPackageJson = await readJsonFile<PackageJson>(libPackageJsonPath);
 
   return {
-    radiance: benchmarkPackageJson.dependencies?.["@radiancejs/gl"] ?? "unknown",
+    radiance: libPackageJson.version ?? "unknown",
     three: benchmarkPackageJson.dependencies?.three ?? "unknown",
     ogl: benchmarkPackageJson.dependencies?.ogl ?? "unknown",
     twgl: benchmarkPackageJson.dependencies?.["twgl.js"] ?? "unknown",

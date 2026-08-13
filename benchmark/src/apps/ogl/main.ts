@@ -14,9 +14,7 @@ const geometry = new Triangle(gl);
 const program = new Program(gl, {
   vertex: await fetch("/shaders/fullscreen.vert").then((res) => res.text()),
   fragment: await fetch("/shaders/fullscreen.frag").then((res) => res.text()),
-  uniforms: {
-    uTime: { value: 0 },
-  },
+  uniforms: { uTime: { value: 0 } },
 });
 const mesh = new Mesh(gl, { geometry, program });
 
