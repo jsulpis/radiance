@@ -11,6 +11,7 @@ const { uniforms, onAfterRender } = glCanvas({
     uSize: 0.2,
     uRotation: 0.1,
     uPosition: [0.5, 0.5],
+    uResolution: ({ canvasResolution }) => canvasResolution,
   },
 });
 

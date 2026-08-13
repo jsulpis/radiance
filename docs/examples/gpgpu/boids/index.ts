@@ -6,11 +6,12 @@ import boidsVelocities from "./velocities.frag?raw";
 import renderPassVertex from "./render.vert?raw";
 import renderPassFragment from "./render.frag?raw";
 
-const { gl, canvas } = glContext("#glCanvas");
+const { gl, canvas } = glContext({ canvas: "#glCanvas" });
 
 const count = 300;
 
-const velocities = pingPongFBO(gl, {
+const velocities = pingPongFBO({
+  gl,
   fragment: boidsVelocities,
   uniforms: {
     uDeltaTime: 0,
@@ -36,7 +37,8 @@ const velocities = pingPongFBO(gl, {
   },
 });
 
-const positions = pingPongFBO(gl, {
+const positions = pingPongFBO({
+  gl,
   fragment: boidsPositions,
   uniforms: {
     uDeltaTime: 0,

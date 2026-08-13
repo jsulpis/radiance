@@ -9,6 +9,9 @@ const toneMapping = hableToneMapping({ exposure: 3 });
 glCanvas({
   canvas: "#glCanvas",
   fragment,
+  uniforms: {
+    uTime: ({ time }) => time / 500,
+  },
   postEffects: [bloomEffect, toneMapping],
 });
 

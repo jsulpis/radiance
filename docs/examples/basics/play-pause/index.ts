@@ -17,6 +17,9 @@ const { play, pause, canvas, onAfterRender } = glCanvas({
       gl_FragColor = vec4(color, 1.);
     }
   `,
+  uniforms: {
+    uTime: ({ time }) => time / 500,
+  },
   immediate: false,
 });
 

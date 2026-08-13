@@ -4,8 +4,8 @@ import "./styles.css";
 const { onAfterRender } = glCanvas({
   canvas: "#glCanvas",
   fragment: /* glsl */ `
-    varying vec2 uv; // automatically provided
-    uniform vec2 resolution; // automatically provided and updated
+    varying vec2 uv; // provided by the default vertex shader
+    uniform vec2 resolution;
     #define RADIUS .2
 
     void main() {
@@ -17,6 +17,9 @@ const { onAfterRender } = glCanvas({
       gl_FragColor = vec4(color, 1.);
     }
   `,
+  uniforms: {
+    resolution: ({ canvasResolution }) => canvasResolution,
+  },
 });
 
 const renderCount = document.querySelector("#renderCount")!;

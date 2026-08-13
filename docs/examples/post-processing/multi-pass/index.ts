@@ -8,7 +8,8 @@ import "./styles.css";
 const horizontalBlur = effectPass({
   fragment: directionalBlurFragment,
   uniforms: {
-    uTexture: ({ inputPass }) => inputPass.target!.texture, // optional, the texture uniform is automatically set
+    uResolution: ({ passResolution }) => passResolution,
+    uTexture: ({ inputPass }) => inputPass.target!.texture,
     uDirection: [1, 0],
     uRadius: 30,
   },
@@ -17,7 +18,8 @@ const horizontalBlur = effectPass({
 const verticalBlur = effectPass({
   fragment: directionalBlurFragment,
   uniforms: {
-    uTexture: () => horizontalBlur.target!.texture, // optional, the texture uniform is automatically set
+    uResolution: ({ passResolution }) => passResolution,
+    uTexture: () => horizontalBlur.target!.texture,
     uDirection: [0, 1],
     uRadius: 30,
   },
@@ -26,6 +28,7 @@ const verticalBlur = effectPass({
 const combine = effectPass({
   fragment: combineFragment,
   uniforms: {
+    uResolution: ({ passResolution }) => passResolution,
     uBaseImage: ({ inputPass }) => inputPass.target!.texture,
     uBloomTexture: ({ previousPass }) => previousPass.target!.texture, // same as () => verticalBlur.target!.texture
     uMix: 1,
@@ -50,7 +53,7 @@ const bloomUniforms = {
   },
 };
 
-const bloom = compositeEffectPass(bloomPasses, bloomUniforms);
+const bloom = compositeEffectPass({ passes: bloomPasses, uniforms: bloomUniforms });
 
 glCanvas({
   canvas: "#glCanvas",
@@ -64,5 +67,5 @@ const pane = new Pane({ title: "Uniforms" });
 // Updating the uniforms of the composite pass will update those of the individual passes,
 // which will trigger a re-render
 const bloomFolder = pane.addFolder({ title: "Bloom" });
-bloomFolder.addBinding(bloomUniforms, "uMix", { min: 0, max: 1 });
-bloomFolder.addBinding(bloomUniforms, "uRadius", { min: 0, max: 50 });
+bloomFolder.addBinding(bloom.uniforms, "uMix", { min: 0, max: 1 });
+bloomFolder.addBinding(bloom.uniforms, "uRadius", { min: 0, max: 50 });

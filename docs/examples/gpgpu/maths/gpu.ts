@@ -11,9 +11,10 @@ export function square(flatMatrix: number[], matrixSize: number) {
     }
   }
 
-  const { gl } = glContext("#glCanvas");
+  const { gl } = glContext({ canvas: "#glCanvas" });
 
-  const tf = transformFeedback(gl, {
+  const tf = transformFeedback({
+    gl,
     vertex: /* glsl */ `
     in float n;
     in float p;

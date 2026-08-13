@@ -8,6 +8,7 @@ const { uniforms } = glCanvas({
   vertex,
   fragment,
   uniforms: {
+    uResolution: ({ canvasResolution }) => canvasResolution,
     // placeholder texture. You can use another lighter image
     uTexture: {
       data: new Uint8Array(
