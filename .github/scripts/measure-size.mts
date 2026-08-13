@@ -1,19 +1,35 @@
 import { gzipSync } from "node:zlib";
-import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { createRequire } from "node:module";
+
+const { build } = createRequire(`${process.cwd()}/package.json`)(
+  "tsdown",
+) as typeof import("tsdown");
 
 const reportDir = process.env.REPORT_DIR;
-const libraryDist = process.env.LIBRARY_DIST;
-const consumerDist = process.env.CONSUMER_DIST;
+const consumerEntry = process.env.CONSUMER_ENTRY;
 
-if (!reportDir || !libraryDist || !consumerDist) {
-  throw new Error("REPORT_DIR, LIBRARY_DIST, and CONSUMER_DIST are required");
+if (!reportDir || !consumerEntry) {
+  throw new Error("REPORT_DIR and CONSUMER_ENTRY are required");
 }
 
-const [library, consumer] = await Promise.all([
-  readFile(join(libraryDist, "index.js")),
-  readFile(join(consumerDist, "glcanvas-entry.js")),
+const options = {
+  format: "esm" as const,
+  platform: "browser" as const,
+  target: "esnext",
+  minify: true,
+  config: false,
+  write: false,
+  publint: false,
+  attw: false,
+};
+const [[libraryResult], [consumerResult]] = await Promise.all([
+  build({ ...options, entry: ["dist/index.js"], outDir: ".size-library" }),
+  build({ ...options, entry: [consumerEntry], outDir: ".size-consumer" }),
 ]);
+const library = Buffer.from(libraryResult.chunks[0].code);
+const consumer = Buffer.from(consumerResult.chunks[0].code);
 const report = {
   libraryGzipBytes: gzipSync(library).byteLength,
   glCanvasGzipBytes: gzipSync(consumer).byteLength,

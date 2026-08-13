@@ -46,38 +46,16 @@ jobs:
 
       - name: Create glCanvas entry
         env:
-          CONSUMER_ENTRY: ${{ github.workspace }}/benchmark/.size/glcanvas-entry.ts
-        run: node --experimental-strip-types .github/scripts/create-glcanvas-entry.mts
-
-      - name: Transpile and minify bundles
-        env:
-          CONSUMER_ENTRY: ${{ github.workspace }}/benchmark/.size/glcanvas-entry.ts
-          LIBRARY_DIST: ${{ runner.temp }}/library-dist
-          CONSUMER_DIST: ${{ runner.temp }}/consumer-dist
-        run: |
-          pnpm --filter="./lib" exec tsdown dist/index.js \
-            --no-config \
-            --format esm \
-            --platform browser \
-            --target es2022 \
-            --minify \
-            --out-dir "$LIBRARY_DIST"
-          pnpm --filter="./lib" exec tsdown "$CONSUMER_ENTRY" \
-            --no-config \
-            --format esm \
-            --platform browser \
-            --target es2022 \
-            --minify \
-            --out-dir "$CONSUMER_DIST"
+          CONSUMER_ENTRY: ${{ runner.temp }}/glcanvas-entry.ts
+          LIBRARY_ENTRY: ${{ github.workspace }}/lib/dist/index.js
+        run: node .github/scripts/create-glcanvas-entry.mts
 
       - name: Measure gzip sizes
         id: measure
         env:
+          CONSUMER_ENTRY: ${{ runner.temp }}/glcanvas-entry.ts
           REPORT_DIR: ${{ runner.temp }}/size-report
-          LIBRARY_DIST: ${{ runner.temp }}/library-dist
-          CONSUMER_DIST: ${{ runner.temp }}/consumer-dist
-        run: |
-          node --experimental-strip-types .github/scripts/measure-size.mts
+        run: pnpm --filter="./lib" exec node ../.github/scripts/measure-size.mts
 
       - name: Save main size report
         if: github.event_name == 'push'
@@ -93,4 +71,4 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_REPORT: ${{ runner.temp }}/size-report/report.json
           BASE_REPORT: ${{ runner.temp }}/base-size-report/report.json
-        run: node --experimental-strip-types .github/scripts/update-size-comment.mts
+        run: node .github/scripts/update-size-comment.mts

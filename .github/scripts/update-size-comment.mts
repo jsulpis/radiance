@@ -7,7 +7,9 @@ const prReportPath = process.env.PR_REPORT;
 const baseReportPath = process.env.BASE_REPORT;
 
 if (!token || !repository || !issueNumber || !prReportPath || !baseReportPath) {
-  throw new Error("GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, PR_REPORT, and BASE_REPORT are required");
+  throw new Error(
+    "GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, PR_REPORT, and BASE_REPORT are required",
+  );
 }
 
 const [owner, repo] = repository.split("/");
@@ -25,7 +27,8 @@ const delta = (current: number, previous?: number) => {
   if (previous === undefined || previous === null) return "";
   const difference = current - previous;
   const sign = difference > 0 ? "+" : "";
-  const percentage = previous === 0 ? "" : ` (${sign}${((difference / previous) * 100).toFixed(1)}%)`;
+  const icon = difference > 0 ? " 🔺" : difference < 0 ? " 🎉" : "";
+  const percentage = ` (${sign}${((difference / previous) * 100).toFixed(1)}%${icon})`;
   return `${sign}${format(difference)}${percentage}`;
 };
 const row = (name: string, key: keyof typeof pr) =>
@@ -33,12 +36,12 @@ const row = (name: string, key: keyof typeof pr) =>
 const marker = "<!-- radiance-size-report -->";
 const body = [
   marker,
-  "## Bundle size",
-  "",
+  "## Bundle size 📦",
+  "minified, gzipped sizes",
   "| Bundle | Base | PR | Delta |",
   "| --- | ---: | ---: | ---: |",
   row("`lib/dist/index.js`", "libraryGzipBytes"),
-  row("`glCanvas` consumer", "glCanvasGzipBytes"),
+  row("`glCanvas`", "glCanvasGzipBytes"),
 ].join("\n");
 
 const api = `https://api.github.com/repos/${owner}/${repo}`;
@@ -47,10 +50,14 @@ const headers = {
   Authorization: `Bearer ${token}`,
   "X-GitHub-Api-Version": "2022-11-28",
 };
-const commentsResponse = await fetch(`${api}/issues/${issueNumber}/comments?per_page=100`, { headers });
+const commentsResponse = await fetch(`${api}/issues/${issueNumber}/comments?per_page=100`, {
+  headers,
+});
 
 if (!commentsResponse.ok) {
-  throw new Error(`Unable to list comments: ${commentsResponse.status} ${await commentsResponse.text()}`);
+  throw new Error(
+    `Unable to list comments: ${commentsResponse.status} ${await commentsResponse.text()}`,
+  );
 }
 
 const comments = await commentsResponse.json();
