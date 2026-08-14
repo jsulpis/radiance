@@ -36,7 +36,7 @@ export function setupUniforms<U extends UniformValues>(uniforms: U) {
         if (value !== target[name]) {
           const oldValue = target[name];
           target[name] = value;
-          executeUpdateCallbacks(name, value, oldValue, getSnapshot(target));
+          executeUpdateCallbacks(name, value, oldValue);
         }
         return true;
       },
@@ -109,10 +109,6 @@ export function setupUniforms<U extends UniformValues>(uniforms: U) {
     }
   }
 
-  function getUniformsSnapshot() {
-    return getSnapshot({ ...currentValues });
-  }
-
   function dispose() {
     for (const { texture } of textureUnits.values()) {
       if (texture) _gl.deleteTexture(texture);
@@ -126,13 +122,8 @@ export function setupUniforms<U extends UniformValues>(uniforms: U) {
     onUpdated,
     uploadUniforms,
     setUniformValues,
-    getUniformsSnapshot,
     dispose,
   };
-}
-
-function getSnapshot<Obj extends Record<string, unknown>>(object: Obj): Obj {
-  return Object.freeze({ ...object });
 }
 
 function isTextureParams(value: unknown): value is ImageTextureParams | DataTextureParams {

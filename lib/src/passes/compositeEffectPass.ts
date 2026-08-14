@@ -20,9 +20,9 @@ export function compositeEffectPass<
 >({ gl, passes, uniforms = {} as U }: CompositeEffectPassParams<U>): CompositeEffectPass<U> {
   const outputPass = passes.at(-1)!;
 
-  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback<any>>();
-  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback<any>>();
-  const [onUpdated, executeUpdateCallbacks] = createHook<UpdatedCallback<any>>();
+  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback>();
+  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback>();
+  const [onUpdated, executeUpdateCallbacks] = createHook<UpdatedCallback<U>>();
   const [onResize, executeResizeCallbacks] = createHook<(width: number, height: number) => void>();
   const [onInit, executeInitCallbacks] = createHook<(gl: WebGL2RenderingContext) => void>();
   const [onDispose, executeDisposeCallbacks] = createHook();
@@ -32,7 +32,7 @@ export function compositeEffectPass<
   function render(options?: RenderOptions<EffectUniformContext>) {
     if (disposed || !_gl) return;
 
-    executeBeforeRenderCallbacks({ uniforms });
+    executeBeforeRenderCallbacks();
     const context = (options?.context ??
       createUniformContext(_gl)) as Readonly<EffectUniformContext>;
     let previousPass: RenderPass | EffectPass | undefined =
@@ -55,7 +55,7 @@ export function compositeEffectPass<
       });
       previousPass = pass;
     }
-    executeAfterRenderCallbacks({ uniforms });
+    executeAfterRenderCallbacks();
   }
 
   function initialize(gl: WebGL2RenderingContext) {
@@ -64,7 +64,7 @@ export function compositeEffectPass<
     for (const pass of passes) {
       pass.initialize(gl);
       pass.onUpdated((...args) => {
-        executeUpdateCallbacks(...args);
+        executeUpdateCallbacks(...(args as Parameters<UpdatedCallback<U>>));
       });
     }
     _gl = gl;

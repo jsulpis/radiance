@@ -31,7 +31,7 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
         target[name] = value;
         cleanupMedia(name);
         resolveSource(name, value);
-        executeUpdated(name, value, oldValue, getSourcesSnapshot());
+        executeUpdated(name, value, oldValue);
         return true;
       },
     },
@@ -61,10 +61,10 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
         (value) => {
           if (disposed || pending.get(name) !== token) return;
           pending.delete(name);
-          const resolvedValue = value as UniformValue | undefined;
+          const resolvedValue = value as UniformValue;
           values[name] = resolvedValue;
-          watchMedia(name, resolvedValue);
-          executeUpdated(name, resolvedValue, undefined, getValuesSnapshot() as Readonly<U>);
+          watchMedia(name, resolvedValue as U[Name]);
+          executeUpdated(name, resolvedValue as U[Name], undefined);
         },
         (error) => {
           if (disposed || pending.get(name) !== token) return;
@@ -80,11 +80,11 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
     if (typeof source === "function") return;
 
     values[name] = source;
-    watchMedia(name, source);
+    watchMedia(name, source as U[Name]);
   }
 
   /** Subscribes to image-load and video-frame events for media uniforms. */
-  function watchMedia(name: Name, value: UniformValue | undefined) {
+  function watchMedia(name: Name, value: U[Name] | undefined) {
     if (mediaValues.get(name) === value) return;
     cleanupMedia(name);
     mediaValues.set(name, value);
@@ -93,7 +93,7 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
     if (isHTMLImageTexture(value) && !value.src.complete) {
       const listener = () => {
         mediaCleanups.delete(name);
-        executeUpdated(name, value, value, getValuesSnapshot() as Readonly<U>);
+        executeUpdated(name, value, undefined);
       };
       value.src.addEventListener("load", listener, { once: true });
       mediaCleanups.set(name, () => value.src.removeEventListener("load", listener));
@@ -102,7 +102,7 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
       let frameId = 0;
       const onFrame = () => {
         if (disposed) return;
-        executeUpdated(name, value, value, getValuesSnapshot() as Readonly<U>);
+        executeUpdated(name, value, undefined);
         frameId = video.requestVideoFrameCallback(onFrame);
       };
       frameId = video.requestVideoFrameCallback(onFrame);
@@ -115,11 +115,6 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
     mediaCleanups.get(name)?.();
     mediaCleanups.delete(name);
     mediaValues.delete(name);
-  }
-
-  /** Returns the current source definitions without exposing the mutable proxy. */
-  function getSourcesSnapshot() {
-    return Object.freeze({ ...sourceProxy });
   }
 
   /** Returns the latest concrete values without exposing the mutable value map. */
