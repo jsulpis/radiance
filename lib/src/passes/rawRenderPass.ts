@@ -45,7 +45,6 @@ export function rawRenderPass<U extends UniformValues>({
     initialize: initializeUniforms,
     onUpdated,
     uploadUniforms,
-    getUniformsSnapshot,
     setUniformValues,
     uniformsProxy,
     dispose: disposeUniforms,
@@ -117,8 +116,8 @@ export function rawRenderPass<U extends UniformValues>({
 
   const drawMode = userDrawMode || (vertex.includes("gl_PointSize") ? "POINTS" : "TRIANGLES");
 
-  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback<U>>();
-  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback<U>>();
+  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback>();
+  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback>();
 
   function render({ target, clear }: RawRenderOptions = {}) {
     if (disposed) return;
@@ -134,7 +133,7 @@ export function rawRenderPass<U extends UniformValues>({
     setBlending(_gl, blending);
     setDepthTest(_gl, depthTest);
 
-    executeBeforeRenderCallbacks({ uniforms: getUniformsSnapshot() as U });
+    executeBeforeRenderCallbacks();
 
     if (hasIndices) {
       _gl.drawElements(_gl[drawMode], getVertexCount(), indexType, 0);
@@ -142,7 +141,7 @@ export function rawRenderPass<U extends UniformValues>({
       _gl.drawArrays(_gl[drawMode], 0, getVertexCount());
     }
 
-    executeAfterRenderCallbacks({ uniforms: getUniformsSnapshot() as U });
+    executeAfterRenderCallbacks();
   }
 
   function dispose() {
@@ -294,9 +293,9 @@ export type RawRenderPass<U extends UniformValues = Record<string, never>> = Dis
   /** Registers a callback called whenever concrete uniforms are updated. */
   onUpdated: (callback: UpdatedCallback<U>) => void;
   /** Registers a callback called just before rendering. */
-  onBeforeRender: (callback: RenderCallback<U>) => void;
+  onBeforeRender: (callback: RenderCallback) => void;
   /** Registers a callback called just after rendering. */
-  onAfterRender: (callback: RenderCallback<U>) => void;
+  onAfterRender: (callback: RenderCallback) => void;
   /** Registers a callback called when the pass is initialized with a GL context. */
   onInit: (callback: (gl: WebGL2RenderingContext) => void) => void;
   /** Registers a callback called when the pass is resized. */
@@ -309,19 +308,14 @@ export type RawRenderPass<U extends UniformValues = Record<string, never>> = Dis
 
 /**
  * Callback function executed during the raw render cycle.
- * @param args - An object containing the uniforms used for the render.
  */
-export type RenderCallback<U extends UniformValues = Record<string, never>> = (
-  args: Readonly<{ uniforms: U }>,
-) => void;
+export type RenderCallback = () => void;
 
 /** Callback invoked when a concrete uniform changes. */
-export type UpdatedCallback<U extends Record<string, unknown> = Record<string, never>> = (
-  name: string,
-  value: unknown,
-  oldValue: unknown,
-  uniforms: Readonly<U>,
-) => void;
+export type UpdatedCallback<
+  U extends Record<string, unknown> = Record<string, never>,
+  K extends Extract<keyof U, string> = Extract<keyof U, string>,
+> = (name: K, value: U[K], oldValue?: U[K]) => void;
 
 /**
  * Valid WebGL draw modes.

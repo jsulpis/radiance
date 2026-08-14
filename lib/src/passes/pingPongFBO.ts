@@ -44,7 +44,7 @@ export function pingPongFBO<U extends UniformSources<UniformContext>>({
     fragment,
     uniforms: Object.assign(uniforms, {
       [dataTextureName]: initialDataTexture,
-    }),
+    }) as U,
   });
 
   const pingPongFBOPass: PingPongFBOPass<U> = Object.assign(fboPass, {
@@ -69,9 +69,11 @@ export function pingPongFBO<U extends UniformSources<UniformContext>>({
   pingPongFBOPass.render = (options?: RenderOptions) => {
     renderFn({ ...options, target: fboWrite });
     pingPongFBOPass.texture = fboWrite.texture;
-    Object.assign(pingPongFBOPass.uniforms, {
-      [dataTextureName]: () => fboRead.texture,
-    });
+    if (typeof pingPongFBOPass.uniforms[dataTextureName] === "object") {
+      Object.assign(pingPongFBOPass.uniforms, {
+        [dataTextureName]: () => fboRead.texture,
+      });
+    }
     swap();
   };
 
