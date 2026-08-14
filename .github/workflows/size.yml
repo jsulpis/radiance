@@ -35,8 +35,16 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/cache/restore@v4
         with:
-          path: ${{ runner.temp }}/base-size-report
+          path: ${{ runner.temp }}/size-report
           key: bundle-size-${{ github.event.pull_request.base.sha }}
+
+      - name: Preserve base size report
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ -f "${RUNNER_TEMP}/size-report/report.json" ]; then
+            mkdir -p "${RUNNER_TEMP}/base-size-report"
+            cp "${RUNNER_TEMP}/size-report/report.json" "${RUNNER_TEMP}/base-size-report/report.json"
+          fi
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
