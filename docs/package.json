@@ -19,7 +19,7 @@
     "sass": "1.102.0",
     "sandpack-vue3": "3.1.12",
     "tweakpane": "4.0.5",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vitepress": "1.6.4",
     "vitepress-plugin-group-icons": "1.7.6",
     "vitepress-plugin-llms": "1.13.4",
