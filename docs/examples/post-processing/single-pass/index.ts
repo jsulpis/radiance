@@ -48,7 +48,7 @@ const { onAfterRender } = glCanvas({
 
 const renderCount = document.querySelector("#renderCount")!;
 onAfterRender(() => {
-  renderCount.textContent = `${Number(renderCount.textContent) + 1}`;
+  renderCount.firstChild!.nodeValue = `${Number(renderCount.textContent) + 1}`;
 });
 
 // You can dynamically update the uniforms of an effect pass, like any other pass

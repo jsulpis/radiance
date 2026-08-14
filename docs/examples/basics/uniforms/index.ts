@@ -34,5 +34,5 @@ pane
 
 const renderCount = document.querySelector("#renderCount")!;
 onAfterRender(() => {
-  renderCount.textContent = `${Number(renderCount.textContent) + 1}`;
+  renderCount.firstChild!.nodeValue = `${Number(renderCount.textContent) + 1}`;
 });
