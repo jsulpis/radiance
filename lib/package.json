@@ -39,7 +39,6 @@
     "lint:fix": "eslint src --fix",
     "prepack": "tsdown",
     "release": "changelogen --release --clean && pnpm publish",
-    "size": "size-limit",
     "test": "playwright test",
     "test:local": "docker compose run --build --rm -p 9323:9323 test",
     "test:update": "docker compose run --build --rm -p 9323:9323 test sh -c 'xvfb-run pnpm run test -u'",
@@ -49,7 +48,6 @@
     "@arethetypeswrong/core": "0.18.5",
     "@astrojs/check": "0.9.10",
     "@playwright/test": "1.62.1",
-    "@size-limit/preset-small-lib": "13.0.3",
     "@tweakpane/core": "2.0.5",
     "@types/node": "24.13.3",
     "astro": "7.1.6",
@@ -59,7 +57,6 @@
     "gl-matrix": "3.4.4",
     "prettier": "3.9.6",
     "publint": "0.3.22",
-    "size-limit": "13.0.3",
     "tsdown": "0.22.14",
     "tweakpane": "4.0.5",
     "typedoc": "0.28.20",
@@ -73,10 +70,5 @@
     "excludeAuthors": [
       ""
     ]
-  },
-  "size-limit": [
-    {
-      "path": "dist/index.js"
-    }
-  ]
+  }
 }

@@ -26,6 +26,7 @@ const format = (bytes: number) => `${(bytes / 1024).toFixed(2)} kB`;
 const delta = (current: number, previous?: number) => {
   if (previous === undefined || previous === null) return "";
   const difference = current - previous;
+  if (difference === 0) return "-";
   const sign = difference > 0 ? "+" : "";
   const icon = difference > 0 ? " 🔺" : difference < 0 ? " 🎉" : "";
   const percentage = ` (${sign}${((difference / previous) * 100).toFixed(1)}%${icon})`;
@@ -36,11 +37,11 @@ const row = (name: string, key: keyof typeof pr) =>
 const marker = "<!-- radiance-size-report -->";
 const body = [
   marker,
-  "## Bundle size 📦",
-  "minified, gzipped sizes",
+  "### 📦 Bundle size",
+  "_minified and gzipped_",
   "| Bundle | Base | PR | Delta |",
   "| --- | ---: | ---: | ---: |",
-  row("`lib/dist/index.js`", "libraryGzipBytes"),
+  row("`index.js`", "libraryGzipBytes"),
   row("`glCanvas`", "glCanvasGzipBytes"),
 ].join("\n");
 
