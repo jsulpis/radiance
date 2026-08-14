@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.12.1
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.12.0...v0.12.1)
+
+### 🚀 Enhancements
+
+- **noise:** Add a time parameter to freeze the noise effect on an animated canvas ([5fd0524](https://github.com/jsulpis/radiance/commit/5fd0524))
+- Track bundle size deltas ([#95](https://github.com/jsulpis/radiance/pull/95))
+
+### 🔥 Performance
+
+- Remove uniforms from updated and render callbacks to avoid unnecessary computations ([750592f](https://github.com/jsulpis/radiance/commit/750592f))
+
+### 🩹 Fixes
+
+- **glCanvas:** Trigger re-renders when renderMode="continuous" and the animation loop was paused ([79b7cd4](https://github.com/jsulpis/radiance/commit/79b7cd4))
+
+### 📖 Documentation
+
+- Update benchmark to use local lib version ([9b0f90b](https://github.com/jsulpis/radiance/commit/9b0f90b))
+- Use local lib version for the examples ([75c61b2](https://github.com/jsulpis/radiance/commit/75c61b2))
+- Add an example for the builtin noise effect ([52cbd3d](https://github.com/jsulpis/radiance/commit/52cbd3d))
+
 ## v0.12.0
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.11.1...v0.12.0)

@@ -1,6 +1,6 @@
 {
   "name": "@radiancejs/gl",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Lightweight, reactive WebGL library for working with shaders",
   "keywords": [
     "webgl",
