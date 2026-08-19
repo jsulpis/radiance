@@ -13,7 +13,8 @@ const { onAfterRender } = glCanvas({
       float dist = distance(uv * resolution, center);
       float radiusPx = min(resolution.x, resolution.y) * RADIUS;
       float circleMask = 1. - smoothstep(radiusPx * .99, radiusPx * 1.01, dist);
-      vec3 color = vec3((uv - .5 + RADIUS) * 2., 1.) * circleMask;
+      vec2 circleUv = (uv * resolution - center) / radiusPx;
+      vec3 color = vec3((circleUv + 1.) * .5, 1.) * circleMask;
       gl_FragColor = vec4(color, 1.);
     }
   `,
