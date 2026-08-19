@@ -19,7 +19,7 @@ const config = defineConfig({
     nav: [
       {
         text: "Guide",
-        link: "/guide/introduction/quick-start",
+        link: "/guide/introduction/getting-started",
         activeMatch: "/guide/",
       },
       {
@@ -48,14 +48,21 @@ const config = defineConfig({
         {
           text: "Introduction",
           base: "/guide/introduction/",
-          items: [{ text: "Quick start ", link: "quick-start" }],
+          items: [
+            { text: "Why this lib?", link: "why-this-lib" },
+            { text: "Getting Started", link: "getting-started" },
+            { text: "Recommended Tooling", link: "recommended-tooling" },
+          ],
         },
       ],
       "/examples/": examplesSidebar,
       "/api/": apiSidebar,
     },
 
-    socialLinks: [{ icon: "github", link: "https://github.com/jsulpis/radiance" }],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/jsulpis/radiance" },
+      { icon: "npm", link: "https://npmx.dev/package/@radiancejs/gl" },
+    ],
 
     outline: {
       level: "deep",
@@ -98,7 +105,11 @@ const config = defineConfig({
           if (token.nesting === -1) return "</ExampleEditor>";
 
           const files = [];
-          for (let index = idx + 1; tokens[index]?.type !== token.type.replace("_open", "_close"); index++) {
+          for (
+            let index = idx + 1;
+            tokens[index]?.type !== token.type.replace("_open", "_close");
+            index++
+          ) {
             const item = tokens[index] as any;
             if (item.type === "fence") {
               const source = item.src?.[0];

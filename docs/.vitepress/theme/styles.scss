@@ -1,18 +1,7 @@
-.example-page {
-  // full width page
-  --vp-layout-max-width: 100%;
-  .content-container,
-  .container {
-    max-width: 100% !important;
-  }
-}
-
 :root {
   --vp-padding: 24px;
-  --wrapper-width: calc(100svw - var(--vp-sidebar-width) - 2 * var(--vp-padding));
-  --wrapper-height: calc(
-    100svh - var(--vp-nav-height) - var(--vp-subnav-height, 0px) - 2 * var(--vp-padding)
-  );
+  --wrapper-height: 600px;
+  --editor-height: 300px;
 
   @media (width < 960px) {
     --vp-sidebar-width: 0px;
@@ -21,6 +10,12 @@
 
   @media (width >= 768px) {
     --vp-padding: 32px;
+  }
+
+  @media (width >= 720px) and (orientation: landscape) {
+    --wrapper-height: 400px;
+    --wrapper-width: 100%;
+    --editor-height: 400px;
   }
 
   @media (orientation: landscape) {
@@ -71,14 +66,6 @@
       width: var(--wrapper-width) !important;
       min-width: 0 !important;
     }
-  }
-
-  .VPDoc > .container > .content {
-    padding: 0;
-  }
-
-  .VPDoc {
-    padding-block: var(--vp-padding) 0;
   }
 
   .sp-wrapper {
@@ -150,15 +137,32 @@
 }
 
 .vp-doc {
-  :is(h2, h3, h4) + :is(p, div[class*="language-"]) {
-    margin-block: 0.25rem;
-
-    ~ :is(p, div[class*="language-"]) {
-      margin-block: 0.25rem;
-    }
-  }
-
   h4 {
     margin-top: 2rem;
+  }
+}
+
+.example-page {
+  // full width page
+  --vp-layout-max-width: 100%;
+  .content-container,
+  .container {
+    max-width: 100% !important;
+  }
+
+  .sp-wrapper {
+    --wrapper-width: calc(100svw - var(--vp-sidebar-width) - 2 * var(--vp-padding)) !important;
+    --wrapper-height: calc(
+      100svh - var(--vp-nav-height) - var(--vp-subnav-height, 0px) - 2 * var(--vp-padding)
+    ) !important;
+    --editor-height: var(--wrapper-height);
+  }
+
+  .VPDoc > .container > .content {
+    padding: 0;
+  }
+
+  .VPDoc {
+    padding-block: var(--vp-padding) 0;
   }
 }
