@@ -8,8 +8,11 @@ hero:
   tagline: A toolkit for building shader-driven experiences.
   actions:
     - theme: brand
+      text: Why this lib?
+      link: /guide/introduction/why-this-lib
+    - theme: alt
       text: Get started
-      link: /guide/introduction/quick-start
+      link: /guide/introduction/getting-started
     - theme: alt
       text: Examples
       link: /examples/basics/full-screen/

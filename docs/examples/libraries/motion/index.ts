@@ -1,4 +1,4 @@
-import { bloom, cineonToneMapping, glCanvas } from "@radiancejs/gl";
+import { bloom, cineonToneMapping, fxaa, glCanvas } from "@radiancejs/gl";
 import { animate } from "motion";
 import fragment from "./morph.frag?raw";
 import "./styles.css";
@@ -12,7 +12,7 @@ const { uniforms } = glCanvas({
     uRotation: 0.0,
     uMorph: 0.0,
   },
-  postEffects: [bloom(), cineonToneMapping()],
+  postEffects: [fxaa(), bloom(), cineonToneMapping()],
 });
 
 animate(0, 1, {
