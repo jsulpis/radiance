@@ -19,7 +19,7 @@ export const examplesSidebar: SidebarItem[] = sections.map((section) => {
     .filter((file) => fs.statSync(path.join(sectionPath, file)).isDirectory());
 
   return {
-    text: upperFirst(section),
+    text: capitalize(section),
     items: pages
       .map((page) => {
         const indexPath = path.join(sectionPath, page, "index.md");
@@ -65,4 +65,8 @@ function formatApiLabel(label: string, depth: number) {
 
 function upperFirst(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function capitalize(str: string) {
+  return str.split(" ").map(upperFirst).join(" ");
 }
