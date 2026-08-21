@@ -1,0 +1,56 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<script>
+  import { fxaa, glCanvas, quadRenderPass } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
+
+  const fragment = `
+    uniform vec2 uResolution;
+
+    in vec2 vUv;
+    out vec4 fragColor;
+
+    void main() {
+      float stripes = step(0.5, fract((vUv.x + .1 * vUv.y) * 8.));
+      float circle = step(length(vUv - 0.5), 0.4);
+      stripes = mix(stripes, 1. - stripes, circle);
+      fragColor = vec4(vec3(stripes), 1.0);
+    }
+  `;
+
+  const withFxaa = glCanvas({
+    canvas: "#glCanvas",
+    dpr: 1,
+    fragment,
+    uniforms: {
+      uResolution: ({ canvasResolution }) => canvasResolution,
+    },
+    postEffects: [fxaa()],
+    renderMode: "manual",
+  });
+
+  const withoutFxaa = quadRenderPass({
+    gl: withFxaa.gl,
+    fragment,
+    uniforms: {
+      uResolution: ({ canvasResolution }) => canvasResolution,
+    },
+  });
+
+  const { gl } = withFxaa;
+  gl.enable(gl.SCISSOR_TEST);
+  withFxaa.onAfterRender(incrementRenderCount);
+  withoutFxaa.onAfterRender(incrementRenderCount);
+
+  gl.scissor(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight / 2);
+  withFxaa.render();
+
+  gl.scissor(0, gl.drawingBufferHeight / 2, gl.drawingBufferWidth, gl.drawingBufferHeight / 2);
+  withoutFxaa.render();
+</script>
+
+<Layout title="FXAA">
+  <canvas id="glCanvas"></canvas>
+</Layout>
