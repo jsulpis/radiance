@@ -12,19 +12,19 @@
     "@braintree/sanitize-url": "7.1.2",
     "@radiancejs/gl": "workspace:*",
     "@tweakpane/core": "2.0.5",
-    "dayjs": "1.11.21",
+    "dayjs": "1.11.23",
     "gray-matter": "4.0.3",
     "markdown-it-container": "4.0.0",
-    "mermaid": "11.16.1",
-    "sass": "1.102.0",
+    "mermaid": "11.17.2",
+    "sass": "1.103.1",
     "sandpack-vue3": "3.1.12",
     "tweakpane": "4.0.5",
     "typescript": "6.0.3",
     "vitepress": "1.6.4",
     "vitepress-plugin-group-icons": "1.7.6",
-    "vitepress-plugin-llms": "1.13.4",
+    "vitepress-plugin-llms": "1.13.5",
     "vitepress-plugin-mermaid": "2.0.17",
-    "vue": "3.5.40"
+    "vue": "3.5.42"
   },
   "devDependencies": {
     "@types/markdown-it-container": "4.0.0"
