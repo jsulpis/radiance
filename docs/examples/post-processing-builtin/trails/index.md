@@ -1,5 +1,5 @@
 ---
-title: Trails (builtin)
+title: Trails
 description: Add persistent motion trails to animated particles with the built-in trails post-processing effect.
 ---
 

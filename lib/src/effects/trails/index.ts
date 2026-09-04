@@ -11,7 +11,7 @@ import outputFragment from "./glsl/output.frag";
  * This effect uses double buffering (ping-pong FBO) to accumulate colors over time,
  * creating a trailing effect behind moving objects.
  *
- * [Example: Trails (builtin)](/examples/post-processing/builtin-trails/)
+ * [Example: Trails (builtin)](/examples/post-processing-builtin/trails/)
  *
  * @param params - Configuration for the trails effect.
  */

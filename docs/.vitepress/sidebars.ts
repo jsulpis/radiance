@@ -12,31 +12,43 @@ const sections = fs
   .readdirSync(examplesDir)
   .filter((file) => fs.statSync(path.join(examplesDir, file)).isDirectory());
 
-export const examplesSidebar: SidebarItem[] = sections.map((section) => {
-  const sectionPath = path.join(examplesDir, section);
-  const pages = fs
-    .readdirSync(sectionPath)
-    .filter((file) => fs.statSync(path.join(sectionPath, file)).isDirectory());
+export const examplesSidebar: SidebarItem[] = sections
+  .map((section, index) => {
+    const sectionPath = path.join(examplesDir, section);
+    const sectionIndexPath = path.join(sectionPath, "index.md");
+    const sectionData = fs.existsSync(sectionIndexPath)
+      ? matter(fs.readFileSync(sectionIndexPath, "utf8")).data
+      : {};
+    const pages = fs
+      .readdirSync(sectionPath)
+      .filter((file) => fs.statSync(path.join(sectionPath, file)).isDirectory());
 
-  return {
-    text: capitalize(section),
-    items: pages
-      .map((page) => {
-        const indexPath = path.join(sectionPath, page, "index.md");
-        const { data } = matter(fs.readFileSync(indexPath, "utf8"));
-        return {
-          title: data.title || page,
-          slug: page,
-          position: data.position || 0,
-        };
-      })
-      .sort((a, b) => a.position - b.position)
-      .map((data) => ({
-        text: data.title,
-        link: `/examples/${section}/${data.slug}/`,
-      })),
-  };
-});
+    return {
+      title: sectionData.title ?? capitalize(section),
+      position: sectionData.position ?? index,
+      item: {
+        text: sectionData.title || capitalize(section),
+        link: `/examples/${section}/`,
+        items: pages
+          .map((page) => {
+            const indexPath = path.join(sectionPath, page, "index.md");
+            const { data } = matter(fs.readFileSync(indexPath, "utf8"));
+            return {
+              title: data.title ?? page,
+              slug: page,
+              position: data.position ?? 0,
+            };
+          })
+          .sort((a, b) => a.position - b.position)
+          .map((data) => ({
+            text: data.title,
+            link: `/examples/${section}/${data.slug}/`,
+          })),
+      },
+    };
+  })
+  .sort((a, b) => a.position - b.position)
+  .map(({ item }) => item);
 
 export const apiSidebar: SidebarItem[] = [
   {

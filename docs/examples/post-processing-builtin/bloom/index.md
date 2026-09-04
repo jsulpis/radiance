@@ -1,5 +1,5 @@
 ---
-title: Bloom (builtin)
+title: Bloom
 description: Combine the built-in bloom and tone-mapping effects to add glow and exposure control.
 ---
 

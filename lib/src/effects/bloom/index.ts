@@ -11,7 +11,7 @@ import upsampleFragment from "./glsl/upsample.frag";
  *
  * Based on [Custom Bloom Post-Process in Unreal Engine](https://www.froyok.fr/blog/2021-12-ue4-custom-bloom/).
  *
- * [Example: Bloom (builtin)](/examples/post-processing/builtin-bloom/)
+ * [Example: Bloom (builtin)](/examples/post-processing-builtin/bloom/)
  *
  * @param params - Bloom configuration.
  */
