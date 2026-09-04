@@ -1,5 +1,5 @@
 ---
-title: FXAA (builtin)
+title: FXAA
 description: Compare a raw render with the built-in fast approximate anti-aliasing effect using a split-screen scissor test.
 ---
 

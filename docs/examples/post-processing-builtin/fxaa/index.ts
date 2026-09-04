@@ -2,6 +2,8 @@ import { fxaa, glCanvas, loop, onPointerEvents, quadRenderPass } from "@radiance
 import fragment from "./scene.frag?raw";
 import "./styles.css";
 
+// Fast Approximate Anti-Aliasing (FXAA)
+
 let threshold = 0.5;
 
 const canvas = document.querySelector("canvas")!;

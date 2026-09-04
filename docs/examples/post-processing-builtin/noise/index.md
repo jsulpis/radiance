@@ -1,5 +1,5 @@
 ---
-title: Noise (builtin)
+title: Noise
 description: Add animated procedural noise to a rendered image with the built-in noise post-processing effect.
 ---
 
