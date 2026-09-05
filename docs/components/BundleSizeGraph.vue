@@ -116,7 +116,7 @@ onBeforeUnmount(() => {
     <p class="bundle-graph__meta">
       Updated {{ generatedAt }}. See the
       <a
-        href="https://github.com/jsulpis/radiance/benchmark"
+        href="https://github.com/jsulpis/radiance/tree/main/benchmark"
         target="_blank"
         rel="noopener noreferrer"
         >benchmark</a
