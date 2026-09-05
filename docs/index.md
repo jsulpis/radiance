@@ -25,7 +25,7 @@ Radiance takes care of the WebGL boilerplate, so you can focus on your shader.
 ::: example-editor
 
 ```ts /index.ts
-import { glCanvas, bloom, linearToneMapping } from "@radiancejs/gl";
+import { glCanvas, fxaa, bloom, linearToneMapping } from "@radiancejs/gl";
 import fragment from "./cube.frag?raw";
 import "./styles.css";
 
@@ -33,7 +33,8 @@ glCanvas({
   canvas: "#glCanvas",
   fragment,
   postEffects: [
-    bloom({ radius: 0.5, mix: 0.8 }), //
+    fxaa(), //
+    bloom({ radius: 0.5, mix: 0.8 }),
     linearToneMapping({ exposure: 1 }),
   ],
   uniforms: {
@@ -127,6 +128,8 @@ Radiance automatically re-renders the canvas when uniforms are updated, or when 
 
 <<< ./examples/basics/uniforms/index.ts
 
+<<< ./examples/basics/uniforms/vertex.frag
+
 <<< ./examples/basics/uniforms/uniforms.frag
 
 <<< @/snippets/canvas-full/styles.css
@@ -193,9 +196,9 @@ uniforms.uPointer = 42; // Type 'number' is not assignable to type 'number[]'. [
       }
 
       @media (width >= 720px) and (orientation: landscape) {
-        --wrapper-height: 460px;
+        --wrapper-height: 480px;
         --wrapper-width: 100%;
-        --editor-height: 460px;
+        --editor-height: 480px;
 
         .sp-editor {
           border-radius: var(--sp-border-radius) 0 0 var(--sp-border-radius);
