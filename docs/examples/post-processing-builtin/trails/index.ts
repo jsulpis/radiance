@@ -5,7 +5,7 @@ import "./styles.css";
 
 const count = 100;
 
-const trailsEffect = trails();
+const trailsEffect = trails({ fadeout: 0.15 });
 
 const { uniforms } = glCanvas({
   canvas: "#glCanvas",
@@ -25,7 +25,7 @@ const { uniforms } = glCanvas({
     },
   },
   uniforms: {
-    uParticleSize: 3,
+    uParticleSize: 5,
     uTime: ({ time }) => time / 500,
   },
   blending: "normal",
