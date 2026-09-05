@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.12.2
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.12.1...v0.12.2)
+
+### 🚀 Enhancements
+
+- **postprocessing:** Add FXAA effect ([19cd5ab](https://github.com/jsulpis/radiance/commit/19cd5ab))
+
+### 📖 Documentation
+
+- Add example of ray tracing from Shadertoy ([0be6095](https://github.com/jsulpis/radiance/commit/0be6095))
+- Reorganize examples sections ([78fa6dd](https://github.com/jsulpis/radiance/commit/78fa6dd))
+- Add an example using the Motion library ([b0959a9](https://github.com/jsulpis/radiance/commit/b0959a9))
+- Add the introduction section ([adee5c9](https://github.com/jsulpis/radiance/commit/adee5c9))
+
+### 🤖 CI
+
+- Update pnpm action ([1a93f9d](https://github.com/jsulpis/radiance/commit/1a93f9d))
+
 ## v0.12.1
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.12.0...v0.12.1)
