@@ -7,6 +7,8 @@ description: Bind UI controls to shader uniforms and trigger re-renders as value
 
 <<< ./index.ts
 
+<<< ./vertex.frag
+
 <<< ./uniforms.frag
 
 <<< @/snippets/canvas-full/styles.css
