@@ -1,13 +1,17 @@
 ---
 title: Particles
-description: Render an animated particle cloud with custom vertex attributes, point sprites, and alpha blending.
+description: Render an animated particle galaxy with custom vertex attributes, point sprites, and additive blending.
 ---
 
 ::: example-editor
 
 <<< ./index.ts
 
-<<< @/snippets/canvas-square/styles.css
+<<< ./galaxy.vert
+
+<<< ./galaxy.frag
+
+<<< @/snippets/canvas-full/styles.css
 
 <<< @/snippets/default/index.html
 
