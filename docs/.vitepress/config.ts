@@ -152,6 +152,11 @@ const config = defineConfig({
   srcExclude: ["AGENTS.md"],
 
   vite: {
+    // mermaid imports fastdom (a CJS package) without a default ESM export,
+    // so it must be pre-bundled to get the CJS interop in dev
+    optimizeDeps: {
+      include: ["fastdom", "fastdom/extensions/fastdom-promised.js"],
+    },
     plugins: [
       groupIconVitePlugin(),
       llmstxt({
