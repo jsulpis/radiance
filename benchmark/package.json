@@ -15,7 +15,7 @@
     "twgl.js": "7.0.0"
   },
   "devDependencies": {
-    "@types/node": "26.4.0",
+    "@types/node": "26.4.1",
     "@types/three": "0.185.4",
     "typescript": "7.0.2",
     "vite": "8.2.2"
