@@ -15,10 +15,10 @@
     "twgl.js": "7.0.0"
   },
   "devDependencies": {
-    "@types/node": "26.4.0",
-    "@types/three": "0.185.4",
+    "@types/node": "26.5.1",
+    "@types/three": "0.186.0",
     "typescript": "7.0.2",
-    "vite": "8.2.2"
+    "vite": "8.3.0"
   },
   "packageManager": "pnpm@11.25.0"
 }
