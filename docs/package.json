@@ -13,7 +13,6 @@
     "@radiancejs/gl": "workspace:*",
     "@tweakpane/core": "2.0.5",
     "dayjs": "1.11.23",
-    "fastdom": "1.0.12",
     "gray-matter": "4.0.3",
     "markdown-it-container": "4.0.0",
     "sandpack-vue3": "3.1.12",

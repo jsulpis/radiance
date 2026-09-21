@@ -82,6 +82,14 @@ const config = defineConfig({
       "script",
       {
         defer: "true",
+        src: "https://gateway.jsulpis.cloud/api/script.js",
+        "data-site-id": "3e3c7b222054",
+      },
+    ],
+    [
+      "script",
+      {
+        defer: "true",
         src: env.UMAMI_SCRIPT_URL || "",
         "data-website-id": env.UMAMI_WEBSITE_ID || "",
       },
