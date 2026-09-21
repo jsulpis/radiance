@@ -7,6 +7,10 @@ description: Draw indexed geometry by reusing vertex data through an index buffe
 
 <<< ./index.ts
 
+<<< ./mesh.vert
+
+<<< ./mesh.frag
+
 <<< @/snippets/canvas-square/styles.css
 
 <<< @/snippets/default/index.html
