@@ -2,7 +2,6 @@ import { defineConfig, loadEnv } from "vitepress";
 import { readFileSync } from "node:fs";
 import { groupIconMdPlugin, groupIconVitePlugin } from "vitepress-plugin-group-icons";
 import container from "markdown-it-container";
-import { withMermaid } from "vitepress-plugin-mermaid";
 import llmstxt from "vitepress-plugin-llms";
 import { apiSidebar, examplesSidebar } from "./sidebars";
 import pkg from "../../lib/package.json";
@@ -152,11 +151,6 @@ const config = defineConfig({
   srcExclude: ["AGENTS.md"],
 
   vite: {
-    // mermaid imports fastdom (a CJS package) without a default ESM export,
-    // so it must be pre-bundled to get the CJS interop in dev
-    optimizeDeps: {
-      include: ["fastdom", "fastdom/extensions/fastdom-promised.js"],
-    },
     plugins: [
       groupIconVitePlugin(),
       llmstxt({
@@ -188,4 +182,4 @@ You can find below three groups of links:
   ignoreDeadLinks: [/\.agents/],
 });
 
-export default withMermaid(config);
+export default config;
