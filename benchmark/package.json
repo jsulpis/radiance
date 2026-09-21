@@ -11,7 +11,7 @@
   "dependencies": {
     "@radiancejs/gl": "workspace:*",
     "ogl": "1.0.11",
-    "three": "0.185.1",
+    "three": "0.186.0",
     "twgl.js": "7.0.0"
   },
   "devDependencies": {
