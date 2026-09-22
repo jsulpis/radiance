@@ -24,12 +24,23 @@ const options = {
   publint: false,
   attw: false,
 };
-const [[libraryResult], [consumerResult]] = await Promise.all([
+const [libraryHandle, consumerHandle] = await Promise.all([
   build({ ...options, entry: ["dist/index.js"], outDir: ".size-library" }),
   build({ ...options, entry: [consumerEntry], outDir: ".size-consumer" }),
 ]);
-const library = Buffer.from(libraryResult.chunks[0].code);
-const consumer = Buffer.from(consumerResult.chunks[0].code);
+
+function getChunkCode(handle: Awaited<ReturnType<typeof build>>): string {
+  const chunk = handle.bundles
+    .flatMap((bundle) => bundle.chunks)
+    .find((chunk) => chunk.type === "chunk");
+  if (!chunk || chunk.code === undefined) {
+    throw new Error("No JS chunk was produced by the build");
+  }
+  return chunk.code;
+}
+
+const library = Buffer.from(getChunkCode(libraryHandle));
+const consumer = Buffer.from(getChunkCode(consumerHandle));
 const report = {
   libraryGzipBytes: gzipSync(library).byteLength,
   glCanvasGzipBytes: gzipSync(consumer).byteLength,
