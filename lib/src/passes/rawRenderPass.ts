@@ -52,6 +52,7 @@ export function rawRenderPass<U extends UniformValues>({
   const {
     initialize: initializeAttributes,
     getVertexCount,
+    getInstanceCount,
     bindVAO,
     hasIndices,
     indexType,
@@ -135,10 +136,19 @@ export function rawRenderPass<U extends UniformValues>({
 
     executeBeforeRenderCallbacks();
 
-    if (hasIndices) {
-      _gl.drawElements(_gl[drawMode], getVertexCount(), indexType, 0);
+    const vertexCount = getVertexCount();
+    const instanceCount = getInstanceCount();
+
+    if (instanceCount != null) {
+      if (hasIndices) {
+        _gl.drawElementsInstanced(_gl[drawMode], vertexCount, indexType, 0, instanceCount);
+      } else {
+        _gl.drawArraysInstanced(_gl[drawMode], 0, vertexCount, instanceCount);
+      }
+    } else if (hasIndices) {
+      _gl.drawElements(_gl[drawMode], vertexCount, indexType, 0);
     } else {
-      _gl.drawArrays(_gl[drawMode], 0, getVertexCount());
+      _gl.drawArrays(_gl[drawMode], 0, vertexCount);
     }
 
     executeAfterRenderCallbacks();

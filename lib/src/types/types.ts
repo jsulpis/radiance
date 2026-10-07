@@ -72,14 +72,35 @@ export interface Attribute {
   size: number;
   /** The data for the attribute. */
   data: TypedArray | number[];
-  /** The GL data type (e.g., gl.FLOAT). Defaults to gl.FLOAT. */
+  /**
+   * The GL data type (e.g., gl.FLOAT).
+   * @default inferred from the data type
+   */
   type?: GLenum;
-  /** Whether fixed-point data should be normalized. */
+  /**
+   * Whether fixed-point data should be normalized.
+   * @default false
+   */
   normalize?: boolean;
-  /** The byte distance between consecutive attributes. */
+  /**
+   * The byte distance between consecutive attributes.
+   * @default 0
+   */
   stride?: number;
-  /** The offset of the first component in the buffer. */
+  /**
+   * The offset of the first component in the buffer.
+   * @default 0
+   */
   offset?: number;
+  /**
+   * The rate at which this attribute advances: `0` advances per vertex,
+   * values `≥ 1` advance every N instances.
+   *
+   * The instance count of a pass is inferred from these attributes as
+   * `data length × divisor`.
+   * @default 0
+   */
+  divisor?: number;
 }
 
 /** A resource that can release its owned browser or GPU resources. */

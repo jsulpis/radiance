@@ -56,6 +56,7 @@ export function setAttribute(
     attribute.stride || 0,
     attribute.offset || 0,
   );
+  gl.vertexAttribDivisor(location, attribute.divisor ?? 0);
   gl.bindBuffer(GL_ARRAY_BUFFER, null);
 
   const vertexCount = attribute.stride

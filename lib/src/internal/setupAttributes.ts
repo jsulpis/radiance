@@ -8,6 +8,7 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
   const buffers: WebGLBuffer[] = [];
 
   let vertexCount = 0;
+  let instanceCount = -1;
 
   function initialize(gl: WebGL2RenderingContext, program: WebGLProgram) {
     _gl = gl;
@@ -15,8 +16,15 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
     _gl.bindVertexArray(_vao);
 
     for (const [attributeName, attributeObj] of Object.entries(attributes)) {
+      const divisor = attributeObj.divisor ?? 0;
       const attr = setAttribute(_gl, program, attributeName, attributeObj);
-      vertexCount = Math.max(vertexCount, attr.vertexCount);
+
+      if (divisor > 0) {
+        instanceCount = Math.max(instanceCount, attr.vertexCount * divisor);
+      } else {
+        vertexCount = Math.max(vertexCount, attr.vertexCount);
+      }
+
       if (attr.buffer) buffers.push(attr.buffer);
     }
   }
@@ -27,6 +35,10 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
 
   function getVertexCount() {
     return vertexCount;
+  }
+
+  function getInstanceCount() {
+    return instanceCount === -1 ? null : instanceCount;
   }
 
   function bindVAO() {
@@ -43,6 +55,7 @@ export function setupAttributes(attributes: Record<string, Attribute>) {
   return {
     initialize,
     getVertexCount,
+    getInstanceCount,
     bindVAO,
     dispose,
     hasIndices,
