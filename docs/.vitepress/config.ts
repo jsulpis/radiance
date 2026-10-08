@@ -53,6 +53,71 @@ const config = defineConfig({
             { text: "Recommended Tooling", link: "recommended-tooling" },
           ],
         },
+        {
+          text: "Essentials",
+          base: "/guide/essentials/",
+          items: [
+            { text: "Update uniforms at runtime", link: "update-uniforms" },
+            { text: "Choose when to render", link: "render-modes" },
+            { text: "Handle resize and device pixel ratio", link: "resize-and-dpr" },
+            { text: "Draw custom geometry", link: "draw-geometry" },
+            { text: "Sample images, videos and data", link: "load-textures" },
+            { text: "React to pointer events", link: "pointer-events" },
+          ],
+        },
+        {
+          text: "Post-processing",
+          base: "/guide/post-processing/",
+          items: [
+            { text: "Write a custom post-processing effect", link: "custom-effect" },
+            { text: "Chain and order post effects", link: "effect-chain" },
+            { text: "Tone map the output", link: "tone-map-the-output" },
+          ],
+        },
+        {
+          text: "GPU Simulations",
+          base: "/guide/gpgpu/",
+          items: [
+            { text: "Run a simulation with ping-pong framebuffers", link: "ping-pong-simulations" },
+            { text: "Capture vertex output with transform feedback", link: "transform-feedback" },
+          ],
+        },
+        {
+          text: "Advanced Usage",
+          base: "/guide/advanced/",
+          items: [
+            { text: "Mount and unmount in a UI framework", link: "mount-in-a-ui-framework" },
+            { text: "Render in a worker with OffscreenCanvas", link: "offscreen-worker" },
+          ],
+        },
+        {
+          text: "Troubleshooting",
+          base: "/guide/troubleshooting/",
+          items: [
+            { text: "Debug shader compilation errors", link: "debug-shader-errors" },
+            { text: "Fix a black or frozen canvas", link: "fix-a-black-canvas" },
+          ],
+        },
+        {
+          text: "Concepts",
+          base: "/guide/concepts/",
+          items: [
+            { text: "About reactive rendering", link: "reactive-rendering" },
+            { text: "About the rendering pipeline", link: "rendering-pipeline" },
+            { text: "About GPU computation", link: "gpgpu" },
+            { text: "About color management", link: "color-management" },
+            { text: "About performance", link: "performance" },
+          ],
+        },
+        {
+          text: "Reference",
+          base: "/guide/reference/",
+          items: [
+            { text: "Shader conventions", link: "shader-conventions" },
+            { text: "Uniform values and sources", link: "uniform-sources" },
+            { text: "Built-in effects", link: "built-in-effects" },
+          ],
+        },
       ],
       "/examples/": examplesSidebar,
       "/api/": apiSidebar,
@@ -168,7 +233,7 @@ const config = defineConfig({
 
 You can find below three groups of links:
 
-1. User guides to get started with the library and learn how to use it
+1. User guides to get started with the library and learn how to use it (starting from "### Introduction")
 2. Code samples for different use cases (starting from "### Basics")
 3. Documentation of the API: functions, types etc (starting from "### Core")
 
