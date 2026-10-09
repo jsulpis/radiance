@@ -61,6 +61,7 @@ const config = defineConfig({
             { text: "Choose when to render", link: "render-modes" },
             { text: "Handle resize and device pixel ratio", link: "resize-and-dpr" },
             { text: "Draw custom geometry", link: "draw-geometry" },
+            { text: "Draw many copies with instancing", link: "instancing" },
             { text: "Sample images, videos and data", link: "load-textures" },
             { text: "React to pointer events", link: "pointer-events" },
           ],
