@@ -115,8 +115,11 @@ A source starting with `#version` keeps its version directive (nothing is prepen
 | `type`                 | GL type; inferred from the array when omitted      |
 | `normalize`            | normalize fixed-point values                       |
 | `stride` / `offset`    | interleaved layout, in bytes                       |
+| `divisor`              | `0` = one value per vertex, `1` = one per instance |
 
 The special attribute name `index` binds an `ELEMENT_ARRAY_BUFFER` (see [Draw custom geometry](../essentials/draw-geometry)). Vertex count comes from the data: `data.length / size`, or `byteLength / stride` with a stride.
+
+Attributes with `divisor > 0` are per-instance: the instance count is inferred from them as `rows × divisor` (the largest across them), and the draw call becomes instanced — see [Draw many copies with instancing](../essentials/instancing).
 
 `drawMode` accepts `"POINTS" | "LINES" | "LINE_STRIP" | "LINE_LOOP" | "TRIANGLES" | "TRIANGLE_STRIP" | "TRIANGLE_FAN"`, and `blending` accepts `"none" | "normal" | "additive"`.
 

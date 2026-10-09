@@ -40,6 +40,9 @@ glCanvas({
 | `normalize` | Normalize fixed-point values to \[0, 1\] or \[-1, 1\]         | `false`                    |
 | `stride`    | Byte distance between consecutive vertices (interleaved data) | `0` (tightly packed)       |
 | `offset`    | Byte offset of the first component                            | `0`                        |
+| `divisor`   | Advance rate: `0` per vertex, `1` per instance                | `0`                        |
+
+Attributes with `divisor > 0` are per-instance data: they draw the mesh many times in one call — see [Draw many copies with instancing](./instancing).
 
 ## Interleaved data
 
