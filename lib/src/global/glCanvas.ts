@@ -54,6 +54,7 @@ export const glCanvas = <U extends UniformSources<UniformContext>>(
     deltaTime: 0,
     canvasResolution: [canvas.width, canvas.height],
     passResolution: [canvas.width, canvas.height],
+    dpr,
   };
 
   function render(options?: RenderOptions) {

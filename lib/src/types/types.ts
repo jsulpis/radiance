@@ -38,6 +38,8 @@ export interface UniformContext extends LoopData {
   canvasResolution: [number, number];
   /** Dimensions of the target currently rendered by the pass. */
   passResolution: [number, number];
+  /** Device pixel ratio used to size the drawing buffer (device pixels per CSS pixel). */
+  dpr: number;
 }
 
 /**

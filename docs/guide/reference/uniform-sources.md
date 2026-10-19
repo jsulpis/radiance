@@ -53,6 +53,7 @@ The object passed to function sources (`UniformContext`):
 | `elapsedTime`      | `number`            | ms since the clock started, including pauses               |
 | `canvasResolution` | `[number, number]`  | drawing-buffer size in device pixels                       |
 | `passResolution`   | `[number, number]`  | size of the render target this pass draws into             |
+| `dpr`              | `number`            | device pixel ratio used to size the drawing buffer         |
 
 Effect passes receive `EffectUniformContext` — the fields above plus:
 
