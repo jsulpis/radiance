@@ -1,0 +1,62 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<script>
+  import { pixelate, glCanvas, loadTexture } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
+
+  const pixelateEffect = pixelate({ size: 12 });
+
+  const { onAfterRender } = glCanvas({
+    canvas: "#glCanvas",
+    fragment: /* glsl */ `
+      uniform sampler2D uTexture;
+      uniform vec2 uResolution;
+
+      in vec2 vUv;
+      out vec4 fragColor;
+
+      void main() {
+        vec2 textureResolution = vec2(textureSize(uTexture, 0));
+        float canvasRatio = uResolution.x / uResolution.y;
+        float textureRatio = textureResolution.x / textureResolution.y;
+
+        vec2 uv = vUv - 0.5;
+        uv.x *= canvasRatio / textureRatio;
+        uv += 0.5;
+
+        vec3 color = texture(uTexture, uv).rgb;
+        color *= step(0.0, uv.x) * (1.0 - step(1.0, uv.x));
+        color *= step(0.0, uv.y) * (1.0 - step(1.0, uv.y));
+
+        fragColor = vec4(color, 1.0);
+      }
+    `,
+    uniforms: {
+      uTexture: await loadTexture("/images/lion.jpg"),
+      uResolution: ({ canvasResolution }) => canvasResolution,
+    },
+    postEffects: [pixelateEffect],
+  });
+
+  // const pane = new Pane({ title: "Pixelate" });
+  // pane.addBinding(pixelateEffect.uniforms, "uSize", {
+  //   min: 1,
+  //   max: 64,
+  //   step: 1,
+  //   label: "Size (CSS px)",
+  // });
+
+  onAfterRender(incrementRenderCount);
+</script>
+
+<Layout title="Pixelate">
+  <canvas id="glCanvas"></canvas>
+</Layout>
+
+<style>
+  canvas {
+    aspect-ratio: 3 / 2;
+  }
+</style>

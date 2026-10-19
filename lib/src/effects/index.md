@@ -4,6 +4,7 @@ The `effects` modules provide ready-to-use post-processing passes built on top o
 
 - `bloom` builds a multi-pass bloom chain.
 - `noise` adds procedural noise to the rendered image.
+- `pixelate` snaps the image to a grid of square blocks.
 - `fxaa` applies fast approximate anti-aliasing to screen-space edges.
 - `trails` accumulates previous frames to create persistence and motion trails.
 - `toneMapping` contains several operators for HDR-to-display conversion.

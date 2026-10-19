@@ -57,6 +57,23 @@ Procedural noise over the image.
 
 Example: [Noise](../../examples/post-processing-builtin/noise/).
 
+## `pixelate(params?)`
+
+Snaps the image to a grid of square blocks. Each block samples the input once, at its center. One full-screen pass with a single
+texture fetch and no extra render target.
+
+| Param  | Type     | Default | Uniform | Meaning                                              |
+| ------ | -------- | ------- | ------- | ---------------------------------------------------- |
+| `size` | `number` | `8`     | `uSize` | block size in **CSS pixels** (1 = no pixelation)     |
+
+`size` is independent of the device pixel ratio, so a given value looks the same on any display. Assign `pixelateEffect.uniforms.uSize` to change it at runtime.
+
+::: tip Smoother and cheaper
+For a smoother pixelated look, render the scene into a small texture and upscale it with `magFilter: "nearest"`. Downsampling averages the source, so the blocks keep more detail, and far fewer fragments are shaded. On a canvas rendered at a low `dpr`, `image-rendering: pixelated` on the canvas gives the same blocky look with no shader pass at all.
+:::
+
+Example: [Pixelate](../../examples/post-processing-builtin/pixelate/).
+
 ## `fxaa()`
 
 Fast approximate anti-aliasing. Detects luminance edges and blends along them. No parameters — place it **last** so it sees final pixels.
