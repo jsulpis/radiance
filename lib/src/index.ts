@@ -36,6 +36,8 @@ export { glContext } from "./global/glContext";
 export { bloom } from "./effects/bloom";
 export { trails } from "./effects/trails";
 export { noise } from "./effects/noise";
+export { pixelate } from "./effects/pixelate";
+export type { PixelateParams } from "./effects/pixelate";
 export { fxaa } from "./effects/fxaa";
 export {
   linearToneMapping,

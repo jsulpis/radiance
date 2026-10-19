@@ -1,0 +1,22 @@
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+}
+
+canvas {
+  /* use a low DPR combined with this declaration 
+  to get a smooth and cheap pixelate effect */
+  image-rendering: pixelated;
+  
+  width: min(90svmin, 900px);
+  aspect-ratio: 16 / 9; /* flower video ratio (960x540) */
+  display: block;
+  border-radius: 8px;
+  border: 1px solid rgb(128 128 128 / 0.4);
+}
