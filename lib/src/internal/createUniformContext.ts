@@ -10,5 +10,6 @@ export function createUniformContext(gl: WebGL2RenderingContext): UniformContext
     elapsedTime: 0,
     canvasResolution: resolution,
     passResolution: [...resolution],
+    dpr: Math.min(globalThis.devicePixelRatio || 1, 2),
   };
 }
