@@ -32,7 +32,7 @@ const [libraryHandle, consumerHandle] = await Promise.all([
 function getChunkCode(handle: Awaited<ReturnType<typeof build>>): string {
   const chunk = handle.bundles
     .flatMap((bundle) => bundle.chunks)
-    .find((chunk) => chunk.type === "chunk");
+    .find((chunk) => chunk.type === "chunk" && chunk.fileName.endsWith(".js"));
   if (!chunk || chunk.code === undefined) {
     throw new Error("No JS chunk was produced by the build");
   }
