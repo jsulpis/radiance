@@ -15,6 +15,8 @@ export const GL_TEXTURE0 = 0x84_c0;
 export const GL_UNPACK_FLIP_Y_WEBGL = 0x92_40;
 
 export const GL_RGBA = 0x19_08;
+export const GL_RED = 0x19_03;
+export const GL_R8 = 0x82_29;
 export const GL_SRGB8_ALPHA8 = 0x8c_43;
 export const GL_UNSIGNED_BYTE = 0x14_01;
 export const GL_FLOAT = 0x14_06;

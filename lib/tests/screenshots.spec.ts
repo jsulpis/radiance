@@ -17,6 +17,7 @@ const expectedRendersByDemo = {
   blending: "2",
   trails: "90",
   fxaa: "2",
+  dither: "7",
 };
 
 for (const { section, route } of routesToTest) {
