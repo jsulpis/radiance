@@ -29,7 +29,7 @@ export function ditherBayer(params?: DitherBayerParams) {
 /**
  * Creates a blue-noise dithering post-processing effect.
  *
- * The threshold comes from a 64x64 void-and-cluster blue-noise mask sampled one
+ * The threshold comes from a 32x32 void-and-cluster blue-noise mask sampled one
  * texel per dither cell. Blue noise has no visible cross-hatch, so it breaks
  * banding more smoothly than any ordered matrix.
  *

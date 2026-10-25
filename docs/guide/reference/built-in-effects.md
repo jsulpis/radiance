@@ -98,7 +98,7 @@ Shared params:
 
 The effects expect **linear** input and write **sRGB** output. Between the two nearest palette values the pattern is mixed in linear light, so the average light matches the source and the image keeps its brightness. If you need tone mapping, use `outputColorSpace: "linear"`, and dither after it: the tone map compresses HDR without clipping. Dithering before the tone map clips anything above 1; feeding sRGB values (the tone mapping default) applies the sRGB curve twice and brightens the image.
 
-`ditherBlueNoise` samples a 64×64 void-and-cluster mask one texel per dither cell.
+`ditherBlueNoise` samples a 32×32 void-and-cluster mask one texel per dither cell.
 
 For `ditherHalftone`, `size` is the distance between dot centres, not their diameter. Dots occupy only part of each cell, so halftone looks finer than the solid-cell patterns at the same value; increase `size` for a coarser screen.
 
