@@ -1,3 +1,5 @@
+#include "../../../internal/glsl/color.glsl"
+
 uniform sampler2D uTexture;
 uniform vec2 uResolution;
 uniform float uSize;
@@ -12,14 +14,6 @@ out vec4 fragColor;
 // rounded to whole device pixels so the pattern stays regular on fractional DPRs.
 vec2 ditherCell() {
   return vUv * uResolution / max(round(uSize * uDpr), 1.0);
-}
-
-vec3 linearToSRGB(vec3 c) {
-  return mix(c * 12.92, pow(c, vec3(1.0 / 2.4)) * 1.055 - 0.055, step(vec3(0.0031308), c));
-}
-
-vec3 sRGBToLinear(vec3 c) {
-  return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c));
 }
 
 // Snaps linear values to the palette: uLevels values per channel, evenly spaced
