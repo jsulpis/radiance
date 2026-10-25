@@ -1,6 +1,6 @@
 ---
 title: Dither
-description: Reduce a moving gradient noise to a small color palette with the built-in dither post-processing effect.
+description: Reduce a lit blue sphere to a small color palette with the built-in dither post-processing effect.
 ---
 
 ::: example-editor {deps=tweakpane@^4.0.5}

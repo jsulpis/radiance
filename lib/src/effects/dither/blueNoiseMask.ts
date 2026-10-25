@@ -17,9 +17,7 @@ let _mask: DataTextureParams | undefined;
 export function blueNoiseMask(): DataTextureParams {
   if (_mask) return _mask;
 
-  const binary = atob(encoded);
-  const data = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) data[i] = binary.charCodeAt(i);
+  const data = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
 
   _mask = {
     data,
