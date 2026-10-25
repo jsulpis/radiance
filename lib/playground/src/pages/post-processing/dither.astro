@@ -1,0 +1,91 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<script>
+  import {
+    compositor,
+    createRenderTarget,
+    ditherBayer,
+    ditherBlueNoise,
+    ditherHalftone,
+    ditherIgn,
+    ditherWhiteNoise,
+    glContext,
+    onResize,
+    quadRenderPass,
+  } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
+
+  const fragment = /* glsl */ `
+    in vec2 vUv;
+    out vec4 fragColor;
+
+    void main() {
+      // a perceptual (sRGB) ramp expressed in linear light, as the effects expect
+      fragColor = vec4(vec3(pow(vUv.x, 2.2)), 1.0);
+    }
+  `;
+
+  const { gl, canvas, setSize } = glContext({ canvas: "#glCanvas" });
+
+  // The gradient is rendered once into this target, then each dither reads it.
+  const gradient = quadRenderPass({
+    gl,
+    fragment,
+    target: createRenderTarget(gl),
+  });
+
+  const effects = [
+    ditherBayer({ matrix: 2, levels: 2 }),
+    ditherBayer({ matrix: 4, levels: 2 }),
+    ditherBayer({ levels: 2 }),
+    ditherBlueNoise({ levels: 2 }),
+    ditherIgn({ levels: 2 }),
+    ditherWhiteNoise({ levels: 2 }),
+    ditherHalftone({ levels: 2 }),
+  ];
+
+  const compositors = effects.map((effect) =>
+    compositor({
+      gl,
+      renderPass: gradient,
+      postEffects: [effect],
+    }),
+  );
+
+  compositors.forEach((comp) => comp.onAfterRender(incrementRenderCount));
+  gl.enable(gl.SCISSOR_TEST);
+
+  function render() {
+    const width = gl.drawingBufferWidth;
+    const height = gl.drawingBufferHeight;
+    const bandHeight = Math.round(height / (compositors.length + 1));
+
+    compositors.forEach((comp, index) => {
+      const y = Math.round(height - (index + 2) * bandHeight);
+      gl.scissor(0, y, width, bandHeight);
+      comp.render();
+    });
+  }
+
+  onResize(canvas, ({ size }) => {
+    const width = Math.round(size.width);
+    const height = Math.round(size.height);
+    setSize(width, height);
+    compositors.forEach((comp) => comp.setSize({ width, height }));
+    render();
+  });
+</script>
+
+<Layout title="Dither">
+  <canvas id="glCanvas"></canvas>
+</Layout>
+
+<style>
+  canvas {
+    background: linear-gradient(to right, black, white);
+    background-clip: content-box;
+    aspect-ratio: 1;
+  }
+</style>

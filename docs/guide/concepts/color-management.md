@@ -25,11 +25,11 @@ const { uniforms } = glCanvas({
 });
 ```
 
-| Content                              | `colorSpace`     | Why                                          |
-| ------------------------------------ | ---------------- | -------------------------------------------- |
-| Photos, video, UI artwork            | `"srgb"`         | authored to look right on an sRGB display    |
-| Normal maps, data textures, LUTs*    | `"linear-rgb"`   | numbers, not display colors                  |
-| Masks and single-channel fields      | `"linear-rgb"`   | a mask must not be gamma-corrected           |
+| Content                           | `colorSpace`   | Why                                       |
+| --------------------------------- | -------------- | ----------------------------------------- |
+| Photos, video, UI artwork         | `"srgb"`       | authored to look right on an sRGB display |
+| Normal maps, data textures, LUTs* | `"linear-rgb"` | numbers, not display colors               |
+| Masks and single-channel fields   | `"linear-rgb"` | a mask must not be gamma-corrected        |
 
 The default is `"linear-rgb"`, which is right for data and wrong for photographs — an easy one to forget. *A display LUT that is itself stored in sRGB would be `"srgb"`; a maths LUT is linear.
 
@@ -53,6 +53,8 @@ postEffects: [bloom(), acesToneMapping({ exposure: 1.2 }), fxaa()],
 ```
 
 If you would rather keep values linear (to chain your own transfer, or to render into another surface), pass `outputColorSpace: "linear"`. Choosing an operator is [Tone map the output](../post-processing/tone-map-the-output); the parameters are in [Built-in effects](../reference/built-in-effects).
+
+The dither family (`ditherBayer`, `ditherBlueNoise`, …) expects linear values and writes sRGB: palette levels are evenly spaced in sRGB, and the pattern is mixed in linear light so the average matches the source. If you need tone mapping, use `outputColorSpace: "linear"`, then dither as the last effect. Dithering before the tone map clips HDR; dithering sRGB values brightens the image.
 
 **The drawing buffer** declares what the canvas holds. By default it is sRGB (what CSS and every screenshot expect). For wide-gamut displays, ask for P3:
 

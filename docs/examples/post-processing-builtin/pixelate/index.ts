@@ -24,9 +24,4 @@ glCanvas({
 });
 
 const pane = new Pane({ title: "Pixelate" });
-pane.addBinding(pixelateEffect.uniforms, "uSize", {
-  min: 1,
-  max: 32,
-  step: 1,
-  label: "Size (CSS px)",
-});
+pane.addBinding(pixelateEffect.uniforms, "uSize", { min: 1, max: 32, step: 1 });

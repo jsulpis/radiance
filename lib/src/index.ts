@@ -38,6 +38,19 @@ export { trails } from "./effects/trails";
 export { noise } from "./effects/noise";
 export { pixelate } from "./effects/pixelate";
 export type { PixelateParams } from "./effects/pixelate";
+export {
+  ditherBayer,
+  ditherBlueNoise,
+  ditherHalftone,
+  ditherIgn,
+  ditherWhiteNoise,
+} from "./effects/dither";
+export type {
+  DitherParams,
+  DitherBayerParams,
+  DitherBlueNoiseParams,
+  DitherHalftoneParams,
+} from "./effects/dither";
 export { fxaa } from "./effects/fxaa";
 export {
   linearToneMapping,
