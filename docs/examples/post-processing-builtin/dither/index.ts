@@ -3,7 +3,7 @@ import { Pane } from "tweakpane";
 import fragment from "./gradient.frag?raw";
 import "./styles.css";
 
-const ditherEffect = ditherBayer({ matrix: 8, size: 1 });
+const ditherEffect = ditherBayer({ matrix: 8, size: 2 });
 
 glCanvas({
   canvas: "#glCanvas",
