@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.12.3
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.12.2...v0.12.3)
+
+### 🚀 Enhancements
+
+- Add the DPR to the uniforms context for device independant scaling ([f4c9775](https://github.com/jsulpis/radiance/commit/f4c9775))
+- Add pixelate effect ([fab0df9](https://github.com/jsulpis/radiance/commit/fab0df9))
+- Add support for instancing ([a0c9391](https://github.com/jsulpis/radiance/commit/a0c9391))
+- **postprocessing:** Add dither effects ([a6461d0](https://github.com/jsulpis/radiance/commit/a6461d0))
+
+### 📖 Documentation
+
+- Update the play/pause example ([b35e571](https://github.com/jsulpis/radiance/commit/b35e571))
+- Update the uniforms example ([e7dccdf](https://github.com/jsulpis/radiance/commit/e7dccdf))
+- Update the pointer example ([b8f0ca9](https://github.com/jsulpis/radiance/commit/b8f0ca9))
+- Update the particles example ([547c4a4](https://github.com/jsulpis/radiance/commit/547c4a4))
+- Update the indices example ([0d8899a](https://github.com/jsulpis/radiance/commit/0d8899a))
+- Remove mermaid ([5b34248](https://github.com/jsulpis/radiance/commit/5b34248))
+- Add guides ([e0f3508](https://github.com/jsulpis/radiance/commit/e0f3508))
+
+### 🏡 Chore
+
+- **release:** V0.12.2 ([11fcd51](https://github.com/jsulpis/radiance/commit/11fcd51))
+
 ## v0.12.2
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.12.1...v0.12.2)
