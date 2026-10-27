@@ -16,13 +16,13 @@
     "gray-matter": "4.0.3",
     "markdown-it-container": "4.0.0",
     "sandpack-vue3": "3.1.12",
-    "sass": "1.105.1",
+    "sass": "1.106.1",
     "tweakpane": "4.0.5",
     "typescript": "6.0.3",
     "vitepress": "1.6.4",
-    "vitepress-plugin-group-icons": "1.7.6",
+    "vitepress-plugin-group-icons": "1.8.1",
     "vitepress-plugin-llms": "1.14.0",
-    "vue": "3.5.43"
+    "vue": "3.5.44"
   },
   "devDependencies": {
     "@types/markdown-it-container": "4.0.1"
