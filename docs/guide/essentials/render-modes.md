@@ -140,6 +140,26 @@ onAfterRender(() => {
 });
 ```
 
+Both callbacks receive `{ uniforms }`: the concrete values the main pass rendered with, for that frame. Functions are already called and promises already awaited, so `uniforms.uMvpMatrix` is the matrix itself, not the function that produced it. The object is a snapshot; read it, do not write to it. Assign to `uniforms` on the `glCanvas` result to change the next frame.
+
+```ts
+const { onAfterRender, uniforms } = glCanvas({
+  canvas: "#glCanvas",
+  fragment,
+  uniforms: {
+    uMvpMatrix: ({ time }) => createMvpMatrix(time),
+  },
+});
+
+onAfterRender(({ uniforms }) => {
+  updateElementPosition(card, uniforms.uMvpMatrix);
+});
+```
+
+`onBeforeRender` receives the same object, but it runs after the main pass has uploaded its uniforms. Assigning to `uniforms` inside it affects the frame after the current one, not the one being drawn.
+
+Post-processing effects do not change what the callbacks see: `uniforms` always holds the main pass's values, and `onAfterRender` runs after the last effect has drawn.
+
 ## See also
 
 - [About reactive rendering](../concepts/reactive-rendering) — what schedules a frame in `auto` mode.
