@@ -5,8 +5,9 @@ import type { CompositeEffectPass } from "./compositeEffectPass";
 import type { EffectPass, EffectUniformContext } from "./effectPass";
 import type { RenderOptions, RenderPass } from "./renderPass";
 import { floatTargetConfig } from "./effectPass";
-import type { Disposable } from "../types/types";
+import type { Disposable, UniformValues } from "../types/types";
 import { createUniformContext } from "../internal/createUniformContext";
+import type { RenderCallback } from "./rawRenderPass";
 
 /**
  * Composes a main pass and post-processing effects into one render graph.
@@ -27,9 +28,11 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
   // add the ability to render to floating-point buffers
   gl.getExtension("EXT_color_buffer_float");
 
-  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook();
-  const [onAfterRender, executeAfterRenderCallbacks] = createHook();
+  const [onBeforeRender, executeBeforeRenderCallbacks] =
+    createHook<RenderCallback<UniformValues>>();
+  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback<UniformValues>>();
   let disposed = false;
+  let mainPassUniforms: UniformValues = {};
 
   const allPasses = [renderPass, ...postEffects];
 
@@ -43,9 +46,12 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
     renderPass.setTarget(intermediateTarget);
   }
 
-  function render(options?: RenderOptions) {
-    executeBeforeRenderCallbacks();
+  renderPass.onBeforeRender(({ uniforms }) => {
+    mainPassUniforms = uniforms;
+    executeBeforeRenderCallbacks({ uniforms });
+  });
 
+  function render(options?: RenderOptions) {
     const { target: outputTarget, ...passOptions } = options ?? {};
     renderPass.render(postEffects.length > 0 ? passOptions : options);
 
@@ -68,7 +74,7 @@ export function compositor({ gl, renderPass, postEffects = [] }: CompositorParam
       previousPass = isCompositeEffectPass(effect) ? effect.passes.at(-1)! : effect;
     }
 
-    executeAfterRenderCallbacks();
+    executeAfterRenderCallbacks({ uniforms: mainPassUniforms });
   }
 
   function setSize(size: { width: number; height: number }) {
@@ -100,7 +106,7 @@ function isCompositeEffectPass(
   return Array.isArray((effect as CompositeEffectPass).passes);
 }
 
-export type Compositor = Disposable & {
+export type Compositor<U extends UniformValues> = Disposable & {
   /** Renders the main pass and every post-processing effect in order. */
   render: (opts?: RenderOptions) => void;
   /** Resizes every pass and render target managed by the compositor. */
@@ -108,9 +114,9 @@ export type Compositor = Disposable & {
   /** Top-level passes supplied to the compositor. */
   allPasses: Array<RenderPass<any, any> | EffectPass | CompositeEffectPass>;
   /** Registers a callback called before the complete chain renders. */
-  onBeforeRender: (callback: () => void) => void;
+  onBeforeRender: (callback: RenderCallback<U>) => void;
   /** Registers a callback called after the complete chain renders. */
-  onAfterRender: (callback: () => void) => void;
+  onAfterRender: (callback: RenderCallback<U>) => void;
 };
 
 /**

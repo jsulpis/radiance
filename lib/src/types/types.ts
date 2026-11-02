@@ -58,6 +58,16 @@ export type UniformSource<Context = UniformContext> =
  */
 export type UniformSources<Context = UniformContext> = Record<string, UniformSource<Context>>;
 
+/**
+ * The concrete values a uniform source object resolves to: functions are called
+ * and promises are awaited.
+ */
+export type ResolvedUniforms<U extends UniformSources<any>> = {
+  readonly [K in keyof U]: ResolvedUniform<U[K]>;
+};
+
+type ResolvedUniform<S> = S extends (...args: any[]) => infer R ? Awaited<R> : Awaited<S>;
+
 /** A collection of concrete uniform values ready for GPU upload. */
 export type UniformValues = Record<string, UniformValue | undefined>;
 

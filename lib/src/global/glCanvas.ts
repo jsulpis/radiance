@@ -1,8 +1,8 @@
 import { onResize } from "../helpers/onResize";
 import type { LoopObj } from "../helpers/loop";
 import { loop, type LoopParams } from "../helpers/loop";
-import type { UniformSources, UniformContext, Disposable } from "../types/types";
-import type { UpdatedCallback } from "../passes/rawRenderPass";
+import type { ResolvedUniforms, UniformSources, UniformContext, Disposable } from "../types/types";
+import type { RenderCallback, UpdatedCallback } from "../passes/rawRenderPass";
 import type { GLContextParams, WebGL2ContextAttributes } from "./glContext";
 import { glContext } from "./glContext";
 import type { QuadPassParams } from "../passes/quadRenderPass";
@@ -227,10 +227,10 @@ export type GLCanvas<U extends UniformSources<UniformContext> = UniformSources<U
     uniforms: U;
     /** Registers a callback whenever a main-pass uniform source changes. */
     onUpdated: (callback: UpdatedCallback<U>) => void;
-    /** Registers a callback before the complete pipeline renders. */
-    onBeforeRender: (callback: () => void) => void;
-    /** Registers a callback after the complete pipeline renders. */
-    onAfterRender: (callback: () => void) => void;
+    /** Registers a callback before the complete pipeline renders. `uniforms` holds the main pass's resolved values. */
+    onBeforeRender: (callback: RenderCallback<ResolvedUniforms<U>>) => void;
+    /** Registers a callback after the complete pipeline renders. `uniforms` holds the main pass's resolved values. */
+    onAfterRender: (callback: RenderCallback<ResolvedUniforms<U>>) => void;
     /** The resize observer, or `null` when sizing is manual or fixed. */
     resizeObserver: ReturnType<typeof onResize> | null;
   };

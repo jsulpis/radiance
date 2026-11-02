@@ -46,6 +46,7 @@ export function rawRenderPass<U extends UniformValues>({
     onUpdated,
     uploadUniforms,
     setUniformValues,
+    getUniformValues,
     uniformsProxy,
     dispose: disposeUniforms,
   } = setupUniforms(userUniforms);
@@ -117,8 +118,8 @@ export function rawRenderPass<U extends UniformValues>({
 
   const drawMode = userDrawMode || (vertex.includes("gl_PointSize") ? "POINTS" : "TRIANGLES");
 
-  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback>();
-  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback>();
+  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback<U>>();
+  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback<U>>();
 
   function render({ target, clear }: RawRenderOptions = {}) {
     if (disposed) return;
@@ -134,7 +135,7 @@ export function rawRenderPass<U extends UniformValues>({
     setBlending(_gl, blending);
     setDepthTest(_gl, depthTest);
 
-    executeBeforeRenderCallbacks();
+    executeBeforeRenderCallbacks({ uniforms: getUniformValues() });
 
     const vertexCount = getVertexCount();
     const instanceCount = getInstanceCount() ?? 1;
@@ -145,7 +146,7 @@ export function rawRenderPass<U extends UniformValues>({
       _gl.drawArraysInstanced(_gl[drawMode], 0, vertexCount, instanceCount);
     }
 
-    executeAfterRenderCallbacks();
+    executeAfterRenderCallbacks({ uniforms: getUniformValues() });
   }
 
   function dispose() {
@@ -313,7 +314,11 @@ export type RawRenderPass<U extends UniformValues = Record<string, never>> = Dis
 /**
  * Callback function executed during the raw render cycle.
  */
-export type RenderCallback = () => void;
+export type RenderCallback<U extends Record<string, unknown> = Record<string, never>> = ({
+  uniforms,
+}: {
+  uniforms: U;
+}) => void;
 
 /** Callback invoked when a concrete uniform changes. */
 export type UpdatedCallback<

@@ -89,8 +89,8 @@ In `rawRenderPass` (the lowest level) only concrete `UniformValue`s are accepted
 | ------------------------------- | -------------------------------------------------------------- |
 | `pass.onUpdated(cb)`            | a uniform source of that pass changes (`name, value, oldValue`) |
 | `glCanvas.onUpdated(cb)`        | a uniform source of the main pass changes                      |
-| `glCanvas.onBeforeRender(cb)`   | before the whole chain renders                                 |
-| `glCanvas.onAfterRender(cb)`    | after the whole chain has rendered                             |
+| `glCanvas.onBeforeRender(cb)`   | before the whole chain renders; `cb({ uniforms })` with resolved main-pass values |
+| `glCanvas.onAfterRender(cb)`    | after the whole chain has rendered; `cb({ uniforms })` with resolved main-pass values |
 | `pass.onResize(cb)` / `onInit` / `onDispose` | lifecycle of that pass                            |
 
 ## See also
