@@ -3,11 +3,19 @@ export { createProgram } from "./core/program";
 export { createRenderTarget, setRenderTarget } from "./core/renderTarget";
 export type { RenderTarget, RenderTargetParams } from "./core/renderTarget";
 export { createShader } from "./core/shader";
-export { loadTexture, loadVideoTexture, createFloatDataTexture } from "./core/texture";
+export {
+  loadTexture,
+  loadVideoTexture,
+  createFloatDataTexture,
+  updateElementMatrix,
+  updateElementRect,
+} from "./core/texture";
 export type {
   BaseTextureParams,
   DataTextureParams,
   ImageTextureParams,
+  ElementTextureParams,
+  ElementRectParams,
   TextureParams,
   LoadVideoParams,
 } from "./core/texture";

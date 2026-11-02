@@ -1,0 +1,27 @@
+article {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+  background: linear-gradient(135deg, #123, #406);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+article h1 {
+  margin: 0;
+  font-size: 2.5em;
+  background: linear-gradient(90deg, #8cf, #fc8);
+  background-clip: text;
+  color: transparent;
+}
+
+article p {
+  margin: 0;
+  font-size: 1.2em;
+  font-style: italic;
+  color: rgba(255 255 255 / 0.8);
+}

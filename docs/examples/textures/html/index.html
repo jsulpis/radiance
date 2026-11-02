@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RadianceJS Example</title>
+  </head>
+  <body>
+    <!-- the element lives inside the canvas and stays real DOM: it is the canvas's
+         fallback content, so text selection and screen readers keep working -->
+    <canvas id="glCanvas" layoutsubtree>
+      <article drawable>
+        <h1>Styled text</h1>
+        <p>Real DOM, rendered as a texture.</p>
+      </article>
+    </canvas>
+    <script src="/index.ts"></script>
+  </body>
+</html>

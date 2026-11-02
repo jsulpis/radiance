@@ -1,0 +1,171 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<script>
+  import { glCanvas, updateElementRect } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
+
+  const canvas = document.querySelector<HTMLCanvasElement>("#glCanvas")!;
+  const card = document.querySelector<HTMLElement>("#card")!;
+  const message = card.querySelector("p")!;
+  const field = card.querySelector<HTMLInputElement>("#text")!;
+  const { onAfterRender } = glCanvas({
+    canvas: "#glCanvas",
+    vertex: /* glsl */ `
+      in vec2 aPosition;
+      in vec2 aUv;
+      uniform vec4 uRect;
+      out vec2 vUv;
+
+      void main() {
+        gl_Position = vec4(mix(uRect.xy, uRect.zw, aPosition), 0.0, 1.0);
+        vUv = aUv;
+      }
+    `,
+    fragment: /* glsl */ `
+      in vec2 vUv;
+      uniform sampler2D uTexture;
+      out vec4 fragColor;
+
+      void main() {
+        fragColor = texture(uTexture, vUv);
+      }
+    `,
+    uniforms: {
+      uTexture: { src: card },
+      uRect: () => toClipRect(cardBox()),
+    },
+    attributes: {
+      aPosition: {
+        size: 2,
+        data: [0, 0, 1, 0, 1, 1, 0, 1],
+      },
+      aUv: {
+        size: 2,
+        data: [0, 0, 1, 0, 1, 1, 0, 1],
+      },
+      index: {
+        size: 1,
+        data: [0, 1, 2, 0, 2, 3],
+      },
+    },
+  });
+
+  onAfterRender(incrementRenderCount);
+  onAfterRender(() => updateElementRect(card, cardBox()));
+
+  function cardBox() {
+    return {
+      x: (canvas.clientWidth - card.offsetWidth) / 2,
+      y: (canvas.clientHeight - card.offsetHeight) / 2,
+      width: card.offsetWidth,
+      height: card.offsetHeight,
+    };
+  }
+
+  function toClipRect({ x, y, width, height }: ReturnType<typeof cardBox>) {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    return [
+      (2 * x) / w - 1,
+      1 - (2 * (y + height)) / h,
+      (2 * (x + width)) / w - 1,
+      1 - (2 * y) / h,
+    ];
+  }
+
+  field.addEventListener("input", () => {
+    message.textContent = field.value || "Type above to change the DOM.";
+  });
+</script>
+
+<Layout title="HTML Texture">
+  <div class="container">
+    <canvas id="glCanvas" layoutsubtree>
+      <div id="card" drawable>
+        <span class="tag">drawable</span>
+        <div class="copy">
+          <h1>Plain DOM, sampled on the GPU</h1>
+          <input
+            id="text"
+            type="text"
+            value="Live markup, sampled every frame."
+            aria-label="Card text"
+          />
+          <p>Live markup, sampled every frame.</p>
+        </div>
+      </div>
+    </canvas>
+  </div>
+</Layout>
+
+<style>
+  .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5em;
+  }
+
+  #card {
+    width: 70%;
+    box-sizing: border-box;
+    padding: 9%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ece6d8;
+    color: #1c1a16;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .tag {
+    align-self: flex-start;
+    padding-bottom: 0.4em;
+    border-bottom: 2px solid #1c1a16;
+    font:
+      600 0.7em ui-monospace,
+      Menlo,
+      monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0 0 0.6em;
+    font-size: 2.6em;
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+
+  #text {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 0.6em;
+    padding: 0.4em 0;
+    border: 0;
+    border-bottom: 2px solid #1c1a16;
+    background: transparent;
+    color: #1c1a16;
+    font: inherit;
+    font-size: 1.1em;
+    outline: none;
+  }
+
+  #text:focus {
+    border-bottom-color: #b5401f;
+  }
+
+  p {
+    margin: 0;
+    max-width: 24ch;
+    padding-left: 0.6em;
+    border-left: 3px solid #b5401f;
+    font-size: 1.1em;
+    line-height: 1.4;
+    color: #4a463d;
+  }
+</style>

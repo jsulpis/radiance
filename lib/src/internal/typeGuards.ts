@@ -1,4 +1,4 @@
-import type { ImageTextureParams } from "../core/texture";
+import type { ElementTextureParams, ImageTextureParams } from "../core/texture";
 
 export function isHTMLImageTexture(params: any): params is ImageTextureParams<HTMLImageElement> {
   return (
@@ -13,6 +13,18 @@ export function isHTMLVideoTexture(params: any): params is ImageTextureParams<HT
     typeof HTMLVideoElement !== "undefined" &&
     isObjectWithProperty(params, "src") &&
     params.src instanceof HTMLVideoElement
+  );
+}
+
+export function isElementTexture(params: any): params is ElementTextureParams {
+  return (
+    typeof HTMLElement !== "undefined" &&
+    isObjectWithProperty(params, "src") &&
+    params.src instanceof HTMLElement &&
+    // elements which are valid TexImageSource keep going through the media path
+    !(params.src instanceof HTMLImageElement) &&
+    !(params.src instanceof HTMLVideoElement) &&
+    !(params.src instanceof HTMLCanvasElement)
   );
 }
 

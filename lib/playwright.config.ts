@@ -36,6 +36,22 @@ export default defineConfig({
       },
     },
     {
+      // dedicated chromium run with the HTML-in-Canvas flag enabled, so that the
+      // experimental features cannot interfere with the other screenshot tests
+      name: "chromium-html",
+      grep: /html texture/,
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: desktopViewport,
+        launchOptions: {
+          args: [
+            "--enable-features=CanvasDrawElement",
+            "--enable-experimental-web-platform-features",
+          ],
+        },
+      },
+    },
+    {
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],

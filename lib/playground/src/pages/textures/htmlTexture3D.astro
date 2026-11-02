@@ -1,0 +1,214 @@
+---
+import GlobalPlayPause from "../../components/GlobalPlayPause.astro";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<script>
+  import { bloom, glCanvas, linearToneMapping, loop, updateElementMatrix } from "@radiancejs/gl";
+  import { incrementRenderCount } from "../../components/renderCount";
+  import { mat4 } from "gl-matrix";
+
+  const QUAD_SIZE = 0.8;
+  const quadPositions = [-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0];
+
+  const card = document.querySelector<HTMLElement>("#card")!;
+  const card2 = document.querySelector<HTMLElement>("#card2")!;
+  const field = card.querySelector<HTMLInputElement>("#text")!;
+  const messages = [card.querySelector("p")!, card2.querySelector("p")!];
+
+  const projectionMatrix = mat4.perspective(mat4.create(), Math.PI / 4, 1, 0.1, 100);
+  const viewMatrix = mat4.lookAt(mat4.create(), [0, 0, 5], [0, 0, 0], [0, 1, 0]);
+  const viewProjectionMatrix = mat4.multiply(mat4.create(), projectionMatrix, viewMatrix);
+
+  function createMvpMatrix(time: number, element: HTMLElement, x: number, y: number, size: number) {
+    const seconds = time / 1000;
+    const aspect = element.offsetWidth / element.offsetHeight;
+    const modelMatrix = mat4.create();
+    mat4.translate(modelMatrix, modelMatrix, [x, y + Math.sin(seconds * 1.2) * 0.08, 0]);
+    mat4.rotateY(modelMatrix, modelMatrix, Math.sin(seconds * 0.6) * 0.5);
+    mat4.rotateX(modelMatrix, modelMatrix, Math.sin(seconds * 0.9) * 0.15);
+    mat4.scale(modelMatrix, modelMatrix, [size * aspect, size, 1]);
+    return mat4.multiply(mat4.create(), viewProjectionMatrix, modelMatrix);
+  }
+
+  const { onAfterRender } = glCanvas({
+    canvas: "#glCanvas",
+    vertex: /* glsl */ `
+      in vec3 aPosition;
+      in vec2 aUv;
+      in float aElement;
+      uniform mat4 uMvpMatrix;
+      uniform mat4 uMvpMatrix2;
+      out vec2 vUv;
+      out float vElement;
+
+      void main() {
+        gl_Position = (aElement < 0.5 ? uMvpMatrix : uMvpMatrix2) * vec4(aPosition, 1.0);
+        vUv = aUv;
+        vElement = aElement;
+      }
+    `,
+    fragment: /* glsl */ `
+      in vec2 vUv;
+      in float vElement;
+      uniform sampler2D uTexture;
+      uniform sampler2D uTexture2;
+      out vec4 fragColor;
+
+      void main() {
+        fragColor = vElement < 0.5 ? texture(uTexture, vUv) : texture(uTexture2, vUv);
+      }
+    `,
+    uniforms: {
+      uTexture: { src: card },
+      uTexture2: { src: card2 },
+      uMvpMatrix: ({ time }) => createMvpMatrix(time + 2000, card, 0, 0, QUAD_SIZE),
+      uMvpMatrix2: ({ time }) => createMvpMatrix(time - 1000, card2, 1, -1, QUAD_SIZE * 0.5),
+    },
+    renderMode: "continuous",
+    immediate: false,
+    attributes: {
+      aPosition: {
+        size: 3,
+        data: [...quadPositions, ...quadPositions],
+      },
+      aUv: {
+        size: 2,
+        data: [0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1],
+      },
+      aElement: {
+        size: 1,
+        data: [0, 0, 0, 0, 1, 1, 1, 1],
+      },
+      index: {
+        size: 1,
+        data: [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7],
+      },
+    },
+  });
+
+  onAfterRender(incrementRenderCount);
+  onAfterRender(({ uniforms }) => {
+    updateElementMatrix(card, uniforms.uMvpMatrix);
+    updateElementMatrix(card2, uniforms.uMvpMatrix2);
+  });
+
+  field.addEventListener("input", () => {
+    for (const message of messages) {
+      message.textContent = field.value || "Type above to change the DOM.";
+    }
+  });
+</script>
+
+<Layout title="HTML Texture 3D">
+  <GlobalPlayPause />
+  <div class="container">
+    <canvas id="glCanvas" layoutsubtree>
+      <div id="card" drawable>
+        <span class="tag">drawable</span>
+        <div class="copy">
+          <h1>Plain DOM, sampled on the GPU</h1>
+          <input
+            id="text"
+            type="text"
+            value="Live markup, sampled every frame."
+            aria-label="Card text"
+          />
+          <p>Live markup, sampled every frame.</p>
+        </div>
+      </div>
+      <div id="card2" drawable>
+        <span class="tag">drawable 2</span>
+        <h1>Plain DOM, sampled on the GPU</h1>
+        <p>Live markup, sampled every frame.</p>
+      </div>
+    </canvas>
+  </div>
+</Layout>
+
+<style>
+  .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5em;
+  }
+
+  #card,
+  #card2 {
+    width: 100%;
+    overflow: auto;
+    aspect-ratio: 3 / 2;
+    box-sizing: border-box;
+    padding: 9%;
+    display: flex;
+    gap: 2em;
+    flex-direction: column;
+    background: #ece6d8;
+    color: #1c1a16;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+
+  #card2 {
+    width: 70%;
+    background: #1c1a16;
+    color: #ece6d8;
+  }
+
+  #card2 .tag {
+    border-bottom-color: #ece6d8;
+  }
+
+  #card2 p {
+    color: #ece6d8;
+  }
+
+  .tag {
+    align-self: flex-start;
+    padding-bottom: 0.4em;
+    border-bottom: 2px solid #1c1a16;
+    font:
+      600 0.7em ui-monospace,
+      Menlo,
+      monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0 0 0.6em;
+    font-size: 2.6em;
+    font-weight: 700;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+
+  #text {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 0.6em;
+    padding: 0.4em 0;
+    border: 0;
+    border-bottom: 2px solid #1c1a16;
+    background: transparent;
+    color: #1c1a16;
+    font: inherit;
+    font-size: 1.1em;
+    outline: none;
+  }
+
+  #text:focus {
+    border-bottom-color: #b5401f;
+  }
+
+  p {
+    margin: 0;
+    max-width: 24ch;
+    padding-left: 0.6em;
+    border-left: 3px solid #b5401f;
+    font-size: 1.1em;
+    line-height: 1.4;
+    color: #4a463d;
+  }
+</style>
