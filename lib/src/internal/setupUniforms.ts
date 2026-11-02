@@ -47,6 +47,10 @@ export function setupUniforms<U extends UniformValues>(uniforms: U) {
     Object.assign(currentValues, values);
   }
 
+  function getUniformValues(): U {
+    return { ...currentValues } as U;
+  }
+
   function uploadUniforms() {
     for (const [name, value] of Object.entries(uniformsProxy)) {
       currentValues[name] = value;
@@ -122,6 +126,7 @@ export function setupUniforms<U extends UniformValues>(uniforms: U) {
     onUpdated,
     uploadUniforms,
     setUniformValues,
+    getUniformValues,
     dispose,
   };
 }
