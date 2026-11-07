@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RadianceJS Example</title>
+  </head>
+  <body>
+    <!-- the elements live inside the canvas and stay real DOM: they are the canvas's
+         fallback content, so text selection, the input and screen readers keep working -->
+    <canvas id="glCanvas" content="drawable">
+      <div id="card" drawable>
+        <span class="tag">drawable</span>
+        <div class="copy">
+          <h1>Plain DOM, sampled on the GPU</h1>
+          <input id="text" type="text" aria-label="Card text" />
+          <p>Type above to change the DOM.</p>
+        </div>
+      </div>
+      <div id="card2" drawable>
+        <span class="tag">drawable 2</span>
+        <h1>Plain DOM, sampled on the GPU</h1>
+        <p>Type above to change the DOM.</p>
+      </div>
+    </canvas>
+    <script src="/index.ts"></script>
+  </body>
+</html>

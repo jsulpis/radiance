@@ -152,7 +152,7 @@ const { onAfterRender, uniforms } = glCanvas({
 });
 
 onAfterRender(({ uniforms }) => {
-  updateElementPosition(card, uniforms.uMvpMatrix);
+  updateElementMatrix(card, uniforms.uMvpMatrix);
 });
 ```
 

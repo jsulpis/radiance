@@ -106,7 +106,7 @@ function isCompositeEffectPass(
   return Array.isArray((effect as CompositeEffectPass).passes);
 }
 
-export type Compositor<U extends UniformValues> = Disposable & {
+export type Compositor<U extends UniformValues = UniformValues> = Disposable & {
   /** Renders the main pass and every post-processing effect in order. */
   render: (opts?: RenderOptions) => void;
   /** Resizes every pass and render target managed by the compositor. */
