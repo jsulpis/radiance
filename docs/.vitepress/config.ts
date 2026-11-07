@@ -63,6 +63,7 @@ const config = defineConfig({
             { text: "Draw custom geometry", link: "draw-geometry" },
             { text: "Draw many copies with instancing", link: "instancing" },
             { text: "Sample images, videos and data", link: "load-textures" },
+            { text: "Render live HTML as a texture", link: "html-textures" },
             { text: "React to pointer events", link: "pointer-events" },
           ],
         },

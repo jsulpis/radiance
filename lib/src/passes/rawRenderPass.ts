@@ -298,9 +298,9 @@ export type RawRenderPass<U extends UniformValues = Record<string, never>> = Dis
   /** Registers a callback called whenever concrete uniforms are updated. */
   onUpdated: (callback: UpdatedCallback<U>) => void;
   /** Registers a callback called just before rendering. */
-  onBeforeRender: (callback: RenderCallback) => void;
+  onBeforeRender: (callback: RenderCallback<U>) => void;
   /** Registers a callback called just after rendering. */
-  onAfterRender: (callback: RenderCallback) => void;
+  onAfterRender: (callback: RenderCallback<U>) => void;
   /** Registers a callback called when the pass is initialized with a GL context. */
   onInit: (callback: (gl: WebGL2RenderingContext) => void) => void;
   /** Registers a callback called when the pass is resized. */

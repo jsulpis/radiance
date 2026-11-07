@@ -34,6 +34,10 @@ Very easy to achieve on purpose or by accident: a mask that multiplies everythin
 
 A promise uniform that never settles is simply never uploaded, and the shader samples an unbound texture (black). Usual causes: a wrong URL (check the network tab), CORS on a cross-origin image, or a video that cannot autoplay. `loadTexture` throws on a failed fetch; `loadVideoTexture` logs `Failed to load texture: …`. See [Sample images, videos and data](../essentials/load-textures).
 
+### An HTML texture stays black
+
+The canvas needs `content="drawable"` and the element needs `drawable`. A canvas with only the older `layoutsubtree` attribute makes `captureElementImage` throw `requires the canvas to have the content=drawable attribute`. The library catches that without logging, so the texture is silently never filled. Check it in the console with `canvas.captureElementImage(card)`. If the browser has no HTML-in-Canvas API at all, the console logs `The HTML-in-Canvas API is not available.` See [Render live HTML as a texture](../essentials/html-textures).
+
 ### WebGL2 is unavailable
 
 `glContext` throws `No WebGL2 context available.` when `getContext("webgl2")` returns `null` — headless browsers, old devices, blocklisted GPUs. The throw is uncaught and stops your module: another case where the console says more than the canvas.

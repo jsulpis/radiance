@@ -162,7 +162,8 @@ Browse the [API reference](https://radiancejs.dev/api/) or start with the
 
 Radiance targets environments with WebGL2 support. Features that use browser
 APIs such as `HTMLVideoElement`, `ImageBitmap`, pointer events, or
-`OffscreenCanvas` depend on the runtime providing those APIs.
+`OffscreenCanvas` depend on the runtime providing those APIs. HTML textures also need
+the HTML-in-Canvas API (`content="drawable"` on the canvas, `drawable` on the element).
 
 ## Contributing
 

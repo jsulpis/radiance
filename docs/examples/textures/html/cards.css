@@ -1,0 +1,76 @@
+#card,
+#card2 {
+  width: 100%;
+  overflow: auto;
+  aspect-ratio: 3 / 2;
+  box-sizing: border-box;
+  padding: 9%;
+  display: flex;
+  gap: 1.75em;
+  flex-direction: column;
+  background: #ece6d8;
+  color: #1c1a16;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+#card2 {
+  width: 70%;
+  background: #1c1a16;
+  color: #ece6d8;
+}
+
+#card2 .tag {
+  border-bottom-color: #ece6d8;
+}
+
+#card2 p {
+  color: #ece6d8;
+}
+
+.tag {
+  align-self: flex-start;
+  padding-bottom: 0.4em;
+  border-bottom: 2px solid #1c1a16;
+  font:
+    600 0.7em ui-monospace,
+    Menlo,
+    monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0 0 0.6em;
+  font-size: 2.6em;
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+#text {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0.6em;
+  padding: 0.4em 0;
+  border: 0;
+  border-bottom: 2px solid #1c1a16;
+  background: transparent;
+  color: #1c1a16;
+  font: inherit;
+  font-size: 1.1em;
+  outline: none;
+}
+
+#text:focus {
+  border-bottom-color: #b5401f;
+}
+
+p {
+  margin: 0;
+  max-width: 30ch;
+  padding-left: 0.6em;
+  border-left: 3px solid #b5401f;
+  font-size: 1.1em;
+  line-height: 1.4;
+  color: #4a463d;
+}

@@ -114,10 +114,10 @@ Chain built-in effects or write your own with a single function. Effect uniforms
 
 ```ts
 import { bloom, ditherHalftone, glCanvas, hableToneMapping } from "@radiancejs/gl";
-import fragment from "./gradient.frag?raw";
+import fragment from "./ball.frag?raw";
 
 glCanvas({
-  canvas: canvas.value!,
+  canvas: "#glCanvas",
   fragment,
   uniforms: {
     uTime: ({ time }) => time / 1000,
@@ -151,6 +151,7 @@ Go further with your own geometry, object instances, render into framebuffers, a
   <a href="/examples/gpgpu/particles/"><strong>Build a stateful particle system</strong><span aria-hidden="true">→</span></a>
   <a href="/examples/gpgpu/boids/"><strong>Run a boids simulation</strong><span aria-hidden="true">→</span></a>
   <a href="/examples/basics/instancing/"><strong>Draw instanced objects</strong><span aria-hidden="true">→</span></a>
+  <a href="/examples/textures/html/"><strong>Render live HTML in a canvas<span class="home-beyond__pill">Experimental</span></strong><span aria-hidden="true">→</span></a>
 </div>
 
   </div>
@@ -248,6 +249,7 @@ uniforms.uPointer = 42; // Type 'number' is not assignable to type '[number, num
     border: 0;
     padding: 0;
     font-size: clamp(1.875rem, 3.2vw, 2.625rem);
+    text-wrap: balance;
     line-height: 1.12;
     letter-spacing: -.035em;
 
@@ -439,6 +441,13 @@ uniforms.uPointer = 42; // Type 'number' is not assignable to type '[number, num
         border-top: 1px solid #344355;
       }
 
+      strong {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2px 8px;
+      }
+
       &:hover strong {
         color: #a9c7ff;
       }
@@ -446,6 +455,19 @@ uniforms.uPointer = 42; // Type 'number' is not assignable to type '[number, num
       span {
         color: #a9c7ff;
         font-size: 1.25rem;
+      }
+
+      .home-beyond__pill {
+        display: inline-block;
+        padding: 0px 10px;
+        border: 1px solid #3b4d63;
+        border-radius: 999px;
+        color: #a9c7ff;
+        font-size: 0.625rem;
+        font-weight: 500;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        vertical-align: middle;
       }
     }
   }

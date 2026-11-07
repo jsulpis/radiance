@@ -3,7 +3,6 @@ import type { UniformSources } from "../types/types";
 import type { RenderTarget } from "../core/renderTarget";
 import type { EffectPass, EffectUniformContext } from "./effectPass";
 import type { UpdatedCallback } from "./rawRenderPass";
-import type { RenderCallback } from "./rawRenderPass";
 import type { RenderOptions, RenderPass } from "./renderPass";
 import { createUniformContext } from "../internal/createUniformContext";
 
@@ -20,8 +19,8 @@ export function compositeEffectPass<
 >({ gl, passes, uniforms = {} as U }: CompositeEffectPassParams<U>): CompositeEffectPass<U> {
   const outputPass = passes.at(-1)!;
 
-  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook<RenderCallback>();
-  const [onAfterRender, executeAfterRenderCallbacks] = createHook<RenderCallback>();
+  const [onBeforeRender, executeBeforeRenderCallbacks] = createHook();
+  const [onAfterRender, executeAfterRenderCallbacks] = createHook();
   const [onUpdated, executeUpdateCallbacks] = createHook<UpdatedCallback<U>>();
   const [onResize, executeResizeCallbacks] = createHook<(width: number, height: number) => void>();
   const [onInit, executeInitCallbacks] = createHook<(gl: WebGL2RenderingContext) => void>();
@@ -121,9 +120,16 @@ export function compositeEffectPass<
  */
 export type CompositeEffectPass<
   U extends UniformSources<EffectUniformContext> = UniformSources<EffectUniformContext>,
-> = Omit<EffectPass<U>, "fragment" | "vertex" | "getResolution"> & {
+> = Omit<
+  EffectPass<U>,
+  "fragment" | "vertex" | "getResolution" | "onBeforeRender" | "onAfterRender"
+> & {
   /** The sequence of sub-passes executed by the composite effect. */
   passes: EffectPass[];
+  /** Registers a callback called before the sub-passes render. */
+  onBeforeRender: (callback: () => void) => void;
+  /** Registers a callback called after the sub-passes render. */
+  onAfterRender: (callback: () => void) => void;
 };
 
 /**

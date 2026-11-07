@@ -1,4 +1,9 @@
-import { isHTMLImageTexture, isHTMLVideoTexture, isPromiseLike } from "./typeGuards";
+import {
+  isElementTexture,
+  isHTMLImageTexture,
+  isHTMLVideoTexture,
+  isPromiseLike,
+} from "./typeGuards";
 import type { UniformSource, UniformValue, UniformValues } from "../types/types";
 import type { UpdatedCallback } from "../passes/rawRenderPass";
 import { createHook } from "./createHook";
@@ -107,6 +112,17 @@ export function uniformRuntime<Context, U extends Record<string, any>>(sources: 
       };
       frameId = video.requestVideoFrameCallback(onFrame);
       mediaCleanups.set(name, () => video.cancelVideoFrameCallback(frameId));
+    } else if (isElementTexture(value)) {
+      const element = value.src;
+      const canvas = element.closest("canvas");
+      if (canvas == null) return;
+      const listener = (event: PaintEvent) => {
+        if (event.changedElements.some((changed) => element.contains(changed))) {
+          executeUpdated(name, value, undefined);
+        }
+      };
+      canvas.addEventListener("paint", listener);
+      mediaCleanups.set(name, () => canvas.removeEventListener("paint", listener));
     }
   }
 

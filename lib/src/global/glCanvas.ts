@@ -159,8 +159,8 @@ export const glCanvas = <U extends UniformSources<UniformContext>>(
     dpr,
     uniforms: renderPass.uniforms,
     onUpdated: renderPass.onUpdated,
-    onBeforeRender: mainCompositor.onBeforeRender,
-    onAfterRender: mainCompositor.onAfterRender,
+    onBeforeRender: mainCompositor.onBeforeRender as GLCanvas<U>["onBeforeRender"],
+    onAfterRender: mainCompositor.onAfterRender as GLCanvas<U>["onAfterRender"],
     resizeObserver,
     dispose,
   };
