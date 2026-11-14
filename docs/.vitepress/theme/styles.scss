@@ -156,6 +156,11 @@
       100svh - var(--vp-nav-height) - var(--vp-subnav-height, 0px) - 2 * var(--vp-padding)
     ) !important;
     --editor-height: var(--wrapper-height);
+
+    @media (orientation: portrait) {
+      --editor-height: 40svh;
+      --preview-height: calc(var(--wrapper-height) - var(--editor-height));
+    }
   }
 
   .VPDoc > .container > .content {
