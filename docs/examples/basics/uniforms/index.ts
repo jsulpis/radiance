@@ -1,12 +1,10 @@
 import { glCanvas } from "@radiancejs/gl";
 import { Pane } from "tweakpane";
-import vertex from "./vertex.frag?raw";
 import fragment from "./uniforms.frag?raw";
 import "./styles.css";
 
 const { uniforms, onAfterRender } = glCanvas({
   canvas: "#glCanvas",
-  vertex,
   fragment,
   uniforms: {
     uWarp: 2.8,

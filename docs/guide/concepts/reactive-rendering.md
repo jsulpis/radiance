@@ -14,8 +14,6 @@ The example below demonstrates this behavior: the render counter only increments
 
 <<< ../../examples/basics/uniforms/index.ts
 
-<<< ../../examples/basics/uniforms/vertex.frag
-
 <<< ../../examples/basics/uniforms/uniforms.frag
 
 <<< @/snippets/canvas-full/styles.css
