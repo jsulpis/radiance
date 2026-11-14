@@ -9,7 +9,7 @@ import {
   pingPongFBO,
   trails,
 } from "@radiancejs/gl";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import simulationFragment from "./home-hero-sim.frag?raw";
 import vertex from "./home-hero.vert?raw";
 import fragment from "./home-hero.frag?raw";
@@ -19,9 +19,12 @@ type RenderUniforms = {
   uParticles: () => unknown;
   uBaseColor: [number, number, number];
   uMainColor: [number, number, number];
+  uHighlightColor: [number, number, number];
   uBaseRadius: number;
   uPointer: [number, number];
-  uResolution: () => [number, number];
+  uPointerStrength: number;
+  uEnergy: number;
+  uResolution: (ctx: { canvasResolution: [number, number] }) => [number, number];
   uDpr: number;
 };
 
@@ -29,7 +32,16 @@ const PARTICLE_COUNT = 400;
 const BASE_RADIUS = 1;
 const BASE_COLOR: [number, number, number] = [1, 1, 1];
 const MAIN_COLOR: [number, number, number] = [0, 0.6, 1];
+const HIGHLIGHT_COLOR: [number, number, number] = [0.55, 0.9, 1];
 const canvasEl = ref<HTMLCanvasElement | null>(null);
+const pointerZoneEl = ref<HTMLElement | null>(null);
+const previewMessage = ref("");
+const reducedMotion = ref(false);
+const message = computed(
+  () =>
+    previewMessage.value ||
+    (reducedMotion.value ? "Particle simulation paused for reduced motion." : ""),
+);
 
 function createInitialState(count: number) {
   const state = new Float32Array(count * 4);
@@ -48,105 +60,162 @@ onMounted(() => {
     return;
   }
 
-  const { gl } = glContext({ canvas, colorSpace: "display-p3" });
+  const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  reducedMotion.value = motionQuery.matches;
 
-  const simulationPass = pingPongFBO({
-    gl,
-    fragment: simulationFragment,
-    dataTexture: {
-      name: "tParticles",
-      initialData: createInitialState(PARTICLE_COUNT),
-    },
-    uniforms: {
-      uCount: PARTICLE_COUNT,
-      uBaseRadius: BASE_RADIUS,
-      uDeltaTime: 0,
-      uPointer: [1, 1],
-    },
-  });
+  try {
+    const { gl } = glContext({ canvas, colorSpace: "display-p3" });
 
-  const halo = effectPass({
-    fragment: haloFragment,
-    uniforms: {
-      uTexture: ({ inputPass }) => inputPass.target!.texture,
-      uBaseRadius: BASE_RADIUS,
-      uBaseColor: BASE_COLOR,
-      uMainColor: MAIN_COLOR,
-      uResolution: ({ passResolution }) => passResolution,
-      uTime: ({ time }) => time,
-    },
-  });
+    const simulationPass = pingPongFBO({
+      gl,
+      fragment: simulationFragment,
+      dataTexture: {
+        name: "tParticles",
+        initialData: createInitialState(PARTICLE_COUNT),
+      },
+      uniforms: {
+        uCount: PARTICLE_COUNT,
+        uBaseRadius: BASE_RADIUS,
+        uDeltaTime: 0,
+        uTime: 0,
+        uEnergy: 0,
+      },
+    });
 
-  const pointerTarget = { x: 0.75, y: 0 };
-  const pointerState = { ...pointerTarget };
+    const halo = effectPass({
+      fragment: haloFragment,
+      uniforms: {
+        uTexture: ({ inputPass }) => inputPass.target!.texture,
+        uBaseRadius: BASE_RADIUS,
+        uBaseColor: BASE_COLOR,
+        uMainColor: MAIN_COLOR,
+        uResolution: ({ passResolution }) => passResolution,
+        uTime: ({ time }) => time,
+      },
+    });
 
-  const renderPass = glCanvas<RenderUniforms>({
-    canvas,
-    vertex,
-    fragment,
-    uniforms: {
-      uParticles: () => simulationPass.texture,
-      uBaseColor: BASE_COLOR,
-      uMainColor: MAIN_COLOR,
-      uBaseRadius: BASE_RADIUS,
-      uPointer: [pointerState.x, pointerState.y],
-      uResolution: ({ canvasResolution }) => canvasResolution,
-      uDpr: Math.min(window.devicePixelRatio || 1, 2),
-    },
-    attributes: {
-      aCoords: simulationPass.coords,
-    },
-    postEffects: [trails({ fadeout: 0.15 }), halo, cineonToneMapping()],
-    blending: "additive",
-  });
+    const pointerTarget = { x: 0, y: 0 };
+    const pointerState = { ...pointerTarget };
+    let pointerStrengthTarget = 0;
+    let pointerStrength = 0;
+    let energy = 0;
 
-  const pointerEvents = onPointerEvents(canvas, {
-    move: ({ pointer, boundingRect, center }) => {
-      const centerX = center.x;
-      const centerY = center.y;
+    const renderPass = glCanvas<RenderUniforms>({
+      canvas,
+      vertex,
+      fragment,
+      uniforms: {
+        uParticles: () => simulationPass.texture,
+        uBaseColor: BASE_COLOR,
+        uMainColor: MAIN_COLOR,
+        uHighlightColor: HIGHLIGHT_COLOR,
+        uBaseRadius: BASE_RADIUS,
+        uPointer: [pointerState.x, pointerState.y],
+        uPointerStrength: 0,
+        uEnergy: 0,
+        uResolution: ({ canvasResolution }) => canvasResolution,
+        uDpr: Math.min(window.devicePixelRatio || 1, 2),
+      },
+      attributes: {
+        aCoords: simulationPass.coords,
+      },
+      postEffects: [trails({ fadeout: 0.15 }), halo, cineonToneMapping()],
+      blending: "additive",
+    });
 
-      pointerTarget.x = (pointer.x - centerX) / (boundingRect.width * 0.5);
-      pointerTarget.y = (centerY - pointer.y) / (boundingRect.height * 0.5);
-    },
-  });
+    const pointerEvents = onPointerEvents(pointerZoneEl.value ?? canvas, {
+      enter: () => {
+        pointerStrengthTarget = 1;
+      },
+      move: ({ pointer }) => {
+        // Normalize against the canvas, but listen on the larger pointer zone so the
+        // interaction is reachable without having to aim at the sphere itself.
+        const rect = canvas.getBoundingClientRect();
 
-  const animationLoop = loop(({ deltaTime }) => {
-    const pointerLerp = deltaTime / 1000;
-    pointerState.x += (pointerTarget.x - pointerState.x) * pointerLerp;
-    pointerState.y += (pointerTarget.y - pointerState.y) * pointerLerp;
+        const x = (pointer.x - (rect.x + rect.width * 0.5)) / (rect.width * 0.5);
+        const y = (rect.y + rect.height * 0.5 - pointer.y) / (rect.height * 0.5);
 
-    simulationPass.uniforms.uPointer = [pointerState.x, pointerState.y];
-    simulationPass.uniforms.uDeltaTime = deltaTime * 0.75;
-    simulationPass.render();
+        pointerTarget.x = Math.max(-1.2, Math.min(1.2, x));
+        pointerTarget.y = Math.max(-1.2, Math.min(1.2, y));
+        pointerStrengthTarget = 1;
+      },
+      leave: () => {
+        pointerStrengthTarget = 0;
+      },
+    });
 
-    renderPass.uniforms.uPointer = [pointerState.x, pointerState.y];
-    renderPass.render();
-  });
+    const animationLoop = loop(
+      ({ deltaTime: rawDeltaTime, time }) => {
+        // Clamp the first frame after a pause to avoid a jump.
+        const deltaTime = Math.min(rawDeltaTime, 64);
+        const pointerLerp = 1 - Math.exp(-deltaTime / 90);
+        pointerState.x += (pointerTarget.x - pointerState.x) * pointerLerp;
+        pointerState.y += (pointerTarget.y - pointerState.y) * pointerLerp;
 
-  function handleVisibilityChange() {
-    if (document.hidden) {
-      animationLoop?.pause();
-    } else {
-      animationLoop?.play();
+        // The lag between the target and the smoothed pointer is proportional to the
+        // cursor speed, which makes a cheap and stable energy signal.
+        const energyTarget = Math.min(
+          1,
+          Math.hypot(pointerTarget.x - pointerState.x, pointerTarget.y - pointerState.y) * 2.5,
+        );
+        energy += (energyTarget - energy) * (1 - Math.exp(-deltaTime / 160));
+        pointerStrength +=
+          (pointerStrengthTarget - pointerStrength) * (1 - Math.exp(-deltaTime / 220));
+
+        simulationPass.uniforms.uEnergy = energy;
+        simulationPass.uniforms.uTime = time;
+        simulationPass.uniforms.uDeltaTime = deltaTime * 0.75;
+        simulationPass.render();
+
+        renderPass.uniforms.uPointer = [pointerState.x, pointerState.y];
+        renderPass.uniforms.uPointerStrength = pointerStrength;
+        renderPass.uniforms.uEnergy = energy;
+        renderPass.render();
+      },
+      { immediate: !reducedMotion.value },
+    );
+
+    function setPaused(paused: boolean) {
+      if (paused) {
+        animationLoop.pause();
+      } else {
+        animationLoop.play();
+      }
     }
+
+    function handleVisibilityChange() {
+      setPaused(document.hidden || reducedMotion.value);
+    }
+
+    function handleMotionPreference(event: MediaQueryListEvent) {
+      reducedMotion.value = event.matches;
+      setPaused(event.matches || document.hidden);
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    motionQuery.addEventListener("change", handleMotionPreference);
+
+    onBeforeUnmount(() => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      motionQuery.removeEventListener("change", handleMotionPreference);
+      animationLoop.stop();
+      pointerEvents?.stop();
+      renderPass.dispose();
+      simulationPass.dispose();
+    });
+  } catch {
+    previewMessage.value = "Particle simulation requires WebGL2.";
   }
-
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-
-  onBeforeUnmount(() => {
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
-    animationLoop?.pause();
-    pointerEvents?.stop();
-  });
 });
 </script>
 
 <template>
   <div class="home-hero-shader">
-    <div class="home-hero-shader__pointer-zone" aria-hidden="true">
+    <div ref="pointerZoneEl" class="home-hero-shader__pointer-zone" aria-hidden="true">
       <div class="ball"></div>
     </div>
-    <canvas ref="canvasEl"></canvas>
+    <canvas ref="canvasEl" aria-hidden="true"></canvas>
+    <p v-if="message" class="home-hero-shader__message">{{ message }}</p>
   </div>
 </template>
 
@@ -167,11 +236,21 @@ onMounted(() => {
     aspect-ratio: 1;
     display: block;
     animation: fadeIn 3s 200ms ease backwards;
+    pointer-events: none;
   }
 
   &__pointer-zone {
     position: absolute;
     inset: -60%;
+  }
+
+  &__message {
+    position: absolute;
+    bottom: 0;
+    color: #a4bad5;
+    font: .625rem/1.5 var(--vp-font-family-mono);
+    letter-spacing: 0.1em;
+    text-align: center;
   }
 }
 

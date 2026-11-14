@@ -3,6 +3,8 @@ import { h } from "vue";
 import BundleSizeGraph from "../../components/BundleSizeGraph.vue";
 import ExampleEditor from "../../components/ExampleEditor.vue";
 import HomeHeroShader from "../../components/Hero/HomeHeroShader.vue";
+import HomeUniforms from "../../components/HomeUniforms.vue";
+import HomeBloom from "../../components/HomeBloom.vue";
 import "virtual:group-icons.css";
 import "./styles.scss";
 
@@ -17,5 +19,7 @@ export default {
     DefaultTheme.enhanceApp(ctx);
     ctx.app.component("BundleSizeGraph", BundleSizeGraph);
     ctx.app.component("ExampleEditor", ExampleEditor);
+    ctx.app.component("HomeUniforms", HomeUniforms);
+    ctx.app.component("HomeBloom", HomeBloom);
   },
 };

@@ -5,7 +5,8 @@ uniform sampler2D tParticles;
 uniform float uCount;
 uniform float uBaseRadius;
 uniform float uDeltaTime;
-uniform vec2 uPointer;
+uniform float uTime;
+uniform float uEnergy;
 
 in vec2 uv;
 out vec4 fragColor;
@@ -18,7 +19,7 @@ float hash(float value) {
 }
 
 vec3 getSpherePosition(float index, float lifetime) {
-  float radialJitter = (hash(index + 1.) * 2. - 1.) * (uPointer.y + 1.);
+  float radialJitter = (hash(index + 1.) * 2. - 1.) * (1.1 + uEnergy * 0.4);
 
   float phi = acos(1. - 2. * ((index / uCount) * lifetime));
   float theta = 2. * PI * fract(index / GOLDEN_RATIO);
@@ -26,7 +27,10 @@ vec3 getSpherePosition(float index, float lifetime) {
 
   phi += chaos * radialJitter;
   theta += chaos * radialJitter;
-  theta += lifetime * 2. * uPointer.x;
+
+  // Twist the growing arcs, and keep the whole sphere slowly rotating on its own.
+  theta += lifetime * (1.5 + uEnergy * 0.4);
+  theta += uTime * 0.00012;
 
   float radiusNoise = radialJitter * pow(phi / PI, 3.);
   float radius = uBaseRadius + radiusNoise;
@@ -45,7 +49,7 @@ void main() {
   float index = float(texel.y * particlesTextureSize.x + texel.x);
 
   float lifetime = state.w;
-  lifetime += uDeltaTime * 0.0003 * smoothstep(-1.5, 0., uPointer.y);
+  lifetime += uDeltaTime * (0.0003 + uEnergy * 0.0004);
 
   if (lifetime < 0.) {
     fragColor = vec4(state.xyz, lifetime);
@@ -56,7 +60,5 @@ void main() {
     return;
   }
 
-  vec3 position = getSpherePosition(index, lifetime);
-
-  fragColor = vec4(position, lifetime);
+  fragColor = vec4(getSpherePosition(index, lifetime), lifetime);
 }

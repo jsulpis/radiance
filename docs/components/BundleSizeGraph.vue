@@ -93,12 +93,12 @@ onBeforeUnmount(() => {
 
           <td class="bundle-graph__metrics">
             <div class="bundle-graph__metric-row">
-              <span class="bundle-graph__metric-value">{{ item.gzip }} kB</span>
+              <span class="bundle-graph__metric-value">{{ item.gzip }} kB</span>
               <div class="bundle-graph__pill" :style="{ width: `${item.weightPercent}%` }"></div>
             </div>
 
             <div class="bundle-graph__metric-row bundle-graph__metric-row--sloc">
-              <span class="bundle-graph__metric-value">{{ item.sloc }} sloc</span>
+              <span class="bundle-graph__metric-value">{{ item.sloc }} sloc</span>
               <div
                 class="bundle-graph__pill bundle-graph__pill--sloc"
                 :style="{ width: `${item.slocPercent}%` }"
@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
 
     .lib-version {
       display: block;
-      font-size: 0.75em;
+      font-size: 0.75rem;
       opacity: 0.8;
     }
   }
@@ -200,7 +200,7 @@ onBeforeUnmount(() => {
     gap: 4px;
     align-items: center;
     line-height: 1.5;
-    font-size: 0.9em;
+    font-size: 0.9rem;
   }
 
   &__pill {
