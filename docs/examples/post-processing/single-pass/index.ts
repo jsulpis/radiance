@@ -41,7 +41,7 @@ const { onAfterRender } = glCanvas({
     }
   `,
   uniforms: {
-    uPicture: loadTexture("https://picsum.photos/id/323/600/400"),
+    uPicture: loadTexture("https://www.radiancejs.dev/images/lotus.jpg"),
   },
   postEffects: [sepia],
 });

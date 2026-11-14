@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/playwright:v1.63.0@sha256:eff16c30e6f3f4af0a03fa4b706120d
 
 WORKDIR /app
 
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY lib/package.json ./lib/package.json
 
 WORKDIR /app/lib
