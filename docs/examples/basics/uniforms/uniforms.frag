@@ -38,7 +38,8 @@ vec3 palette(float t) {
 }
 
 void main() {
-  vec2 uv = vUv;
+  // centered, aspect-corrected UVs
+  vec2 uv = (2. * vUv - 1.) * uResolution / uResolution.y;
 
   // domain-warped fbm: q warps r, r warps the final value
   vec2 q = vec2(fbm(uv * uScale), fbm(uv * uScale + vec2(5.2, 1.3)));
