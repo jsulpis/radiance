@@ -72,7 +72,7 @@ function init(message: InitMessage) {
     postMessage({ type: "rendered" });
   });
 
-  scene.uniforms.uTexture = loadTexture("https://picsum.photos/id/669/600/400");
+  scene.uniforms.uTexture = loadTexture("/images/lotus.jpg");
 }
 
 function resize(message: ResizeMessage) {
