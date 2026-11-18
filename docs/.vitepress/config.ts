@@ -140,7 +140,8 @@ const config = defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "© 2024-present Julien Sulpis",
+      copyright:
+        '© 2024-present <a href="https://www.jsulpis.dev" target="_blank" rel="noopener">Julien Sulpis</a>',
     },
   },
 

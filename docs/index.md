@@ -536,11 +536,11 @@ uniforms.uPointer = 42; // Type 'number' is not assignable to type '[number, num
 
 /* Closing block */
 .home-end {
-  padding: 120px 0 80px;
+  padding-top: 120px;
   text-align: center;
 
   @media (max-width: 719px) {
-    padding: 80px 0 40px;
+    padding-top: 80px;
   }
 }
 </style>
