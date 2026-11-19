@@ -119,6 +119,7 @@ export function fillTexture(
 
 const blackPixel = new Uint8Array([0, 0, 0, 255]);
 const elementStorageAllocations = new WeakMap<WebGLTexture, { width: number; height: number }>();
+const unsupportedElementTextures = new WeakSet<WebGLTexture>();
 
 function fillElementTexture(
   gl: WebGL2RenderingContext,
@@ -129,6 +130,9 @@ function fillElementTexture(
   format: number,
   type: number,
 ): boolean {
+  // the fallback is initialized once per texture: this runs every frame in continuous mode
+  if (unsupportedElementTextures.has(texture)) return true;
+
   const canvas = gl.canvas;
 
   if (
@@ -137,6 +141,7 @@ function fillElementTexture(
     typeof canvas.captureElementImage !== "function"
   ) {
     console.error("The HTML-in-Canvas API is not available.");
+    unsupportedElementTextures.add(texture);
     gl.texImage2D(GL_TEXTURE_2D, level, internalFormat, 1, 1, 0, format, type, blackPixel);
     return true;
   }
