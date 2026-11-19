@@ -10,7 +10,7 @@ allowBuilds:
 
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
-  # Renovate security update: astro@7.1.0
-  - astro@7.1.0
+  # Renovate security update: astro@7.1.0 || 7.4.7
+  - astro@7.1.0 || 7.4.7
   # Renovate security update: vite@8.3.3
   - vite@8.3.3
