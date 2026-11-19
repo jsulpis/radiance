@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.12.4
+
+[compare changes](https://github.com/jsulpis/radiance/compare/v0.12.3...v0.12.4)
+
+### 🚀 Enhancements
+
+- Provide main pass uniforms values in before/after render callbacks ([7e623c1](https://github.com/jsulpis/radiance/commit/7e623c1))
+- Add support for the experimental html-in-canvas API ([988f736](https://github.com/jsulpis/radiance/commit/988f736))
+
+### 📖 Documentation
+
+- Update the home page ([651e751](https://github.com/jsulpis/radiance/commit/651e751))
+- Update the renders counter ([724f59b](https://github.com/jsulpis/radiance/commit/724f59b))
+- Fix broken display of the examples on mobile screens ([541474a](https://github.com/jsulpis/radiance/commit/541474a))
+
+### 🏡 Chore
+
+- Stop relying on picsum.photos ([e8054f8](https://github.com/jsulpis/radiance/commit/e8054f8))
+
 ## v0.12.3
 
 [compare changes](https://github.com/jsulpis/radiance/compare/v0.12.2...v0.12.3)
