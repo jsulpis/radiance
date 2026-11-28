@@ -49,8 +49,8 @@
     "@astrojs/check": "0.9.12",
     "@playwright/test": "1.63.0",
     "@tweakpane/core": "2.0.5",
-    "@types/node": "24.19.2",
-    "astro": "7.4.7",
+    "@types/node": "24.19.4",
+    "astro": "7.4.13",
     "changelogen": "0.6.2",
     "eslint": "10.15.0",
     "eslint-config-unjs": "0.6.2",
@@ -63,7 +63,7 @@
     "typedoc-plugin-markdown": "4.14.1",
     "typedoc-vitepress-theme": "1.1.4",
     "typescript": "6.0.3",
-    "vite-plugin-glsl": "1.6.3"
+    "vite-plugin-glsl": "1.6.4"
   },
   "packageManager": "pnpm@12.21.0+sha512.66fd8278ee28935ce951792d34367ff3af5c432a2756445823029533835b8da529bbe0be5130afd56ed0713fb8789e47bad82d93bd5ae2fe54b15562d6276ef0",
   "changelog": {
